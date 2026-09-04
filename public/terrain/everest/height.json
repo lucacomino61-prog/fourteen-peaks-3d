@@ -1,0 +1,27 @@
+{
+  "width": 2048,
+  "height": 2048,
+  "bbox": {
+    "west": 86.7919921875,
+    "east": 87.1435546875,
+    "north": 28.11074876063354,
+    "south": 27.80020993741824
+  },
+  "minEl": 3857.56640625,
+  "maxEl": 8736.7900390625,
+  "metresPerPx": 16.874335445671527,
+  "k2": {
+    "lat": 27.9881,
+    "lon": 86.925
+  },
+  "zoom": 13,
+  "source": "Copernicus GLO-30",
+  "q16": {
+    "scale": 0.25,
+    "encoding": "row-delta-zigzag-le16-deflate"
+  },
+  "lo": {
+    "width": 512,
+    "height": 512
+  }
+}

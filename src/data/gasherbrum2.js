@@ -23,29 +23,30 @@ const routes = [
     color: '#ff6a3d',
     firstAscent: '7 July 1956, Fritz Moravec, Josef Larch & Hans Willenpart (Austrian expedition), after a bivouac at 7,150 m without tents or sleeping bags',
     share: '≈ 95% of all ascents',
-    difficulty: 'The Gasherbrum icefall, a curving snow ridge at 35-45°, and a rocky summit pyramid; fixed rope throughout',
+    difficulty: 'The Gasherbrum icefall, a curving snow ridge at 35-45°, a rising traverse right under the summit pyramid to the east ridge, and the ridge to the top; fixed rope throughout',
     verticalGain: '≈ 3,000 m from Base Camp',
     summary:
-      'Up the shared icefall to Camp 1, then the curving crest the guides call the Banana Ridge to the shoulder below the summit pyramid, and up its rocks to the top. The 1956 Austrians, storm-bound low on the mountain, made a single push from 7,150 m; today it is the most climbed route in the Karakoram.',
+      'Up the shared icefall to Camp 1, then the curving crest the guides call the Banana Ridge to the shoulder below the summit pyramid; from there a rising traverse right under the pyramid to a saddle on the east ridge, and up the ridge to the top. The 1956 Austrians, storm-bound low on the mountain, made a single push from 7,150 m; today it is the most climbed route in the Karakoram.',
     waypoints: [
       [35.7450, 76.5800], // Base Camp
       [35.7400, 76.6400],
       [35.7306, 76.6581], // C1
-      [35.7375, 76.6569],
-      [35.7421, 76.6561],
-      [35.7445, 76.6557], // C2
-      [35.7480, 76.6551], // C3
-      [35.7514, 76.6545], // C4
-      [35.7537, 76.6541],
-      [35.7560, 76.6537], // summit pyramid
+      [35.7360, 76.6585],
+      [35.7390, 76.6587],
+      [35.7418, 76.6588], // C2
+      [35.7465, 76.6585], // C3
+      [35.7505, 76.6575], // C4
+      [35.7530, 76.6590], // diagonal traverse under the pyramid
+      [35.7555, 76.6605], // saddle on the east ridge
+      [35.7577, 76.6550], // east ridge
       [35.7583, 76.6533], // Summit
     ],
     camps: [
       { name: 'Base Camp', alt: 5050, lat: 35.7450, lon: 76.5800, blurb: 'On the Abruzzi Glacier, shared with Gasherbrum I expeditions; a week up the Baltoro from Askole.' },
       { name: 'Camp 1', alt: 5900, lat: 35.7306, lon: 76.6581, blurb: 'Above the icefall, where the Gasherbrum I and II routes divide.' },
-      { name: 'Camp 2', alt: 6500, lat: 35.7445, lon: 76.6557, blurb: 'On the crest of the Banana Ridge.' },
-      { name: 'Camp 3', alt: 6950, lat: 35.7480, lon: 76.6551, blurb: 'Below the shoulder, the last camp for most teams.' },
-      { name: 'Camp 4', alt: 7400, lat: 35.7514, lon: 76.6545, blurb: 'On the shoulder below the summit pyramid, used by slower teams; summit day from here is six to eight hours.' },
+      { name: 'Camp 2', alt: 6500, lat: 35.7418, lon: 76.6588, blurb: 'On the crest of the Banana Ridge.' },
+      { name: 'Camp 3', alt: 6950, lat: 35.7465, lon: 76.6585, blurb: 'Below the shoulder, the last camp for most teams.' },
+      { name: 'Camp 4', alt: 7350, lat: 35.7505, lon: 76.6575, blurb: 'On the shoulder below the summit pyramid, used by slower teams; summit day from here is six to eight hours, starting with the traverse under the pyramid.' },
     ],
     hazards: ['gasherbrum-icefall', 'banana-ridge', 'upper-slopes', 'summit-pyramid', 'death-zone'],
   },
@@ -56,26 +57,34 @@ const routes = [
     color: '#c77dff',
     firstAscent: '1 July 1983, Jerzy Kukuczka & Wojciech Kurtyka (Poland), alpine style, traversing Gasherbrum II East on the way',
     share: 'One ascent',
-    difficulty: 'A spur from the Gasherbrum La basin to the east ridge, then the long crest over the east summit to the main top',
-    verticalGain: '≈ 2,100 m from the Gasherbrum La',
+    difficulty: 'From the Gasherbrum La up a spur to the east ridge, then the long crest over the east summit to the main top',
+    verticalGain: '≈ 1,550 m from the Gasherbrum La',
     summary:
-      'The first of the Polish pair’s two new routes in a fortnight: from the basin below the Gasherbrum La up a spur to the ridge, over the 7,772 m east summit and along the crest to the top, then down the normal route. A week later they climbed the south-west face of Hidden Peak.',
+      'The first of the Polish pair’s two new routes in a fortnight: from a camp on the Gasherbrum La up a spur to the ridge, over the 7,772 m east summit and along the crest to the top, then down the normal route. A week later they climbed the south-west face of Hidden Peak.',
     waypoints: [
       [35.7306, 76.6581], // C1
-      [35.7400, 76.6750],
-      [35.7450, 76.6800], // La camp
-      [35.7500, 76.6820],
-      [35.7540, 76.6790],
-      [35.7569, 76.6723], // east ridge
-      [35.7574, 76.6660],
-      [35.7578, 76.6596],
-      [35.7581, 76.6565],
+      [35.7340, 76.6640],
+      [35.7370, 76.6695],
+      [35.7400, 76.6750], // basin
+      [35.7420, 76.6810],
+      [35.7440, 76.6870],
+      [35.7460, 76.6930], // Gasherbrum La camp
+      [35.7500, 76.6890],
+      [35.7540, 76.6848], // spur to the east ridge
+      [35.7546, 76.6800],
+      [35.7549, 76.6750], // bivouac on the ridge
+      [35.7543, 76.6690], // Gasherbrum II East
+      [35.7548, 76.6650],
+      [35.7553, 76.6610],
+      [35.7567, 76.6570],
+      [35.7577, 76.6550],
       [35.7583, 76.6533], // Summit
     ],
     camps: [
       { name: 'Camp 1', alt: 5900, lat: 35.7306, lon: 76.6581, blurb: 'The shared camp above the icefall.' },
-      { name: 'La camp', alt: 6450, lat: 35.7450, lon: 76.6800, blurb: 'In the basin below the Gasherbrum La, at the foot of the spur.' },
-      { name: 'East ridge', alt: 7300, lat: 35.7569, lon: 76.6723, blurb: 'The bivouac on the ridge below Gasherbrum II East.' },
+      { name: 'La camp', alt: 6500, lat: 35.7460, lon: 76.6930, blurb: 'On the Gasherbrum La, the col between the two mountains, at the foot of the long east ridge.' },
+      { name: 'East ridge', alt: 7300, lat: 35.7549, lon: 76.6750, blurb: 'The bivouac on the ridge below Gasherbrum II East.' },
+      { name: 'Gasherbrum II East', alt: 7772, lat: 35.7543, lon: 76.6690, blurb: 'The east summit, crossed on the way to the main top.' },
     ],
     hazards: ['gasherbrum-icefall', 'la-basin', 'east-ridge', 'summit-pyramid', 'death-zone'],
   },
@@ -86,19 +95,28 @@ const routes = [
     color: '#7dffb3',
     firstAscent: '24–28 June 1984, Reinhold Messner & Hans Kammerlander, from the summit of Gasherbrum II down to the Gasherbrum La and up Hidden Peak',
     share: 'Once',
-    difficulty: 'Two summits and a 1,500 m descent between them, carried in one push with a single tent',
+    difficulty: 'Two summits and a 1,400 m descent between them, carried in one push with a single tent',
     verticalGain: '≈ 2,900 m of ascent above Camp 3',
     summary:
-      'The first traverse of two 8,000 m peaks: up the normal route on Gasherbrum II, down its south-east side to the Gasherbrum La, then straight up the north-west face of Hidden Peak and down its normal route, without touching base camp between the two summits.',
+      'The first traverse of two 8,000 m peaks: up the normal route on Gasherbrum II, down the south side of its east ridge to the Gasherbrum La, then straight up the north face of Hidden Peak and down its south-west ridge, without touching base camp between the two summits.',
     waypoints: [
-      [35.7480, 76.6551], // C3
-      [35.7514, 76.6545],
-      [35.7560, 76.6537],
+      [35.7465, 76.6585], // C3
+      [35.7505, 76.6575], // C4
+      [35.7530, 76.6590],
+      [35.7555, 76.6605], // saddle on the east ridge
+      [35.7577, 76.6550],
       [35.7583, 76.6533], // Gasherbrum II summit
-      [35.7543, 76.6613],
-      [35.7503, 76.6693],
-      [35.7450, 76.6800], // Gasherbrum La
-      [35.7400, 76.6750],
+      [35.7567, 76.6570],
+      [35.7553, 76.6610],
+      [35.7548, 76.6650],
+      [35.7543, 76.6690], // Gasherbrum II East
+      [35.7549, 76.6750],
+      [35.7540, 76.6848],
+      [35.7500, 76.6890],
+      [35.7460, 76.6930], // Gasherbrum La
+      [35.7440, 76.6870],
+      [35.7420, 76.6810],
+      [35.7400, 76.6750], // basin
       [35.7353, 76.6814],
       [35.7321, 76.6857], // couloir
       [35.7305, 76.6878],
@@ -107,11 +125,11 @@ const routes = [
     ],
     camps: [
       { name: 'Gasherbrum II summit', alt: 8035, lat: 35.7583, lon: 76.6533, blurb: 'The first summit, reached on the second day from base camp.' },
-      { name: 'Gasherbrum La', alt: 6500, lat: 35.7450, lon: 76.6800, blurb: 'The col between the two mountains, where the pair bivouacked between summits.' },
+      { name: 'Gasherbrum La', alt: 6600, lat: 35.7460, lon: 76.6930, blurb: 'The col between the two mountains, where the pair bivouacked between summits.' },
       { name: 'Couloir top', alt: 7100, lat: 35.7305, lon: 76.6878, blurb: 'The last bivouac, on Hidden Peak’s north-west ridge.' },
     ],
     hazards: ['la-basin', 'summit-pyramid', 'death-zone'],
-    finish: { title: 'Gasherbrum I', alt: 8080, body: 'The second summit of the traverse, reached on the fifth day. From here the pair descended Hidden Peak’s normal route to the shared base camp.' },
+    finish: { title: 'Gasherbrum I', alt: 8080, body: 'The second summit of the traverse, reached on the fifth day. From here the pair descended the south-west ridge, bivouacking at 7,500 m and at the foot of the ridge, and reached the shared base camp on 30 June.' },
   },
   {
     id: 'winter',
@@ -128,17 +146,20 @@ const routes = [
       [35.7450, 76.5800], // Base Camp
       [35.7400, 76.6400],
       [35.7306, 76.6581], // C1
-      [35.7421, 76.6561],
-      [35.7445, 76.6557], // C2
-      [35.7491, 76.6549], // C3
-      [35.7537, 76.6541],
-      [35.7560, 76.6537],
+      [35.7360, 76.6585],
+      [35.7390, 76.6587],
+      [35.7418, 76.6588], // C2
+      [35.7465, 76.6585], // C3
+      [35.7505, 76.6575],
+      [35.7530, 76.6590],
+      [35.7555, 76.6605], // saddle on the east ridge
+      [35.7577, 76.6550],
       [35.7583, 76.6533], // Summit
     ],
     camps: [
       { name: 'Camp 1', alt: 5900, lat: 35.7306, lon: 76.6581, blurb: 'The first night, in the icefall wind.' },
-      { name: 'Camp 2', alt: 6500, lat: 35.7445, lon: 76.6557, blurb: 'Dug into the ridge.' },
-      { name: 'Camp 3', alt: 7100, lat: 35.7491, lon: 76.6549, blurb: 'The last camp before the summit push on 2 February.' },
+      { name: 'Camp 2', alt: 6500, lat: 35.7418, lon: 76.6588, blurb: 'Dug into the ridge.' },
+      { name: 'Camp 3', alt: 6900, lat: 35.7465, lon: 76.6585, blurb: 'The last camp; the summit push of 2 February left here at 3 am.' },
     ],
     hazards: ['gasherbrum-icefall', 'upper-slopes', 'summit-pyramid', 'death-zone'],
   },
@@ -152,21 +173,21 @@ const hazards = [
     incidents: ['2006, a serac collapse in the icefall kills a climber and a high-altitude porter'],
   },
   {
-    id: 'banana-ridge', name: 'Banana Ridge', lat: 35.7445, lon: 76.6557, alt: 6500, radius: 300, severity: 3,
+    id: 'banana-ridge', name: 'Banana Ridge', lat: 35.7418, lon: 76.6588, alt: 6500, radius: 300, severity: 3,
     kind: 'Crevasses · exposure',
     blurb: 'The curving snow crest between Camps 1 and 2, corniced on its eastern side.',
     incidents: [],
   },
   {
-    id: 'upper-slopes', name: 'Upper slopes', lat: 35.7491, lon: 76.6549, alt: 7100, radius: 300, severity: 4,
+    id: 'upper-slopes', name: 'Upper slopes', lat: 35.7485, lon: 76.6580, alt: 7150, radius: 300, severity: 4,
     kind: 'Windslab · avalanche',
     blurb: 'The snow slopes between Camp 3 and the shoulder, which load with windslab and have avalanched onto descending parties.',
     incidents: ['2 Feb 2011, the winter team is swept by an avalanche on the descent and survives'],
   },
   {
-    id: 'summit-pyramid', name: 'Summit pyramid', lat: 35.7560, lon: 76.6537, alt: 7750, radius: 250, severity: 4,
+    id: 'summit-pyramid', name: 'Summit pyramid', lat: 35.7565, lon: 76.6580, alt: 7750, radius: 250, severity: 4,
     kind: 'Rockfall · queues · late descents',
-    blurb: 'The rocky pyramid and short summit ridge, where parties bunch up on the fixed lines and descend in the afternoon.',
+    blurb: 'The traverse under the pyramid and the east ridge, where parties bunch up on the fixed lines and descend in the afternoon.',
     incidents: [],
   },
   {
@@ -176,7 +197,7 @@ const hazards = [
     incidents: [],
   },
   {
-    id: 'east-ridge', name: 'East ridge', lat: 35.7569, lon: 76.6723, alt: 7300, radius: 320, severity: 4,
+    id: 'east-ridge', name: 'East ridge', lat: 35.7553, lon: 76.6610, alt: 7600, radius: 320, severity: 4,
     kind: 'Cornice · exposure',
     blurb: 'The corniced crest between Gasherbrum II East and the main summit, climbed once.',
     incidents: [],

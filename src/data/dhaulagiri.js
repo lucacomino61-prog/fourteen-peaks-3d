@@ -26,13 +26,20 @@ const routes = [
     difficulty: 'Glacier and serac-threatened slopes to the North-east Col, then a long snow and ice ridge at 40-50° with a corniced finish',
     verticalGain: '≈ 3,400 m from Base Camp',
     summary:
-      'From the Chhonbardan Glacier around the foot of the north face to the North-east Col, then up the ridge the Austrians and Swiss tried in the late 1950s. The 1960 expedition flew its camps to the col in a Pilatus Porter, the first mountaineering airlift; the plane crashed there, and the climbers walked up anyway.',
+      'From the Chhonbardan Glacier around the foot of the north face and up the icefall to the North-east Col, then up the ridge the Austrians and Swiss tried in the late 1950s. The 1960 expedition flew its camps to the col in a Pilatus Porter, the first mountaineering airlift; the plane later crashed on the Dampus Pass, and the climbers walked up anyway.',
     waypoints: [
-      [28.7000, 83.4570], // Base Camp
-      [28.7150, 83.4750],
-      [28.7228, 83.4892],
-      [28.7212, 83.5196], // NE Col, C1
-      [28.7155, 83.5116],
+      [28.7472, 83.4995], // Base Camp
+      [28.7440, 83.4980],
+      [28.7420, 83.5040],
+      [28.7400, 83.5100],
+      [28.7350, 83.5135],
+      [28.7300, 83.5170], // icefall
+      [28.7255, 83.5195],
+      [28.7210, 83.5220],
+      [28.7150, 83.5250], // NE Col, C1
+      [28.7130, 83.5195],
+      [28.7110, 83.5140],
+      [28.7103, 83.5088],
       [28.7097, 83.5036], // C2
       [28.7059, 83.4982], // C3
       [28.7040, 83.4955], // C4
@@ -41,8 +48,8 @@ const routes = [
       [28.6983, 83.4875], // Summit
     ],
     camps: [
-      { name: 'Base Camp', alt: 4750, lat: 28.7000, lon: 83.4570, blurb: 'On the Chhonbardan Glacier below the west and north faces, reached over the French Pass from Marpha or up the Myagdi Khola from Darbang.' },
-      { name: 'Camp 1', alt: 5700, lat: 28.7212, lon: 83.5196, blurb: 'On the North-east Col, where the Swiss landed their Pilatus Porter in 1960. The wind blows through it from Tibet.' },
+      { name: 'Base Camp', alt: 4750, lat: 28.7472, lon: 83.4995, blurb: 'On the Chhonbardan Glacier under the north face, 4 km below the French Pass; reached over the pass from Marpha or up the Myagdi Khola from Darbang.' },
+      { name: 'Camp 1', alt: 5750, lat: 28.7150, lon: 83.5250, blurb: 'On the North-east Col, where the Swiss landed their Pilatus Porter in 1960. The wind blows through it from Tibet.' },
       { name: 'Camp 2', alt: 6600, lat: 28.7097, lon: 83.5036, blurb: 'On the ridge above the col; the slopes below load with windslab.' },
       { name: 'Camp 3', alt: 7200, lat: 28.7059, lon: 83.4982, blurb: 'A cramped platform on the crest.' },
       { name: 'Camp 4', alt: 7500, lat: 28.7040, lon: 83.4955, blurb: 'The last camp, below the summit slopes and their false tops. Summit day is eight to twelve hours.' },
@@ -83,7 +90,7 @@ const routes = [
     name: 'Southwest Pillar',
     aka: 'Japanese route, 1978',
     color: '#7dffb3',
-    firstAscent: '1978, a Japanese expedition, after several attempts on the pillar through the 1970s',
+    firstAscent: '10–11 May 1978, a Japanese expedition (Takashi Amemiya among the summit party), after several attempts on the pillar through the 1970s',
     share: 'Rarely repeated',
     difficulty: 'A rock and ice pillar with serac bands, sustained above 6,500 m',
     verticalGain: '≈ 3,700 m from the glacier',
@@ -144,7 +151,7 @@ const routes = [
     name: 'Southeast Ridge',
     aka: 'The 1969 line · climbed 1978',
     color: '#5fd3ff',
-    firstAscent: '1978, a Japanese expedition, on the ridge where the American expedition was destroyed by an avalanche in 1969',
+    firstAscent: '19–20 October 1978, a Japanese expedition (Seiko Tanaka), on the ridge where the American expedition was destroyed by an avalanche in 1969; one member, Kogure, was killed',
     share: 'Rarely repeated',
     difficulty: 'A long ridge from the Kali Gandaki side, with an avalanche-prone approach and corniced upper crest',
     verticalGain: '≈ 3,800 m from the glacier',
@@ -175,22 +182,22 @@ const routes = [
 
 const hazards = [
   {
-    id: 'north-face-serac', name: 'North face seracs', lat: 28.7150, lon: 83.4900, alt: 6000, radius: 420, severity: 5,
+    id: 'north-face-serac', name: 'North face seracs', lat: 28.7380, lon: 83.5080, alt: 4950, radius: 420, severity: 5,
     kind: 'Serac fall · avalanche',
-    blurb: 'The approach from Base Camp to the North-east Col runs beneath the hanging glaciers of the north face; the crossing is done before dawn and never in fresh snow.',
-    incidents: ['1998, Chantal Mauduit and Ang Tshering die when their tent at Camp 2 is buried by an avalanche', 'Oct 1999, Ginette Harrison killed by an avalanche between Camps 2 and 3'],
+    blurb: 'The approach from Base Camp to the icefall and the North-east Col runs beneath the hanging glaciers of the north face; the crossing is done before dawn and never in fresh snow.',
+    incidents: [],
   },
   {
-    id: 'ne-col', name: 'Northeast Col', lat: 28.7212, lon: 83.5196, alt: 5700, radius: 320, severity: 3,
+    id: 'ne-col', name: 'Northeast Col', lat: 28.7150, lon: 83.5250, alt: 5750, radius: 320, severity: 3,
     kind: 'Wind · crevasses',
-    blurb: 'Camp 1 sits on the col where the Swiss landed a light aircraft in 1960, the first mountaineering airlift; the plane later crashed on it and its wreck lay there for years.',
+    blurb: 'Camp 1 sits on the col where the Swiss landed a light aircraft in 1960, the first mountaineering airlift; the plane crashed on the Dampus Pass a few days later and the expedition finished on foot.',
     incidents: [],
   },
   {
     id: 'ridge-slopes', name: 'Ridge slopes', lat: 28.7078, lon: 83.5009, alt: 6900, radius: 320, severity: 4,
     kind: 'Windslab · exposure',
     blurb: 'The snow slopes between Camps 2 and 3 load with windslab after every storm and have avalanched onto fixed lines repeatedly.',
-    incidents: [],
+    incidents: ['1998, Chantal Mauduit and Ang Tshering die when their tent at Camp 2 is buried by an avalanche', 'Oct 1999, Ginette Harrison killed by an avalanche between Camps 2 and 3'],
   },
   {
     id: 'summit-traverse', name: 'Summit crest', lat: 28.7010, lon: 83.4900, alt: 7900, radius: 260, severity: 4,

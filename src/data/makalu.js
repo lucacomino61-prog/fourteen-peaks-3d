@@ -4,7 +4,7 @@
 // documented values. Not for navigation.
 
 const peak = {
-  lat: 27.8897, lon: 87.0885, elevation: 8485, name: 'Makalu', aka: 'Makalu · Kumbhakarna · the Great Black',
+  lat: 27.8914, lon: 87.0887, elevation: 8485, name: 'Makalu', aka: 'Makalu · Kumbhakarna · the Great Black',
   range: 'Himalaya, Mahalangur Himal', countries: 'Nepal / China',
   tagline: 'The fifth highest mountain on Earth: an isolated pyramid of black granite, harder than its neighbours and far less crowded.',
   summitText: 'A small snow summit on a pyramid of granite, with Everest, Lhotse and Kangchenjunga all in view. The French reached it in 1955 with every member of the team; since then the ridge and couloir below have claimed climbers on the way down more often than on the way up.',
@@ -28,26 +28,42 @@ const routes = [
     summary:
       'Up the Barun Glacier to the col between Makalu and Kangchungtse, then the north-west ridge and a final couloir of loose granite to the summit. The French climbed it in 1955 in perfect weather with every member reaching the top, a model expedition; the ridge above the La is where the wind lives.',
     waypoints: [
-      [27.8477, 87.0837], // Base Camp
-      [27.8620, 87.0828], // ABC
-      [27.8716, 87.0822], // C1
-      [27.8764, 87.0819], // C2
-      [27.8850, 87.0700],
-      [27.8950, 87.0750],
-      [27.9000, 87.0780],
-      [27.9050, 87.0800], // Makalu La
-      [27.9004, 87.0825],
+      [27.8353, 87.0761], // Hillary Base Camp
+      [27.8400, 87.0740],
+      [27.8450, 87.0720],
+      [27.8500, 87.0700], // Barun Glacier
+      [27.8550, 87.0680],
+      [27.8600, 87.0660],
+      [27.8640, 87.0655],
+      [27.8680, 87.0650], // Advanced Base
+      [27.8710, 87.0600],
+      [27.8720, 87.0530], // round the foot of the West Pillar
+      [27.8740, 87.0500],
+      [27.8770, 87.0500],
+      [27.8805, 87.0500],
+      [27.8840, 87.0500], // glacier basin north of the pillar
+      [27.8870, 87.0553],
+      [27.8900, 87.0607],
+      [27.8930, 87.0660], // C1
+      [27.8970, 87.0680],
+      [27.9020, 87.0700], // C2
+      [27.9045, 87.0720],
+      [27.9070, 87.0740], // slopes to the La
+      [27.9103, 87.0782], // Makalu La
+      [27.9060, 87.0805],
+      [27.9020, 87.0815],
+      [27.8995, 87.0822],
       [27.8974, 87.0842], // C4
       [27.8943, 87.0859], // French Couloir
-      [27.8920, 87.0870],
-      [27.8897, 87.0885], // Summit
+      [27.8925, 87.0875],
+      [27.8914, 87.0887], // Summit
     ],
     camps: [
-      { name: 'Base Camp', alt: 4870, lat: 27.8477, lon: 87.0837, blurb: 'Hillary Base Camp on the moraine of the Barun Glacier, a fortnight’s walk from Tumlingtar through the Barun valley.' },
-      { name: 'Advanced Base', alt: 5700, lat: 27.8620, lon: 87.0828, blurb: 'On the upper Barun Glacier under the west face.' },
-      { name: 'Camp 1', alt: 6100, lat: 27.8716, lon: 87.0822, blurb: 'At the foot of the slopes leading towards the La.' },
-      { name: 'Camp 2', alt: 6600, lat: 27.8764, lon: 87.0819, blurb: 'On the glacier shelf below the col; the last easy ground.' },
-      { name: 'Makalu La', alt: 7400, lat: 27.9050, lon: 87.0800, blurb: 'Camp 3, on the col between Makalu and Kangchungtse. The wind here is legendary; tents are shredded every season.' },
+      { name: 'Base Camp', alt: 4870, lat: 27.8353, lon: 87.0761, blurb: 'Hillary Base Camp on the moraine of the Barun Glacier, a fortnight’s walk from Tumlingtar through the Barun valley.' },
+      { name: 'Advanced Base', alt: 5700, lat: 27.8680, lon: 87.0650, blurb: 'In the upper Barun cirque below the West Pillar.' },
+      { name: 'Camp 1', alt: 6100, lat: 27.8930, lon: 87.0660, blurb: 'In the glacier basin north of the West Pillar, at the foot of the slopes leading towards the La.' },
+      { name: 'Camp 2', alt: 6600, lat: 27.9020, lon: 87.0700, blurb: 'On the glacier shelf below the col; the last easy ground.' },
+      { name: 'Makalu La', alt: 7400, lat: 27.9103, lon: 87.0782, blurb: 'Camp 3, on the col between Makalu and Kangchungtse. The wind here is legendary; tents are shredded every season.' },
       { name: 'Camp 4', alt: 7800, lat: 27.8974, lon: 87.0842, blurb: 'On the ridge below the French Couloir. Summit pushes leave at midnight for a 10 to 12 hour climb.' },
     ],
     hazards: ['barun-approach', 'makalu-la', 'nw-ridge', 'french-couloir', 'death-zone'],
@@ -64,22 +80,24 @@ const routes = [
     summary:
       'The great granite pillar that divides the west face from the north-west face. Paragot’s 1971 expedition fixed it in spring cold and put two climbers on the summit, a step change in what was considered possible at altitude. Repeated alpine-style only decades later.',
     waypoints: [
-      [27.8850, 87.0500], // glacier
-      [27.8862, 87.0596],
-      [27.8870, 87.0660], // C1
-      [27.8877, 87.0725],
-      [27.8881, 87.0757], // C2
-      [27.8885, 87.0789], // C3
-      [27.8889, 87.0821], // C4
-      [27.8893, 87.0853], // C5
-      [27.8897, 87.0885], // Summit
+      [27.8760, 87.0500], // glacier
+      [27.8780, 87.0560], // C1
+      [27.8790, 87.0600],
+      [27.8800, 87.0640],
+      [27.8810, 87.0680],
+      [27.8820, 87.0720], // C2
+      [27.8830, 87.0760], // C3
+      [27.8845, 87.0800], // C4
+      [27.8860, 87.0840],
+      [27.8885, 87.0865], // C5
+      [27.8914, 87.0887], // Summit
     ],
     camps: [
-      { name: 'Camp 1', alt: 6000, lat: 27.8870, lon: 87.0660, blurb: 'At the foot of the pillar on the Barun Glacier.' },
-      { name: 'Camp 2', alt: 6650, lat: 27.8881, lon: 87.0757, blurb: 'On the crest below the first rock towers.' },
-      { name: 'Camp 3', alt: 7000, lat: 27.8885, lon: 87.0789, blurb: 'Hanging tents at the start of the hardest rock.' },
-      { name: 'Camp 4', alt: 7400, lat: 27.8889, lon: 87.0821, blurb: 'Above the crux towers.' },
-      { name: 'Camp 5', alt: 7850, lat: 27.8893, lon: 87.0853, blurb: 'The highest camp, where the pillar merges into the summit slopes.' },
+      { name: 'Camp 1', alt: 6000, lat: 27.8780, lon: 87.0560, blurb: 'At the foot of the pillar on the Barun Glacier.' },
+      { name: 'Camp 2', alt: 6650, lat: 27.8820, lon: 87.0720, blurb: 'On the crest below the first rock towers.' },
+      { name: 'Camp 3', alt: 7000, lat: 27.8830, lon: 87.0760, blurb: 'Hanging tents at the start of the hardest rock.' },
+      { name: 'Camp 4', alt: 7400, lat: 27.8845, lon: 87.0800, blurb: 'Above the crux towers.' },
+      { name: 'Camp 5', alt: 7850, lat: 27.8885, lon: 87.0865, blurb: 'The highest camp, where the pillar merges into the summit slopes.' },
     ],
     hazards: ['west-pillar-rock', 'death-zone'],
   },
@@ -95,20 +113,23 @@ const routes = [
     summary:
       'Straight up the face left of the pillar, on ground the 1970s teams considered impossible. The Russians climbed it capsule-style over weeks in 1997 and reached the summit late in the day; one climber did not survive the descent.',
     waypoints: [
-      [27.8800, 87.0550], // glacier
-      [27.8824, 87.0634],
-      [27.8840, 87.0690], // C1
-      [27.8857, 87.0745], // C2
-      [27.8873, 87.0801], // C3
-      [27.8881, 87.0829], // C4
-      [27.8889, 87.0857],
-      [27.8897, 87.0885], // Summit
+      [27.8880, 87.0550], // glacier
+      [27.8895, 87.0595],
+      [27.8910, 87.0640],
+      [27.8920, 87.0680], // C1
+      [27.8910, 87.0710],
+      [27.8900, 87.0740], // C2
+      [27.8897, 87.0775],
+      [27.8895, 87.0810], // C3
+      [27.8890, 87.0830], // C4
+      [27.8905, 87.0845],
+      [27.8914, 87.0887], // Summit
     ],
     camps: [
-      { name: 'Camp 1', alt: 6200, lat: 27.8840, lon: 87.0690, blurb: 'Below the first rock band.' },
-      { name: 'Camp 2', alt: 6650, lat: 27.8857, lon: 87.0745, blurb: 'A snow ledge in the middle of the face.' },
-      { name: 'Camp 3', alt: 7200, lat: 27.8873, lon: 87.0801, blurb: 'Below the headwall.' },
-      { name: 'Camp 4', alt: 7550, lat: 27.8881, lon: 87.0829, blurb: 'The last camp before the summit push.' },
+      { name: 'Camp 1', alt: 6200, lat: 27.8920, lon: 87.0680, blurb: 'Below the first rock band.' },
+      { name: 'Camp 2', alt: 6650, lat: 27.8900, lon: 87.0740, blurb: 'A snow ledge in the middle of the face.' },
+      { name: 'Camp 3', alt: 7200, lat: 27.8895, lon: 87.0810, blurb: 'Below the headwall.' },
+      { name: 'Camp 4', alt: 7550, lat: 27.8890, lon: 87.0830, blurb: 'The last camp before the summit push.' },
     ],
     hazards: ['west-face', 'death-zone'],
   },
@@ -132,7 +153,8 @@ const routes = [
       [27.8784, 87.0904], // C4
       [27.8812, 87.0899], // C5
       [27.8840, 87.0894],
-      [27.8897, 87.0885], // Summit
+      [27.8877, 87.0890],
+      [27.8914, 87.0887], // Summit
     ],
     camps: [
       { name: 'Camp 1', alt: 5900, lat: 27.8642, lon: 87.0927, blurb: 'At the foot of the face.' },
@@ -165,7 +187,7 @@ const routes = [
       [27.8823, 87.0952],
       [27.8847, 87.0930], // C5
       [27.8872, 87.0907],
-      [27.8897, 87.0885], // Summit
+      [27.8914, 87.0887], // Summit
     ],
     camps: [
       { name: 'Camp 1', alt: 6000, lat: 27.8624, lon: 87.1133, blurb: 'Where the ridge rises from the glacier.' },
@@ -180,13 +202,13 @@ const routes = [
 
 const hazards = [
   {
-    id: 'barun-approach', name: 'Barun Glacier', lat: 27.8620, lon: 87.0828, alt: 5700, radius: 350, severity: 3,
+    id: 'barun-approach', name: 'Barun Glacier', lat: 27.8680, lon: 87.0650, alt: 5700, radius: 350, severity: 3,
     kind: 'Crevasses · rockfall',
     blurb: 'The glacier between Base Camp and Camp 1, crossed many times in a season, threatened by rockfall from the walls of Makalu’s west side.',
     incidents: [],
   },
   {
-    id: 'makalu-la', name: 'Makalu La', lat: 27.9050, lon: 87.0800, alt: 7400, radius: 300, severity: 4,
+    id: 'makalu-la', name: 'Makalu La', lat: 27.9103, lon: 87.0782, alt: 7400, radius: 300, severity: 4,
     kind: 'Wind · exposure',
     blurb: 'The col between Makalu and Kangchungtse funnels the jet stream. Tents are shredded here every season and climbers have been blown off the ridge above.',
     incidents: ['2009, the winter expedition of Moro and Urubko waits out weeks of 150 km/h winds at the La'],
@@ -204,13 +226,13 @@ const hazards = [
     incidents: ['2019 and 2023, several climbers die of exhaustion between the couloir and Camp 4'],
   },
   {
-    id: 'west-pillar-rock', name: 'West Pillar towers', lat: 27.8885, lon: 87.0789, alt: 7000, radius: 300, severity: 5,
+    id: 'west-pillar-rock', name: 'West Pillar towers', lat: 27.8830, lon: 87.0760, alt: 7000, radius: 300, severity: 5,
     kind: 'Technical rock at 7,000 m · rockfall',
     blurb: 'Granite towers climbed with aid in 1971; the fixed ropes left on them have killed climbers who trusted old anchors.',
     incidents: [],
   },
   {
-    id: 'west-face', name: 'West Face', lat: 27.8857, lon: 87.0745, alt: 6800, radius: 400, severity: 5,
+    id: 'west-face', name: 'West Face', lat: 27.8900, lon: 87.0740, alt: 6800, radius: 400, severity: 5,
     kind: 'Rockfall · ice · commitment',
     blurb: 'A 2,500 m wall of granite and ice with no easy retreat, climbed once.',
     incidents: ['1997, Salavat Khabibullin dies of exhaustion after reaching the summit ridge'],
@@ -228,7 +250,7 @@ const hazards = [
     incidents: [],
   },
   {
-    id: 'death-zone', name: 'The Death Zone', lat: 27.8897, lon: 87.0885, alt: 8000, radius: 900, severity: 5,
+    id: 'death-zone', name: 'The Death Zone', lat: 27.8914, lon: 87.0887, alt: 8000, radius: 900, severity: 5,
     kind: 'Altitude · cold · wind',
     blurb: 'Above 8,000 m the body can no longer acclimatise. On Makalu the summit day from Camp 4 climbs the couloir into it and returns down loose rock in the afternoon.',
     incidents: [],

@@ -28,7 +28,8 @@ const routes = [
     summary:
       'Up the Diamir side from a base camp in a meadow at 4,200 m: an icefall, the Kinshofer Wall with its fixed ropes and ladder, the slopes to Camp 4, then a long traverse across the Bazhin Basin below the summit. Every commercial ascent, and the 2016 winter ascent, follows it.',
     waypoints: [
-      [35.2650, 74.5100], // Base Camp
+      [35.2590, 74.5120], // Base Camp
+      [35.2585, 74.5210],
       [35.2581, 74.5298],
       [35.2547, 74.5397],
       [35.2520, 74.5470], // C1
@@ -42,7 +43,7 @@ const routes = [
       [35.2375, 74.5892], // Summit
     ],
     camps: [
-      { name: 'Base Camp', alt: 4200, lat: 35.2650, lon: 74.5100, blurb: 'In a meadow above the Diamir Glacier, two days from the Karakoram Highway. Attacked by gunmen in June 2013; eleven climbers and staff were killed.' },
+      { name: 'Base Camp', alt: 4200, lat: 35.2590, lon: 74.5120, blurb: 'In a meadow on the floor of the Diamir valley, two days from the Karakoram Highway. Attacked by gunmen in June 2013; eleven climbers and staff were killed.' },
       { name: 'Camp 1', alt: 4900, lat: 35.2520, lon: 74.5470, blurb: 'Above the icefall, below the wall.' },
       { name: 'Camp 2', alt: 6100, lat: 35.2461, lon: 74.5645, blurb: 'On the shelf above the Kinshofer Wall.' },
       { name: 'Camp 3', alt: 6650, lat: 35.2435, lon: 74.5720, blurb: 'Snow slopes below the upper seracs.' },
@@ -62,26 +63,37 @@ const routes = [
     summary:
       'The line of the German expeditions of the 1930s, which lost sixteen climbers and Sherpas to storm and avalanche in 1934 and 1937. In 1953 Buhl left Camp 5 alone at 2:30 am and reached the summit at 7 pm; he survived a standing bivouac at 8,000 m and returned after forty-one hours.',
     waypoints: [
-      [35.3300, 74.6300], // Base Camp
-      [35.2987, 74.6279], // C1
+      [35.3250, 74.6150], // Base Camp
+      [35.3185, 74.6155],
+      [35.3120, 74.6160],
+      [35.3055, 74.6170],
+      [35.2987, 74.6180], // C1
+      [35.2925, 74.6225],
       [35.2863, 74.6271], // C2
       [35.2800, 74.6267], // C3
+      [35.2740, 74.6262],
       [35.2675, 74.6258], // C4
-      [35.2650, 74.6200],
-      [35.2620, 74.6120], // C5, Moor's Head
-      [35.2580, 74.6100], // Silver Saddle
+      [35.2648, 74.6290],
+      [35.2620, 74.6320], // ridge west of Rakhiot Peak
+      [35.2600, 74.6240], // C5, Moor's Head
+      [35.2605, 74.6195],
+      [35.2610, 74.6150],
+      [35.2598, 74.6088],
+      [35.2585, 74.6025], // Silver Saddle
       [35.2550, 74.6020], // Silver Plateau
+      [35.2525, 74.5985],
       [35.2500, 74.5950], // Bazhin Gap
       [35.2440, 74.5920],
+      [35.2408, 74.5906],
       [35.2375, 74.5892], // Summit
     ],
     camps: [
-      { name: 'Base Camp', alt: 3970, lat: 35.3300, lon: 74.6300, blurb: 'On the Rakhiot Glacier below Fairy Meadows, where the 1930s expeditions camped and where their memorial stands.' },
-      { name: 'Camp 1', alt: 4600, lat: 35.2987, lon: 74.6279, blurb: 'On the Rakhiot Glacier.' },
+      { name: 'Base Camp', alt: 3970, lat: 35.3250, lon: 74.6150, blurb: 'On the Rakhiot Glacier below Fairy Meadows, where the 1930s expeditions camped and where their memorial stands.' },
+      { name: 'Camp 1', alt: 4600, lat: 35.2987, lon: 74.6180, blurb: 'On the Rakhiot Glacier.' },
       { name: 'Camp 2', alt: 5300, lat: 35.2863, lon: 74.6271, blurb: 'Below the Rakhiot icefall.' },
       { name: 'Camp 3', alt: 5700, lat: 35.2800, lon: 74.6267, blurb: 'The upper glacier basin, in the fall line of Rakhiot Peak.' },
       { name: 'Camp 4', alt: 6150, lat: 35.2675, lon: 74.6258, blurb: 'Below Rakhiot Peak, where the 1934 retreat began; Willy Merkl and Gaylay died above here.' },
-      { name: 'Camp 5', alt: 6900, lat: 35.2620, lon: 74.6120, blurb: 'The Moor’s Head, Buhl’s last camp. He set out from here alone with a rucksack, no rope and two Pervitin tablets.' },
+      { name: 'Camp 5', alt: 6900, lat: 35.2600, lon: 74.6240, blurb: 'The Moor’s Head, the rock bump on the ridge west of Rakhiot Peak and Buhl’s last camp. He set out from here alone with a rucksack, no rope and two Pervitin tablets.' },
     ],
     hazards: ['rakhiot-peak', 'silver-saddle', 'summit-slopes', 'death-zone'],
   },
@@ -116,7 +128,7 @@ const routes = [
       { name: 'Camp 2', alt: 4850, lat: 35.2137, lon: 74.5946, blurb: 'On the lower ice field.' },
       { name: 'Camp 3', alt: 5750, lat: 35.2205, lon: 74.5931, blurb: 'Below the Wieland rocks.' },
       { name: 'Camp 4', alt: 6700, lat: 35.2273, lon: 74.5915, blurb: 'On the Merkl Icefield.' },
-      { name: 'Camp 5', alt: 7100, lat: 35.2307, lon: 74.5907, blurb: 'At the foot of the Merkl Gully, the 1970 top camp. The brothers left it before dawn on 27 June.' },
+      { name: 'Camp 5', alt: 7200, lat: 35.2307, lon: 74.5907, blurb: 'At the foot of the Merkl Gully, the 1970 top camp. The brothers left it before dawn on 27 June.' },
     ],
     hazards: ['rupal-face', 'merkl-gully', 'summit-slopes', 'death-zone'],
   },
@@ -135,20 +147,23 @@ const routes = [
       [35.1950, 74.5300], // glacier
       [35.2050, 74.5367], // C1
       [35.2150, 74.5433], // C2
-      [35.2200, 74.5467], // C3
-      [35.2250, 74.5500],
-      [35.2266, 74.5549], // C4
-      [35.2297, 74.5647],
-      [35.2328, 74.5745],
+      [35.2175, 74.5495],
+      [35.2200, 74.5555],
+      [35.2222, 74.5615],
+      [35.2240, 74.5670], // C3
+      [35.2275, 74.5680], // Mazeno Gap
+      [35.2275, 74.5740], // C4
+      [35.2290, 74.5780],
+      [35.2305, 74.5790],
       [35.2344, 74.5794], // C5
       [35.2359, 74.5843],
       [35.2375, 74.5892], // Summit
     ],
     camps: [
       { name: 'Camp 1', alt: 5150, lat: 35.2050, lon: 74.5367, blurb: 'On the glacier at the west end of the Rupal valley.' },
-      { name: 'Camp 2', alt: 5800, lat: 35.2150, lon: 74.5433, blurb: 'Below the Mazeno Gap.' },
-      { name: 'Camp 3', alt: 6500, lat: 35.2200, lon: 74.5467, blurb: 'On the slopes to the gap.' },
-      { name: 'Camp 4', alt: 7000, lat: 35.2266, lon: 74.5549, blurb: 'On the south-west ridge above the Mazeno Gap.' },
+      { name: 'Camp 2', alt: 5800, lat: 35.2150, lon: 74.5433, blurb: 'Below the slopes that lead up to the Mazeno Gap.' },
+      { name: 'Camp 3', alt: 6500, lat: 35.2240, lon: 74.5670, blurb: 'On the Rupal-side slopes just under the gap.' },
+      { name: 'Camp 4', alt: 7000, lat: 35.2275, lon: 74.5740, blurb: 'On the south-west ridge just east of the Mazeno Gap.' },
       { name: 'Camp 5', alt: 7450, lat: 35.2344, lon: 74.5794, blurb: 'The highest camp, on the upper ridge below the summit slopes.' },
     ],
     hazards: ['mazeno-gap', 'summit-slopes', 'death-zone'],
@@ -165,20 +180,26 @@ const routes = [
     summary:
       'The great ridge that runs west from the summit for ten kilometres: attempted many times since the 1970s, traversed in full only in 2012 by two Scots in their fifties, who spent eighteen days above 6,000 m and descended the Diamir side with no food left.',
     waypoints: [
-      [35.2100, 74.4600], // Mazeno Pass
+      [35.2138, 74.4842], // Mazeno Pass
       [35.2159, 74.4877],
+      [35.2178, 74.4970],
       [35.2198, 74.5061], // bivouac
+      [35.2218, 74.5153],
       [35.2237, 74.5246],
-      [35.2277, 74.5431], // bivouac
-      [35.2296, 74.5523],
-      [35.2316, 74.5615], // Mazeno Gap
-      [35.2328, 74.5745], // joins the Schell route
+      [35.2246, 74.5343],
+      [35.2255, 74.5440], // bivouac, Mazeno Peak
+      [35.2262, 74.5500],
+      [35.2270, 74.5560],
+      [35.2273, 74.5620],
+      [35.2275, 74.5680], // Mazeno Gap
+      [35.2275, 74.5740],
+      [35.2290, 74.5780], // joins the Schell route
     ],
     camps: [
-      { name: 'Mazeno Pass', alt: 5400, lat: 35.2100, lon: 74.4600, blurb: 'The pass at the western end of the ridge, reached from the Rupal valley.' },
+      { name: 'Mazeno Pass', alt: 5360, lat: 35.2138, lon: 74.4842, blurb: 'The pass at the western end of the ridge, reached from the Rupal valley.' },
       { name: 'Bivouac 1', alt: 6300, lat: 35.2198, lon: 74.5061, blurb: 'One of a string of bivouacs along the crest over the Mazeno peaks.' },
-      { name: 'Bivouac 2', alt: 6750, lat: 35.2277, lon: 74.5431, blurb: 'Below Mazeno Peak, the highest point of the ridge before the gap.' },
-      { name: 'Mazeno Gap', alt: 6940, lat: 35.2316, lon: 74.5615, blurb: 'The col where the ridge meets the mountain proper; the 2012 team split here, two continuing to the summit.' },
+      { name: 'Bivouac 2', alt: 6900, lat: 35.2255, lon: 74.5440, blurb: 'By Mazeno Peak, the highest point of the ridge before the gap.' },
+      { name: 'Mazeno Gap', alt: 6940, lat: 35.2275, lon: 74.5680, blurb: 'The col where the ridge meets the mountain proper; the 2012 team split here, two continuing to the summit.' },
     ],
     hazards: ['mazeno-crest', 'mazeno-gap', 'death-zone'],
     joins: 'schell',
@@ -217,7 +238,7 @@ const hazards = [
     incidents: ['1934, Willy Merkl, Uli Wieland, Willo Welzenbach and six Sherpas die in a week-long storm above Camp 4', '15 Jun 1937, an avalanche buries Camp 4; sixteen die in their sleep'],
   },
   {
-    id: 'silver-saddle', name: 'Silver Saddle and Plateau', lat: 35.2560, lon: 74.6050, alt: 7450, radius: 360, severity: 4,
+    id: 'silver-saddle', name: 'Silver Saddle and Plateau', lat: 35.2585, lon: 74.6025, alt: 7450, radius: 360, severity: 4,
     kind: 'Wind · distance',
     blurb: 'A high, windswept plateau between the saddle and the Bazhin Gap, kilometres long and nowhere to shelter; Buhl crossed it alone in 1953.',
     incidents: [],
@@ -235,7 +256,7 @@ const hazards = [
     incidents: [],
   },
   {
-    id: 'mazeno-gap', name: 'Mazeno Gap', lat: 35.2316, lon: 74.5615, alt: 6940, radius: 300, severity: 4,
+    id: 'mazeno-gap', name: 'Mazeno Gap', lat: 35.2275, lon: 74.5680, alt: 6940, radius: 300, severity: 4,
     kind: 'Wind · exposure',
     blurb: 'The col at the end of the Mazeno ridge, exposed to the wind from both valleys.',
     incidents: [],

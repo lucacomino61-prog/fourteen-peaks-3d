@@ -4,7 +4,7 @@
 // documented values. Not for navigation.
 
 const peak = {
-  lat: 28.3525, lon: 85.7792, elevation: 8027, name: 'Shishapangma', aka: 'Shishapangma · Gosainthan · Xixabangma',
+  lat: 28.3520, lon: 85.7817, elevation: 8027, name: 'Shishapangma', aka: 'Shishapangma · Gosainthan · Xixabangma',
   range: 'Himalaya, Jugal Himal', countries: 'China (Tibet)',
   tagline: 'The fourteenth and lowest of the 8,000 m peaks, the only one entirely in Tibet, and the last to be climbed: a summit that many who claim it never actually reached.',
   summitText: 'A corniced crest at the end of a ridge that many parties never finish. The Central summit, 8,008 m, is where most ascents stop; the true top is 19 m higher and an hour further along a ridge that has killed people in both directions. In 1964 ten Chinese climbers stood here, the last first ascent of the fourteen.',
@@ -18,32 +18,37 @@ const peak = {
 const routes = [
   {
     id: 'normal',
-    name: 'Northwest Face',
-    aka: 'The Chinese route · the normal route from Tibet',
+    name: 'North Ridge',
+    aka: 'The Chinese route · north-east face to the north ridge · the normal route from Tibet',
     color: '#ff6a3d',
     firstAscent: '2 May 1964, Xu Jing and nine others (Chinese expedition of 195 members), the last first ascent of the fourteen 8,000 m peaks',
     share: '≈ 90% of all ascents',
-    difficulty: 'A long glacier approach and snow slopes at 30-45° to the north ridge, then a corniced summit ridge over the central summit to the true top',
+    difficulty: 'A long glacier approach and snow slopes at 30-45° up the north-east flank to the north ridge, then a corniced summit ridge over the central summit to the true top',
     verticalGain: '≈ 2,400 m from Advanced Base',
     summary:
-      'From a drivable base camp on the Tibetan plateau up the Yebokangjiala Glacier to Advanced Base, then the broad north-west face to the ridge. The technical difficulty is low; the difficulty is the last hour, a knife-edge from the central summit to the main one that most parties, and most guidebooks, quietly skip.',
+      'From a drivable base camp on the Tibetan plateau up the Yebokangjiala Glacier to Advanced Base, then the north-east flank to the north ridge. The technical difficulty is low; the difficulty is the last hour, a knife-edge from the central summit to the main one that most parties, and most guidebooks, quietly skip.',
     waypoints: [
-      [28.4500, 85.7800], // Advanced Base
-      [28.4200, 85.7800],
+      [28.4400, 85.7750], // Advanced Base
+      [28.4300, 85.7762],
+      [28.4210, 85.7775],
+      [28.4114, 85.7787],
       [28.4018, 85.7799], // C1
+      [28.3955, 85.7798],
       [28.3895, 85.7797],
+      [28.3810, 85.7796],
       [28.3730, 85.7795], // C2
       [28.3648, 85.7794],
       [28.3607, 85.7793], // C3
-      [28.3560, 85.7760], // Central summit
-      [28.3540, 85.7780],
-      [28.3525, 85.7792], // Main summit
+      [28.3580, 85.7790],
+      [28.3555, 85.7778], // Central summit
+      [28.3535, 85.7800],
+      [28.3520, 85.7817], // Main summit
     ],
     camps: [
-      { name: 'Advanced Base', alt: 5600, lat: 28.4500, lon: 85.7800, blurb: 'On the moraine of the Yebokangjiala Glacier, two days by yak from the Chinese Base Camp at 5,000 m, which is itself an hour from the road.' },
+      { name: 'Advanced Base', alt: 5650, lat: 28.4400, lon: 85.7750, blurb: 'On the moraine of the Yebokangjiala Glacier, two days by yak from the Chinese Base Camp at 5,000 m, which is itself an hour from the road.' },
       { name: 'Camp 1', alt: 6400, lat: 28.4018, lon: 85.7799, blurb: 'On the glacier below the face.' },
-      { name: 'Camp 2', alt: 6900, lat: 28.3730, lon: 85.7795, blurb: 'A snow shelf on the face, in the fall line of the slopes above.' },
-      { name: 'Camp 3', alt: 7400, lat: 28.3607, lon: 85.7793, blurb: 'Below the north ridge. Summit day reaches the central summit in five or six hours; the true summit is another hour of exposed ridge.' },
+      { name: 'Camp 2', alt: 6900, lat: 28.3730, lon: 85.7795, blurb: 'A snow shelf on the north-east flank, in the fall line of the slopes above.' },
+      { name: 'Camp 3', alt: 7400, lat: 28.3607, lon: 85.7793, blurb: 'On the north ridge above the rock band. Summit day reaches the central summit in five or six hours; the true summit is another hour of exposed ridge.' },
     ],
     hazards: ['face-avalanche', 'central-summit', 'summit-ridge', 'death-zone'],
   },
@@ -66,7 +71,7 @@ const routes = [
       [28.3444, 85.7719], // bivouac
       [28.3471, 85.7743],
       [28.3498, 85.7768], // bivouac
-      [28.3525, 85.7792], // Summit
+      [28.3520, 85.7817], // Summit
     ],
     camps: [
       { name: 'Glacier camp', alt: 5600, lat: 28.3200, lon: 85.7500, blurb: 'On the glacier below the face, reached from Nyalam.' },
@@ -92,8 +97,8 @@ const routes = [
       [28.3348, 85.7795], // foot of the face
       [28.3419, 85.7794],
       [28.3454, 85.7793], // rest
-      [28.3490, 85.7793],
-      [28.3525, 85.7792], // Summit
+      [28.3490, 85.7810],
+      [28.3520, 85.7817], // Summit
     ],
     camps: [
       { name: 'Glacier camp', alt: 5900, lat: 28.3100, lon: 85.7800, blurb: 'The starting point of the night push.' },
@@ -106,27 +111,36 @@ const routes = [
     name: 'West Ridge',
     aka: 'Kukuczka–Hajzer, 1987 · the fourteenth',
     color: '#7dffb3',
-    firstAscent: '18 September 1987, Jerzy Kukuczka & Artur Hajzer (Poland), a new route; Kukuczka’s last of the fourteen, completed in eight years',
+    firstAscent: '18 September 1987, Jerzy Kukuczka & Artur Hajzer (Poland), a new route over the unclimbed west summit; Kukuczka’s last of the fourteen, completed in eight years',
     share: 'Rarely repeated',
-    difficulty: 'A long ridge of snow and rock from the west, joining the summit ridge at the central summit',
-    verticalGain: '≈ 2,300 m from the glacier',
+    difficulty: 'A long ridge of snow and rock from the north-west basin, over the west summit, joining the summit ridge at the central summit',
+    verticalGain: '≈ 1,600 m from Camp 1',
     summary:
-      'Kukuczka finished the fourteen 8,000 m peaks here, by a new route, as he had done on almost every one of them: a long ridge from the west climbed with Artur Hajzer and descended on skis by Hajzer from the summit. Only Messner had completed the fourteen before him, one year earlier.',
+      'Kukuczka finished the fourteen 8,000 m peaks here, by a new route, as he had done on almost every one of them: from the north side, a long ridge climbed with Artur Hajzer over the unclimbed west summit to the central and main summits. Kukuczka skied down the normal route the next day. Only Messner had completed the fourteen before him, one year earlier.',
     waypoints: [
-      [28.3500, 85.7200], // glacier
-      [28.3513, 85.7496],
-      [28.3515, 85.7545], // C1
-      [28.3517, 85.7595], // C2
-      [28.3519, 85.7644], // C3
-      [28.3521, 85.7693],
-      [28.3523, 85.7743],
-      [28.3560, 85.7760], // Central summit
-      [28.3525, 85.7792], // Main summit
+      [28.3900, 85.7700], // north-west glacier basin
+      [28.3850, 85.7650],
+      [28.3800, 85.7600], // Camp 1
+      [28.3763, 85.7560],
+      [28.3727, 85.7520],
+      [28.3690, 85.7480], // bivouac at the foot of the ridge
+      [28.3650, 85.7520],
+      [28.3620, 85.7560],
+      [28.3604, 85.7600],
+      [28.3594, 85.7640], // ridge bivouac
+      [28.3594, 85.7680],
+      [28.3568, 85.7700],
+      [28.3567, 85.7720], // West summit
+      [28.3561, 85.7760],
+      [28.3555, 85.7778], // Central summit
+      [28.3535, 85.7800],
+      [28.3520, 85.7817], // Main summit
     ],
     camps: [
-      { name: 'Camp 1', alt: 6100, lat: 28.3515, lon: 85.7545, blurb: 'At the foot of the ridge.' },
-      { name: 'Camp 2', alt: 6450, lat: 28.3517, lon: 85.7595, blurb: 'On the crest.' },
-      { name: 'Camp 3', alt: 6800, lat: 28.3519, lon: 85.7644, blurb: 'Below the steep upper ridge.' },
+      { name: 'Camp 1', alt: 6400, lat: 28.3800, lon: 85.7600, blurb: 'The site of the traditional Camp 1 on the north side, reached on skis.' },
+      { name: 'Bivouac', alt: 6800, lat: 28.3690, lon: 85.7480, blurb: 'At the bottom of the ridge.' },
+      { name: 'Ridge bivouac', alt: 7300, lat: 28.3594, lon: 85.7640, blurb: 'On the crest above the rock band, with snowfields on the southern side.' },
+      { name: 'West summit', alt: 7966, lat: 28.3567, lon: 85.7720, blurb: 'The unclimbed west summit, crossed on the way to the central summit.' },
     ],
     hazards: ['west-ridge', 'central-summit', 'summit-ridge', 'death-zone'],
   },
@@ -142,17 +156,26 @@ const routes = [
     summary:
       'After a decade of Polish winter attempts, Morawski and Moro reached the true summit on 14 January 2005 and descended the same day, the first winter ascent of the last of the fourteen to be climbed in winter at that time.',
     waypoints: [
-      [28.4500, 85.7800], // Advanced Base
+      [28.4400, 85.7750], // Advanced Base
+      [28.4300, 85.7762],
+      [28.4210, 85.7775],
+      [28.4114, 85.7787],
       [28.4018, 85.7799], // C1
+      [28.3955, 85.7798],
+      [28.3895, 85.7797],
+      [28.3810, 85.7796],
       [28.3730, 85.7795], // C2
+      [28.3648, 85.7794],
       [28.3607, 85.7793], // C3
-      [28.3560, 85.7760],
-      [28.3525, 85.7792], // Summit
+      [28.3580, 85.7790],
+      [28.3555, 85.7778], // Central summit
+      [28.3535, 85.7800],
+      [28.3520, 85.7817], // Summit
     ],
     camps: [
       { name: 'Camp 1', alt: 6400, lat: 28.4018, lon: 85.7799, blurb: 'The first camp, on the glacier.' },
-      { name: 'Camp 2', alt: 6900, lat: 28.3730, lon: 85.7795, blurb: 'Dug into the face against the wind.' },
-      { name: 'Camp 3', alt: 7400, lat: 28.3607, lon: 85.7793, blurb: 'The top camp; the summit push of 14 January started here before dawn.' },
+      { name: 'Camp 2', alt: 6900, lat: 28.3730, lon: 85.7795, blurb: 'Dug into the north-east flank against the wind.' },
+      { name: 'Camp 3', alt: 7400, lat: 28.3607, lon: 85.7793, blurb: 'The top camp on the north ridge; the summit push of 14 January started here before dawn.' },
     ],
     hazards: ['face-avalanche', 'central-summit', 'summit-ridge', 'death-zone'],
   },
@@ -160,22 +183,22 @@ const routes = [
 
 const hazards = [
   {
-    id: 'face-avalanche', name: 'Northwest face', lat: 28.3730, lon: 85.7795, alt: 6900, radius: 420, severity: 5,
+    id: 'face-avalanche', name: 'North-east face', lat: 28.3730, lon: 85.7795, alt: 6900, radius: 420, severity: 5,
     kind: 'Avalanche · windslab',
-    blurb: 'Broad, gently angled slopes that load after every storm and release across the fixed lines; the normal route’s deaths are nearly all here.',
-    incidents: ['7 Oct 2023, two avalanches kill Anna Gutu, Gina Rzucidlo and their guides Mingmar Sherpa and Tenjen Lama, racing to finish the fourteen', '2014, an avalanche kills Sebastian Haag and Andrea Zambaldi below Camp 3'],
+    blurb: 'Broad, gently angled slopes on the north-east flank that load after every storm and release across the fixed lines; the normal route’s deaths are nearly all here.',
+    incidents: ['7 Oct 2023, two avalanches kill Anna Gutu, Gina Rzucidlo and their guides Mingmar Sherpa and Tenjen Lama, racing to finish the fourteen'],
   },
   {
-    id: 'central-summit', name: 'Central summit', lat: 28.3560, lon: 85.7760, alt: 8008, radius: 200, severity: 3,
+    id: 'central-summit', name: 'Central summit', lat: 28.3555, lon: 85.7778, alt: 8008, radius: 200, severity: 3,
     kind: 'False summit',
     blurb: 'At 8,008 m the central summit is where most ascents end. Whether it counts has divided the sport; guidebook stats and personal records were quietly rewritten when it stopped counting.',
     incidents: [],
   },
   {
-    id: 'summit-ridge', name: 'Summit ridge', lat: 28.3540, lon: 85.7780, alt: 8015, radius: 220, severity: 5,
+    id: 'summit-ridge', name: 'Summit ridge', lat: 28.3535, lon: 85.7800, alt: 8015, radius: 220, severity: 5,
     kind: 'Cornice · knife-edge',
     blurb: 'The ridge from the central to the main summit: an hour of corniced knife-edge above 8,000 m, dangerous in both directions and impossible in poor snow.',
-    incidents: ['Several parties have turned back within sight of the true summit; falls from the cornice have killed climbers on both sides'],
+    incidents: ['24 Sep 2014, an avalanche at about 7,900 m just below the summit ridge kills Sebastian Haag and Andrea Zambaldi', 'Several parties have turned back within sight of the true summit; falls from the cornice have killed climbers on both sides'],
   },
   {
     id: 'sw-face', name: 'Southwest face', lat: 28.3444, lon: 85.7719, alt: 6500, radius: 420, severity: 5,
@@ -184,13 +207,13 @@ const hazards = [
     incidents: ['5 Oct 1999, Alex Lowe and David Bridges killed by an avalanche while scouting the face for a ski descent'],
   },
   {
-    id: 'west-ridge', name: 'West ridge', lat: 28.3519, lon: 85.7644, alt: 6800, radius: 350, severity: 4,
+    id: 'west-ridge', name: 'West ridge', lat: 28.3594, lon: 85.7640, alt: 7300, radius: 350, severity: 4,
     kind: 'Cornice · exposure',
     blurb: 'A long crest with cornices over the south side, rarely repeated since 1987.',
     incidents: [],
   },
   {
-    id: 'death-zone', name: 'The Death Zone', lat: 28.3525, lon: 85.7792, alt: 8000, radius: 500, severity: 5,
+    id: 'death-zone', name: 'The Death Zone', lat: 28.3520, lon: 85.7817, alt: 8000, radius: 500, severity: 5,
     kind: 'Altitude · cold · wind',
     blurb: 'Only the summit ridge lies above 8,000 m, and it is where the argument about this mountain is settled: an hour of exposure that many choose not to take.',
     incidents: [],
@@ -207,7 +230,7 @@ const timeline = [
   { year: 1999, title: 'Alex Lowe', text: 'Alex Lowe, the finest all-round climber of his generation, and David Bridges are killed by an avalanche on 5 October while scouting a ski descent of the south face. Conrad Anker survives.' },
   { year: 2005, title: 'Winter', text: 'Piotr Morawski and Simone Moro make the first winter ascent on 14 January, reaching the true summit.' },
   { year: 2011, title: 'Steck', text: 'Ueli Steck solos the south-west face in ten and a half hours from base camp.' },
-  { year: 2014, title: 'Avalanche', text: 'Sebastian Haag and Andrea Zambaldi are killed by an avalanche below Camp 3 on the normal route.' },
+  { year: 2014, title: 'Avalanche', text: 'Sebastian Haag and Andrea Zambaldi are killed on 24 September by an avalanche at about 7,900 m, just below the summit ridge and above Camp 3 on the normal route.' },
   { year: 2023, title: 'The race', text: 'Two American women, Anna Gutu and Gina Rzucidlo, each trying to become the first American woman to climb all fourteen, die with their guides in two avalanches on the same day, 7 October. China closes the mountain for the season.' },
 ]
 

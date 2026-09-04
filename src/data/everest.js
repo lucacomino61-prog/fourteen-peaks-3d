@@ -31,7 +31,7 @@ const routes = [
       [28.0025, 86.8555], // Base Camp
       [27.9972, 86.8668], // Khumbu Icefall
       [27.9918, 86.8782], // C1
-      [27.9905, 86.8830],
+      [27.9870, 86.8830], // floor of the Western Cwm
       [27.9847, 86.8933], // C2
       [27.9793, 86.9047],
       [27.9758, 86.9122], // foot of the Lhotse Face
@@ -41,8 +41,8 @@ const routes = [
       [27.9725, 86.9305], // South Col
       [27.9772, 86.9288],
       [27.9834, 86.9266], // Balcony
-      [27.9865, 86.9256], // South Summit
-      [27.9873, 86.9253], // Hillary Step
+      [27.9850, 86.9252], // South Summit
+      [27.9857, 86.9253], // Hillary Step
       [27.9881, 86.9250], // Summit
     ],
     camps: [
@@ -67,23 +67,25 @@ const routes = [
       'The line of the British expeditions of the 1920s: up the East Rongbuk Glacier to the North Col, then the north ridge to the north-east ridge and its three steps. Drier and windier than the Nepal side, with a far longer summit day.',
     waypoints: [
       [28.0265, 86.9425], // ABC
-      [28.0184, 86.9380],
-      [28.0130, 86.9350],
-      [28.0120, 86.9330], // North Col
-      [28.0082, 86.9333],
-      [28.0070, 86.9328], // C2
-      [28.0009, 86.9303],
-      [27.9936, 86.9273], // C3
-      [27.9917, 86.9265], // First Step
-      [27.9905, 86.9260], // Second Step
-      [27.9895, 86.9255], // Third Step
+      [28.0240, 86.9378],
+      [28.0215, 86.9330], // head of the East Rongbuk Glacier
+      [28.0185, 86.9270], // foot of the North Col slope
+      [28.0160, 86.9235], // North Col
+      [28.0125, 86.9250],
+      [28.0080, 86.9280], // C2
+      [28.0040, 86.9300],
+      [27.9990, 86.9322], // C3
+      [27.9960, 86.9315], // junction with the north-east ridge
+      [27.9932, 86.9300], // First Step
+      [27.9917, 86.9288], // Second Step
+      [27.9904, 86.9272], // Third Step
       [27.9881, 86.9250], // Summit
     ],
     camps: [
       { name: 'Advanced Base', alt: 6400, lat: 28.0265, lon: 86.9425, blurb: 'At the head of the East Rongbuk Glacier, reached by yak from the Rongbuk Base Camp at 5,150 m.' },
-      { name: 'North Col', alt: 7020, lat: 28.0120, lon: 86.9330, blurb: 'Camp 1, on the saddle between Everest and Changtse, above the ice slope that killed seven Sherpas in 1922.' },
-      { name: 'Camp 2', alt: 7500, lat: 28.0070, lon: 86.9328, blurb: 'On the broad, windswept north ridge. Tents are routinely destroyed here.' },
-      { name: 'Camp 3', alt: 8300, lat: 27.9936, lon: 86.9273, blurb: 'The highest camp on any route, on sloping ledges below the ridge crest. Summit night starts here at around 11 pm.' },
+      { name: 'North Col', alt: 7020, lat: 28.0160, lon: 86.9235, blurb: 'Camp 1, on the saddle between Everest and Changtse, above the ice slope that killed seven Sherpas in 1922.' },
+      { name: 'Camp 2', alt: 7500, lat: 28.0080, lon: 86.9280, blurb: 'On the broad, windswept north ridge. Tents are routinely destroyed here.' },
+      { name: 'Camp 3', alt: 8300, lat: 27.9990, lon: 86.9322, blurb: 'The highest camp on any route, on sloping ledges below the ridge crest. Summit night starts here at around 11 pm.' },
     ],
     hazards: ['north-col-slope', 'northeast-ridge', 'second-step', 'death-zone'],
   },
@@ -95,25 +97,31 @@ const routes = [
     firstAscent: '22 May 1963, Tom Hornbein & Willi Unsoeld (USA), descending the South Col route in the first traverse of the mountain',
     share: 'A handful of ascents; the direct line is rarely attempted',
     difficulty: 'Long mixed ridge to the West Shoulder, then the 45-55° Hornbein Couloir on the North Face',
-    verticalGain: '≈ 2,850 m from the Lho La',
+    verticalGain: '≈ 2,450 m from Camp 2 in the Western Cwm',
     summary:
-      'From the Lho La the ridge climbs to the West Shoulder and along the crest, then breaks onto the north face to finish up a narrow gully, the Hornbein Couloir. Hornbein and Unsoeld climbed it knowing they could not retreat, bivouacked at 8,500 m without shelter, and survived.',
+      'From Camp 2 in the Western Cwm the 1963 line climbs to the West Shoulder and along the crest, then drops across the north face by the Diagonal Ditch to finish up a narrow gully, the Hornbein Couloir. Hornbein and Unsoeld climbed it knowing they could not retreat, bivouacked at 8,500 m without shelter, and survived. The 1979 Yugoslav direct started lower, from the Lho La.',
     waypoints: [
-      [28.0090, 86.8750], // Lho La
-      [28.0020, 86.8800],
-      [27.9977, 86.8884], // West Shoulder
+      [27.9847, 86.8933], // Camp 2, Western Cwm
+      [27.9880, 86.8940],
+      [27.9910, 86.8940],
+      [27.9935, 86.8942], // 3W
+      [27.9961, 86.8942], // West Shoulder
+      [27.9953, 86.8974],
       [27.9945, 86.9006],
-      [27.9924, 86.9087], // C4
-      [27.9913, 86.9128], // Hornbein Couloir
-      [27.9902, 86.9169], // C5
-      [27.9892, 86.9209],
+      [27.9935, 86.9046],
+      [27.9924, 86.9087], // C4 (4W)
+      [27.9940, 86.9120], // Diagonal Ditch
+      [27.9945, 86.9150],
+      [27.9930, 86.9195], // foot of the Hornbein Couloir
+      [27.9918, 86.9205], // C5 (5W)
+      [27.9900, 86.9220], // top of the couloir, west ridge
       [27.9881, 86.9250], // Summit
     ],
     camps: [
-      { name: 'Lho La', alt: 6000, lat: 28.0090, lon: 86.8750, blurb: 'The col at the head of the Khumbu Icefall, on the Tibetan border. Reached by fixed ropes from the Nepal side.' },
-      { name: 'West Shoulder', alt: 7250, lat: 27.9977, lon: 86.8884, blurb: 'A broad snow shoulder where the ridge levels off, exposed to the full force of the jet stream.' },
-      { name: 'Camp 4', alt: 7500, lat: 27.9924, lon: 86.9087, blurb: 'On the crest of the ridge before the line drops onto the north face.' },
-      { name: 'Camp 5', alt: 8300, lat: 27.9902, lon: 86.9169, blurb: 'Inside the Hornbein Couloir, the highest camp of the 1963 climb.' },
+      { name: 'Camp 2', alt: 6400, lat: 27.9847, lon: 86.8933, blurb: 'Advanced Base in the Western Cwm, shared with the South Col route. The 1963 West Ridge party climbed from here to the West Shoulder.' },
+      { name: 'West Shoulder', alt: 7250, lat: 27.9961, lon: 86.8942, blurb: 'A broad snow shoulder where the ridge levels off, exposed to the full force of the jet stream.' },
+      { name: 'Camp 4', alt: 7700, lat: 27.9924, lon: 86.9087, blurb: 'On the crest of the ridge before the line drops onto the north face by the Diagonal Ditch.' },
+      { name: 'Camp 5', alt: 8310, lat: 27.9918, lon: 86.9205, blurb: 'Inside the Hornbein Couloir at the Yellow Band, the highest camp of the 1963 climb.' },
     ],
     hazards: ['hornbein-couloir', 'death-zone'],
   },
@@ -137,6 +145,7 @@ const routes = [
       [27.9854, 86.9181], // C5
       [27.9863, 86.9204], // Rock Band
       [27.9868, 86.9215], // C6
+      [27.9850, 86.9252], // South Summit
       [27.9881, 86.9250], // Summit
     ],
     camps: [
@@ -159,20 +168,20 @@ const routes = [
     summary:
       'The remote east face, three kilometres of ice and serac that Mallory dismissed in 1921. A four-person team climbed the buttress to the South Col in 1988 without oxygen or Sherpa support; Venables went on alone to the summit and spent a night out on the descent.',
     waypoints: [
-      [27.9780, 86.9650], // Kangshung Base
+      [27.9780, 86.9650], // Advanced Base
       [27.9769, 86.9582],
       [27.9764, 86.9548],
       [27.9758, 86.9514], // C1
       [27.9747, 86.9446],
-      [27.9742, 86.9412], // C2
-      [27.9736, 86.9378],
+      [27.9742, 86.9412],
+      [27.9736, 86.9378], // C2, the Flying Wing
       [27.9731, 86.9344],
       [27.9725, 86.9305], // South Col, joins the normal route
     ],
     camps: [
-      { name: 'Kangshung Base', alt: 5450, lat: 27.9780, lon: 86.9650, blurb: 'On the Kangshung Glacier in a lonely valley of Tibet, a week’s walk from the road.' },
+      { name: 'Advanced Base', alt: 5450, lat: 27.9780, lon: 86.9650, blurb: 'On the Kangshung Glacier at the foot of the buttress, in a lonely valley of Tibet a week’s walk from the road. Base Camp proper was 450 m lower on the north bank of the glacier.' },
       { name: 'Camp 1', alt: 6400, lat: 27.9758, lon: 86.9514, blurb: 'On top of the buttress, above the worst of the serac fall.' },
-      { name: 'Camp 2', alt: 7150, lat: 27.9742, lon: 86.9412, blurb: 'A snow cave on the upper slopes below the South Col.' },
+      { name: 'Camp 2', alt: 7450, lat: 27.9736, lon: 86.9378, blurb: 'A snow cave under the Flying Wing, a roof of ice at 7,450 m on the slopes below the South Col.' },
     ],
     hazards: ['kangshung-avalanche', 'south-col'],
     joins: 'southcol',
@@ -211,31 +220,31 @@ const hazards = [
     incidents: ['2019, queues of more than 200 people above here in a narrow window; 11 die that season'],
   },
   {
-    id: 'hillary-step', name: 'Hillary Step', lat: 27.9873, lon: 86.9253, alt: 8790, radius: 120, severity: 5,
+    id: 'hillary-step', name: 'Hillary Step', lat: 27.9857, lon: 86.9253, alt: 8790, radius: 120, severity: 5,
     kind: 'Exposure · queues',
     blurb: 'A 12 m rock step, largely a snow slope since the 2015 earthquake, on a knife-edge with 2,400 m drops into Tibet and 3,000 m into Nepal. One fixed rope carries traffic in both directions.',
     incidents: ['2019, fatal queues on the summit ridge'],
   },
   {
-    id: 'north-col-slope', name: 'North Col slope', lat: 28.0150, lon: 86.9360, alt: 6800, radius: 300, severity: 4,
+    id: 'north-col-slope', name: 'North Col slope', lat: 28.0190, lon: 86.9262, alt: 6700, radius: 300, severity: 4,
     kind: 'Avalanche',
     blurb: 'The 400 m ice slope below the North Col loads with windslab after every storm and has avalanched onto climbing parties since 1922.',
     incidents: ['7 Jun 1922, an avalanche kills seven Sherpas: the first deaths on Everest'],
   },
   {
-    id: 'northeast-ridge', name: 'Northeast Ridge', lat: 27.9960, lon: 86.9285, alt: 8200, radius: 300, severity: 4,
+    id: 'northeast-ridge', name: 'Northeast Ridge', lat: 27.9950, lon: 86.9310, alt: 8400, radius: 300, severity: 4,
     kind: 'Exposure · long descent',
     blurb: 'Hours of traverse on loose, outward-sloping slabs above 8,000 m. The bodies along the ridge mark where descents ran out of daylight, oxygen or strength.',
     incidents: ['1996, three climbers die on this side in the same storm as the South Col disaster'],
   },
   {
-    id: 'second-step', name: 'Second Step', lat: 27.9905, lon: 86.9260, alt: 8610, radius: 120, severity: 5,
+    id: 'second-step', name: 'Second Step', lat: 27.9917, lon: 86.9288, alt: 8610, radius: 120, severity: 5,
     kind: 'Technical rock at 8,600 m',
     blurb: 'A 30 m cliff on the north-east ridge, climbed since 1975 by a Chinese aluminium ladder. Whether Mallory and Irvine got past it in 1924 remains the mountain’s great question.',
     incidents: ['8 Jun 1924, Mallory and Irvine last seen going strong below the steps'],
   },
   {
-    id: 'hornbein-couloir', name: 'Hornbein Couloir', lat: 27.9905, lon: 86.9160, alt: 8000, radius: 250, severity: 5,
+    id: 'hornbein-couloir', name: 'Hornbein Couloir', lat: 27.9918, lon: 86.9205, alt: 8200, radius: 250, severity: 5,
     kind: 'Avalanche · no retreat',
     blurb: 'A 500 m gully on the north face at 45-55°, swept by spindrift avalanches, with no reasonable way back down once committed.',
     incidents: [],

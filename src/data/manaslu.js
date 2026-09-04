@@ -28,7 +28,10 @@ const routes = [
     summary:
       'From Samagaon up the moraine to Base Camp, then the north-east face: an icefall, the Hourglass serac band, the broad shelf of Camp 3 and the slopes to the plateau. Technically the gentlest of the fourteen after Cho Oyu, and one of the most avalanche-prone; in autumn a thousand people share its fixed lines.',
     waypoints: [
-      [28.5842, 84.6028], // Base Camp
+      [28.5941, 84.6002], // Base Camp
+      [28.5900, 84.5990],
+      [28.5860, 84.5975],
+      [28.5820, 84.5965],
       [28.5785, 84.5956],
       [28.5756, 84.5920],
       [28.5712, 84.5865], // C1
@@ -43,7 +46,7 @@ const routes = [
       [28.5497, 84.5597], // Summit
     ],
     camps: [
-      { name: 'Base Camp', alt: 4800, lat: 28.5842, lon: 84.6028, blurb: 'On the moraine above Samagaon, a village that in 1954 turned the Japanese away, blaming them for the avalanche that destroyed its monastery. Today it hosts hundreds of tents each September.' },
+      { name: 'Base Camp', alt: 4800, lat: 28.5941, lon: 84.6002, blurb: 'On the moraine above Samagaon, a village that in 1954 turned the Japanese away, blaming them for the avalanche that destroyed its monastery. Today it hosts hundreds of tents each September.' },
       { name: 'Camp 1', alt: 5700, lat: 28.5712, lon: 84.5865, blurb: 'On a flat glacier shelf above the first crevasse field.' },
       { name: 'Camp 2', alt: 6400, lat: 28.5650, lon: 84.5790, blurb: 'Above the Hourglass, on a bench that has been hit by serac fall more than once.' },
       { name: 'Camp 3', alt: 6800, lat: 28.5598, lon: 84.5722, blurb: 'A broad shelf below the upper seracs, where eleven climbers died in their tents in 2012.' },
@@ -90,80 +93,112 @@ const routes = [
     firstAscent: '25 April 1972, Reinhold Messner, solo from the top camp (Tyrolean expedition led by Wolfgang Nairz); Franz Jäger and Andi Schlick died in the storm that followed',
     share: 'A few ascents',
     difficulty: 'A 3,000 m face of ice fields and rock at 45-60°, exposed to storms from the south',
-    verticalGain: '≈ 2,200 m from the glacier plateau',
+    verticalGain: '≈ 3,750 m from the Thulagi Glacier',
     summary:
-      'The face Messner climbed alone from the last camp in 1972, his second 8,000 m peak. On the descent a storm caught the team; Jäger turned back and vanished, Schlick walked out of a tent into the night and was never found. Messner spent the night searching for them.',
+      'The face Messner climbed alone from the last camp in 1972, his second 8,000 m peak, approached up the Dona Khola and the Thulagi Glacier to the basin the team called the Butterfly Valley. On the descent a storm caught the team; Jäger turned back and vanished, Schlick walked out of a tent into the night and was never found. Messner spent the night searching for them.',
     waypoints: [
-      [28.5324, 84.5365], // glacier plateau
+      [28.4940, 84.5240], // Advanced Base, Thulagi Glacier
+      [28.5000, 84.5270],
+      [28.5060, 84.5300],
+      [28.5100, 84.5320],
+      [28.5140, 84.5340], // C1
+      [28.5200, 84.5360],
+      [28.5260, 84.5380],
+      [28.5324, 84.5365], // C2, glacier plateau
       [28.5373, 84.5432],
       [28.5398, 84.5465],
-      [28.5423, 84.5498], // C2
-      [28.5448, 84.5531], // C3
+      [28.5423, 84.5498], // C3
+      [28.5448, 84.5531],
       [28.5472, 84.5564], // C4
       [28.5497, 84.5597], // Summit
     ],
     camps: [
-      { name: 'Glacier plateau', alt: 5950, lat: 28.5324, lon: 84.5365, blurb: 'The high basin below the south-west face, reached from the Thulagi side.' },
-      { name: 'Camp 2', alt: 6600, lat: 28.5423, lon: 84.5498, blurb: 'On the lower face.' },
-      { name: 'Camp 3', alt: 7000, lat: 28.5448, lon: 84.5531, blurb: 'A snow ledge in the middle of the face.' },
-      { name: 'Camp 4', alt: 7450, lat: 28.5472, lon: 84.5564, blurb: 'The 1972 top camp, from which Messner climbed alone to the summit and back in a day.' },
+      { name: 'Advanced Base', alt: 4400, lat: 28.4940, lon: 84.5240, blurb: 'On the Thulagi Glacier, a day above the base camp in the Dona Khola on the Marsyangdi side.' },
+      { name: 'Camp 1', alt: 5650, lat: 28.5140, lon: 84.5340, blurb: 'Below the ice labyrinth that guards the upper basin.' },
+      { name: 'Camp 2', alt: 5850, lat: 28.5324, lon: 84.5365, blurb: 'The high basin below the south-west face, the Butterfly Valley of the 1972 team.' },
+      { name: 'Camp 3', alt: 6600, lat: 28.5423, lon: 84.5498, blurb: 'On the south-west shoulder, above the lower face.' },
+      { name: 'Camp 4', alt: 7400, lat: 28.5472, lon: 84.5564, blurb: 'The 1972 top camp at the edge of the plateau, from which Messner climbed alone to the summit and back in a day.' },
     ],
     hazards: ['sw-face', 'false-summit', 'death-zone'],
   },
   {
     id: 'south',
-    name: 'South Ridge',
-    aka: 'Polish route · the first winter ascent, 1984',
+    name: 'Messner Route in Winter',
+    aka: 'Polish first winter ascent, 1984 · the 1972 line from the south',
     color: '#ffc14d',
-    firstAscent: '12 January 1984, Maciej Berbeka & Ryszard Gajewski (Poland), by a new line in winter',
-    share: 'Rarely repeated',
-    difficulty: 'A high col reached from the south, then a ridge of ice and rock at 45-55° in winter winds',
-    verticalGain: '≈ 1,650 m from the col',
+    firstAscent: '12 January 1984, Maciej Berbeka & Ryszard Gajewski (Poland), by the 1972 Messner route from the south',
+    share: 'Historic; the same line as the south-west face',
+    difficulty: 'The Thulagi Glacier and the ice labyrinth to the Butterfly Valley, then the south-west face at 45-60° in winter winds',
+    verticalGain: '≈ 3,700 m from the Thulagi Glacier',
     summary:
-      'Lech Korniszewski’s Polish expedition climbed a new route from the south in the depths of winter, one of the run of Polish winter firsts of the 1980s. Berbeka and Gajewski reached the summit on 12 January in −40 °C.',
+      'Lech Korniszewski’s Polish expedition came up the Marsyangdi and the Dona Khola and climbed the Tyrolean line of 1972 in the depths of winter, one of the run of Polish winter firsts of the 1980s. Stanisław Jaworski died on 11 December when a fixed rope broke below Camp 1; Berbeka and Gajewski reached the summit at 11 am on 12 January.',
     waypoints: [
-      [28.5232, 84.5632], // south glacier
-      [28.5265, 84.5628],
-      [28.5299, 84.5624],
-      [28.5332, 84.5619], // col camp
-      [28.5365, 84.5615], // C2
-      [28.5398, 84.5610],
-      [28.5431, 84.5606], // C3
-      [28.5464, 84.5601],
+      [28.4940, 84.5240], // Advanced Base, Thulagi Glacier
+      [28.5000, 84.5270],
+      [28.5060, 84.5300],
+      [28.5100, 84.5320],
+      [28.5140, 84.5340], // C1
+      [28.5200, 84.5360],
+      [28.5260, 84.5380],
+      [28.5324, 84.5365], // Butterfly Valley
+      [28.5373, 84.5432],
+      [28.5398, 84.5465], // C2
+      [28.5423, 84.5498],
+      [28.5448, 84.5531], // C3
+      [28.5472, 84.5564],
+      [28.5485, 84.5580], // C4, on the plateau
       [28.5497, 84.5597], // Summit
     ],
     camps: [
-      { name: 'Col camp', alt: 6500, lat: 28.5332, lon: 84.5619, blurb: 'On the saddle between Manaslu and its southern satellites, reached from the Thulagi Glacier.' },
-      { name: 'Camp 2', alt: 7000, lat: 28.5365, lon: 84.5615, blurb: 'On the ridge above the col.' },
-      { name: 'Camp 3', alt: 7500, lat: 28.5431, lon: 84.5606, blurb: 'The 1984 top camp, dug into the ridge.' },
+      { name: 'Advanced Base', alt: 4400, lat: 28.4940, lon: 84.5240, blurb: 'On the Thulagi Glacier above the 4,000 m base camp in the Dona Khola, occupied in December.' },
+      { name: 'Camp 1', alt: 5650, lat: 28.5140, lon: 84.5340, blurb: 'Below the ice labyrinth. Jaworski fell to his death below here on 11 December when a fixed rope parted.' },
+      { name: 'Camp 2', alt: 6400, lat: 28.5398, lon: 84.5465, blurb: 'In the Butterfly Valley, at the foot of the face.' },
+      { name: 'Camp 3', alt: 7100, lat: 28.5448, lon: 84.5531, blurb: 'A snow ledge in the middle of the face.' },
+      { name: 'Camp 4', alt: 7700, lat: 28.5485, lon: 84.5580, blurb: 'On the plateau, the 1984 top camp; the summit is an hour beyond in still weather, longer in January wind.' },
     ],
-    hazards: ['south-col', 'false-summit', 'death-zone'],
+    hazards: ['sw-face', 'false-summit', 'death-zone'],
+    joins: 'swface',
   },
   {
     id: 'east',
-    name: 'East Side',
-    aka: 'Kukuczka–Carsolio, 1986',
+    name: 'Northeast Face Direct',
+    aka: 'Kukuczka–Hajzer, 1986',
     color: '#7dffb3',
-    firstAscent: '10 November 1986, Jerzy Kukuczka & Carlos Carsolio (Poland / Mexico), by a new line up the east side in late autumn',
+    firstAscent: '10 November 1986, Jerzy Kukuczka & Artur Hajzer (Poland), by a new line up the north-east face in alpine style; Carlos Carsolio stopped at the 8,000 m bivouac with frostbite',
     share: 'One ascent',
-    difficulty: 'Steep ice and mixed ground from the eastern glacier basin to the summit plateau, climbed in post-monsoon cold',
-    verticalGain: '≈ 3,700 m from the glacier',
+    difficulty: 'Steep ice and mixed ground from the Manaslu Glacier to the east edge of the summit plateau, climbed in five days of November cold',
+    verticalGain: '≈ 3,750 m from the Manaslu Glacier',
     summary:
-      'Kukuczka’s thirteenth 8,000 m peak, climbed by a new route with the young Carlos Carsolio after weeks of storms had turned back the rest of the team. They reached the summit in November wind and descended the normal route.',
+      'Kukuczka’s twelfth 8,000 m peak. After six weeks of failure on the east ridge, he, Hajzer and Carsolio left the glacier on 5 November and climbed the face to the right of the ridge in alpine style, five bivouacs in five days. Carsolio stayed in the last one with frostbitten feet; the two Poles reached the summit on 10 November and all three went down the normal route.',
     waypoints: [
-      [28.5450, 84.6200], // glacier
-      [28.5466, 84.5999],
-      [28.5477, 84.5848], // C1
-      [28.5485, 84.5748], // C2
-      [28.5489, 84.5697], // C3
-      [28.5493, 84.5647], // C4
+      [28.5970, 84.6110], // Base Camp, Manaslu Glacier
+      [28.5929, 84.6082],
+      [28.5889, 84.6055],
+      [28.5848, 84.6027],
+      [28.5808, 84.5999],
+      [28.5767, 84.5972],
+      [28.5727, 84.5944],
+      [28.5709, 84.5932], // bivouac 5,500
+      [28.5686, 84.5916],
+      [28.5645, 84.5889],
+      [28.5605, 84.5861],
+      [28.5586, 84.5827],
+      [28.5567, 84.5793], // bivouac 6,300
+      [28.5549, 84.5759],
+      [28.5530, 84.5725],
+      [28.5511, 84.5691],
+      [28.5492, 84.5657], // bivouac 7,300
+      [28.5494, 84.5637], // bivouac 7,600
+      [28.5496, 84.5605], // bivouac 8,000
       [28.5497, 84.5597], // Summit
     ],
     camps: [
-      { name: 'Camp 1', alt: 5200, lat: 28.5477, lon: 84.5848, blurb: 'In the eastern glacier basin.' },
-      { name: 'Camp 2', alt: 5800, lat: 28.5485, lon: 84.5748, blurb: 'Below the serac bands.' },
-      { name: 'Camp 3', alt: 6550, lat: 28.5489, lon: 84.5697, blurb: 'On the steep upper face.' },
-      { name: 'Camp 4', alt: 7450, lat: 28.5493, lon: 84.5647, blurb: 'The last bivouac before the plateau.' },
+      { name: 'Base Camp', alt: 4400, lat: 28.5970, lon: 84.6110, blurb: 'On the Manaslu Glacier below the normal-route moraine, set up on 8 September 1986.' },
+      { name: 'Bivouac 1', alt: 5500, lat: 28.5709, lon: 84.5932, blurb: 'The first night on the face, 5 November.' },
+      { name: 'Bivouac 2', alt: 6300, lat: 28.5567, lon: 84.5793, blurb: 'On the spur east of the Hourglass.' },
+      { name: 'Bivouac 3', alt: 7300, lat: 28.5492, lon: 84.5657, blurb: 'Below the steep upper face.' },
+      { name: 'Bivouac 4', alt: 7600, lat: 28.5494, lon: 84.5637, blurb: 'A snow cave under the plateau rim.' },
+      { name: 'Bivouac 5', alt: 8000, lat: 28.5496, lon: 84.5605, blurb: 'On the edge of the plateau. Carsolio stayed here with frostbite while Kukuczka and Hajzer went to the top.' },
     ],
     hazards: ['east-slopes', 'false-summit', 'death-zone'],
   },
@@ -207,15 +242,9 @@ const hazards = [
     incidents: ['25 Apr 1972, Franz Jäger and Andi Schlick die in a storm on the descent'],
   },
   {
-    id: 'south-col', name: 'South col', lat: 28.5332, lon: 84.5619, alt: 6500, radius: 300, severity: 4,
-    kind: 'Wind · winter cold',
-    blurb: 'The saddle at the foot of the south ridge, swept by the winter jet stream.',
-    incidents: [],
-  },
-  {
-    id: 'east-slopes', name: 'East side', lat: 28.5485, lon: 84.5748, alt: 5800, radius: 400, severity: 4,
+    id: 'east-slopes', name: 'East side of the face', lat: 28.5549, lon: 84.5759, alt: 6500, radius: 400, severity: 4,
     kind: 'Serac · avalanche',
-    blurb: 'Steep glacier bands below the plateau, climbed once, in November cold.',
+    blurb: 'Steep ice and serac bands east of the normal route, below the plateau rim, climbed once, in November cold.',
     incidents: [],
   },
   {
@@ -234,8 +263,8 @@ const timeline = [
   { year: 1971, title: 'Northwest spur', text: 'A Japanese team opens the second route on the mountain.' },
   { year: 1972, title: 'Fifteen dead, and Messner', text: 'On 10 April an avalanche kills fifteen members of a Korean expedition. Two weeks later Reinhold Messner climbs the south-west face solo from the top camp; Franz Jäger and Andi Schlick die in the storm that follows.' },
   { year: 1974, title: 'The women’s ascent', text: 'A Japanese women’s expedition puts Naoko Nakaseko, Masako Uchida and Mieko Mori on the summit on 4 May, the first women on any 8,000 m peak.' },
-  { year: 1984, title: 'Winter', text: 'Maciej Berbeka and Ryszard Gajewski make the first winter ascent on 12 January by a new route from the south.' },
-  { year: 1986, title: 'Kukuczka', text: 'Jerzy Kukuczka and Carlos Carsolio climb a new route on the east side on 10 November, Kukuczka’s thirteenth of the fourteen.' },
+  { year: 1984, title: 'Winter', text: 'Maciej Berbeka and Ryszard Gajewski make the first winter ascent on 12 January by the 1972 Messner route from the south.' },
+  { year: 1986, title: 'Kukuczka', text: 'Jerzy Kukuczka and Artur Hajzer climb a new route on the north-east face on 10 November in alpine style, Kukuczka’s twelfth of the fourteen; Carlos Carsolio stops at the last bivouac with frostbite.' },
   { year: 2012, title: 'Camp 3', text: 'A serac avalanche buries Camp 3 before dawn on 23 September; eleven climbers die, the mountain’s second mass tragedy.' },
   { year: 2021, title: 'The false summit', text: 'Drone footage proves that the great majority of recorded ascents stopped on the fore-summit; Nepal begins to require photographs from the true top.' },
   { year: 2022, title: 'Record season', text: 'More than 400 summits in one autumn. Hilaree Nelson dies in a fall from the summit ridge; an avalanche below Camp 4 kills a Nepali climber.' },

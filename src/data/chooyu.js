@@ -10,7 +10,7 @@ const peak = {
   summitText: 'A flat snow plateau so wide that the true summit is a long walk beyond the point where most people stop. Everest, Lhotse and Makalu line the horizon to the east; the Nangpa La trade route lies 2,500 m below to the west.',
   summitBlurb: 'Sixth highest point on Earth, 20 km west of Everest on the Nepal–Tibet border. About 4,000 ascents, more than any 8,000 m peak but Everest, and the lowest death rate of the fourteen.',
   figuresLead: 'The mountain where most people climb their first 8,000 m peak, and where altitude, not terrain, does the killing.',
-  otherLines: 'Lines climbed but not modelled here: the 1984 Yugoslav north face, the 1994 Russian west face, and the north-west face direct from the Nangpa La side.',
+  otherLines: 'Lines climbed but not modelled here: the 1984 Yugoslav north face, the 1994 Russian west face, and the 2022 commercial line from Gokyo on the Nepal side.',
   historyTitle: 'Seventy years',
   historyLead: 'From Tichy’s three-man ascent of 1954 to the busiest slopes in Tibet.',
 }
@@ -21,9 +21,9 @@ const routes = [
     name: 'Northwest Ridge',
     aka: 'The normal route from Tibet',
     color: '#ff6a3d',
-    firstAscent: 'In its modern form from the 1980s; the mountain was first climbed nearby on 19 October 1954 by Herbert Tichy, Sepp Jöchler & Pasang Dawa Lama',
+    firstAscent: 'In its modern form from the 1980s; the mountain was first climbed by this flank on 19 October 1954 by Herbert Tichy, Sepp Jöchler & Pasang Dawa Lama',
     share: '≈ 95% of all ascents',
-    difficulty: 'Snow slopes at 30-40°, one 40 m ice cliff at 6,700 m and a short rock band at 7,600 m; the easiest of the fourteen',
+    difficulty: 'Snow slopes at 30-40°, one 40 m ice cliff at 6,600 m and a short rock band at 7,600 m; the easiest of the fourteen',
     verticalGain: '≈ 2,500 m from Advanced Base',
     summary:
       'From an Advanced Base reached by yak from the roadhead at Tingri, up the broad north-west flank: a scree hill, two snow camps, the ice cliff with its fixed ladder, a rock band, and then the plateau. Nothing on it is hard, which is exactly why it fills with people who have never been above 7,000 m.',
@@ -44,7 +44,7 @@ const routes = [
       { name: 'Camp 2', alt: 7050, lat: 28.1020, lon: 86.6420, blurb: 'Above the ice cliff on a broad snow shelf; most teams sleep here on oxygen.' },
       { name: 'Camp 3', alt: 7550, lat: 28.0990, lon: 86.6490, blurb: 'Below the rock band, the last camp before the plateau. Summit day is six to ten hours.' },
     ],
-    hazards: ['abc-altitude', 'ice-cliff', 'yellow-band', 'summit-plateau', 'death-zone'],
+    hazards: ['abc-altitude', 'ice-cliff', 'camp4-1959', 'yellow-band', 'summit-plateau', 'death-zone'],
   },
   {
     id: 'tichy',
@@ -52,30 +52,34 @@ const routes = [
     aka: 'Tichy route · from the Nangpa La',
     color: '#ffc14d',
     firstAscent: '19 October 1954, Herbert Tichy, Sepp Jöchler & Pasang Dawa Lama (Austria / Nepal), a three-man expedition without oxygen',
-    share: 'Historic; joins the normal route on the upper flank',
-    difficulty: 'Glacier and snow slopes from the Nangpa La trade pass, then the same upper flank as the normal route',
-    verticalGain: '≈ 2,500 m from the Nangpa La',
+    share: 'Historic; the same north-west flank as the normal route',
+    difficulty: 'Glacier from the Nangpa La trade pass to the Gyabrag base, then the north-west face: the ice cliff, the snow slopes and the plateau',
+    verticalGain: '≈ 2,700 m from the 1954 base camp',
     summary:
-      'Tichy’s tiny post-monsoon expedition walked over the Nangpa La from Nepal into Tibet, climbed the north-west face in a fortnight with a handful of Sherpas, and reached the summit in a storm with Tichy’s frostbitten hands wrapped in bandages: the smallest team to make a first ascent of an 8,000 m peak.',
+      'Tichy’s tiny post-monsoon expedition walked over the Nangpa La from Nepal into Tibet, put its base on the Gyabrag Glacier and climbed the north-west face in a fortnight with a handful of Sherpas, reaching the summit in a storm with Tichy’s frostbitten hands wrapped in bandages: the smallest team to make a first ascent of an 8,000 m peak. The line is the normal route of today.',
     waypoints: [
       [28.1150, 86.5850], // Nangpa La
-      [28.1060, 86.5980],
-      [28.1000, 86.6100],
-      [28.0977, 86.6303], // C1
-      [28.0965, 86.6405], // C2
-      [28.0959, 86.6456], // C3
-      [28.0954, 86.6506], // C4
-      [28.0948, 86.6557],
+      [28.1158, 86.5900],
+      [28.1166, 86.5950],
+      [28.1174, 86.6000],
+      [28.1180, 86.6050], // 1954 Base Camp, modern Advanced Base
+      [28.1136, 86.6152],
+      [28.1085, 86.6270],
+      [28.1060, 86.6330], // ice cliff, C3 below it
+      [28.1020, 86.6420], // C4
+      [28.0990, 86.6490],
+      [28.0975, 86.6540],
+      [28.0964, 86.6557], // plateau
       [28.0942, 86.6608], // Summit
     ],
     camps: [
       { name: 'Nangpa La', alt: 5716, lat: 28.1150, lon: 86.5850, blurb: 'The glacier pass between Nepal and Tibet, a yak trade route for centuries and the refugees’ road out of Tibet.' },
-      { name: 'Camp 1', alt: 6350, lat: 28.0977, lon: 86.6303, blurb: 'On the western flank below the ice cliffs.' },
-      { name: 'Camp 2', alt: 6750, lat: 28.0965, lon: 86.6405, blurb: 'Where the 1954 team sat out a storm for days.' },
-      { name: 'Camp 3', alt: 7000, lat: 28.0959, lon: 86.6456, blurb: 'The 1954 high camp; the summit push started from here.' },
-      { name: 'Camp 4', alt: 7600, lat: 28.0954, lon: 86.6506, blurb: 'A modern high camp on the same flank, above the rock band.' },
+      { name: 'Base Camp', alt: 5500, lat: 28.1180, lon: 86.6050, blurb: 'On the Gyabrag Glacier a short way below the modern Advanced Base, a day’s walk over the pass from Nepal.' },
+      { name: 'Camp 3', alt: 6600, lat: 28.1062, lon: 86.6325, blurb: 'Just below the ice cliff that had turned Shipton and Hillary back in 1952.' },
+      { name: 'Camp 4', alt: 7000, lat: 28.1023, lon: 86.6412, blurb: 'The 1954 high camp, above the ice cliff; summit day started here.' },
     ],
-    hazards: ['nangpa-la', 'yellow-band', 'summit-plateau', 'death-zone'],
+    hazards: ['nangpa-la', 'ice-cliff', 'camp4-1959', 'yellow-band', 'summit-plateau', 'death-zone'],
+    joins: 'normal',
   },
   {
     id: 'swface',
@@ -85,25 +89,35 @@ const routes = [
     firstAscent: '20–21 September 1990, Erhard Loretan, Jean Troillet (Switzerland) & Wojciech Kurtyka (Poland), in a single push of two days and one night',
     share: 'A handful of ascents',
     difficulty: 'A 2,500 m face of ice fields and rock bands at 50-60°, climbed night-naked style with no tents or rope',
-    verticalGain: '≈ 2,300 m from the glacier',
+    verticalGain: '≈ 2,200 m from the foot of the face',
     summary:
-      'The face that looks down on Gokyo. Three of the best alpinists of their generation climbed it without a tent in 1990, resting in the sun by day and moving by night, in the same style Loretan and Troillet had used on Everest’s north face four years earlier.',
+      'The face above the glacier basin west of the summit, reached over the Nangpa La from a base camp across the Gyabrag Glacier from the pass. Three of the best alpinists of their generation climbed it without a tent in 1990, resting in the sun by day and moving by night, in the same style Loretan and Troillet had used on Everest’s north face four years earlier, and came back down the west ridge.',
     waypoints: [
-      [28.0500, 86.6600], // glacier
-      [28.0574, 86.6601],
-      [28.0647, 86.6603],
-      [28.0721, 86.6604], // foot of the face
-      [28.0758, 86.6605],
-      [28.0795, 86.6605], // bivouac
-      [28.0831, 86.6606],
-      [28.0868, 86.6607], // headwall
-      [28.0905, 86.6607],
+      [28.1180, 86.6050], // Base Camp
+      [28.1140, 86.6060],
+      [28.1100, 86.6070],
+      [28.1060, 86.6083],
+      [28.1020, 86.6095],
+      [28.1000, 86.6100],
+      [28.0975, 86.6145],
+      [28.0950, 86.6190],
+      [28.0930, 86.6230], // foot of the face
+      [28.0932, 86.6280],
+      [28.0933, 86.6330],
+      [28.0935, 86.6380],
+      [28.0936, 86.6419],
+      [28.0937, 86.6450], // bivouac
+      [28.0938, 86.6482],
+      [28.0939, 86.6513], // headwall
+      [28.0941, 86.6545],
+      [28.0941, 86.6576],
       [28.0942, 86.6608], // Summit
     ],
     camps: [
-      { name: 'Glacier camp', alt: 5900, lat: 28.0500, lon: 86.6600, blurb: 'On the upper Ngozumpa side, below the face; reached from Gokyo.' },
-      { name: 'Bivouac', alt: 6950, lat: 28.0795, lon: 86.6605, blurb: 'A snow ledge where the 1990 trio sat out the daylight hours.' },
-      { name: 'Headwall', alt: 7500, lat: 28.0868, lon: 86.6607, blurb: 'The steepest rock, climbed unroped at night.' },
+      { name: 'Base Camp', alt: 5700, lat: 28.1180, lon: 86.6050, blurb: 'Across the Gyabrag Glacier from the Nangpa La, where the normal route’s Advanced Base now stands; the 1990 trio walked in over the pass from Nepal.' },
+      { name: 'Foot of the face', alt: 6000, lat: 28.0930, lon: 86.6230, blurb: 'The flat glacier basin under the face, west-south-west of the summit.' },
+      { name: 'Bivouac', alt: 6950, lat: 28.0937, lon: 86.6450, blurb: 'A snow ledge where the 1990 trio sat out the daylight hours.' },
+      { name: 'Headwall', alt: 7500, lat: 28.0939, lon: 86.6513, blurb: 'The steepest rock, climbed unroped at night.' },
     ],
     hazards: ['sw-face', 'summit-plateau', 'death-zone'],
   },
@@ -115,24 +129,27 @@ const routes = [
     firstAscent: '12 February 1985, Maciej Berbeka & Maciej Pawlikowski (Poland); Jerzy Kukuczka and Andrzej Heinrich three days later',
     share: 'Rarely repeated',
     difficulty: 'A long pillar of rock and ice at 45-60° from the Nepal side, climbed in −40 °C winter winds',
-    verticalGain: '≈ 2,400 m from the glacier',
+    verticalGain: '≈ 2,800 m from the Lungsampa Glacier',
     summary:
-      'A new route and a first winter ascent in one: Andrzej Zawada’s Polish expedition forced the pillar in the coldest weeks of the year, with the permit technically expiring the day before the second summit team topped out.',
+      'A new route and a first winter ascent in one: Andrzej Zawada’s Polish expedition forced 2,800 m of ice and rock from the Lungsampa Glacier in the coldest weeks of the year, with the permit technically expiring the day before the second summit team topped out.',
     waypoints: [
-      [28.0600, 86.7100], // glacier
-      [28.0685, 86.6977],
-      [28.0742, 86.6895], // C1
-      [28.0800, 86.6813],
-      [28.0857, 86.6731], // C2
-      [28.0885, 86.6690], // C3
-      [28.0914, 86.6649], // C4
+      [28.0680, 86.6720], // Lungsampa Glacier
+      [28.0713, 86.6706],
+      [28.0746, 86.6692],
+      [28.0771, 86.6681], // C1
+      [28.0810, 86.6664], // C2
+      [28.0855, 86.6645], // C3
+      [28.0877, 86.6636], // C4
+      [28.0888, 86.6631], // C5
+      [28.0920, 86.6617],
       [28.0942, 86.6608], // Summit
     ],
     camps: [
-      { name: 'Camp 1', alt: 6200, lat: 28.0742, lon: 86.6895, blurb: 'Below the pillar on the glacier.' },
-      { name: 'Camp 2', alt: 6700, lat: 28.0857, lon: 86.6731, blurb: 'On the crest of the pillar.' },
-      { name: 'Camp 3', alt: 7200, lat: 28.0885, lon: 86.6690, blurb: 'Under the upper rock band.' },
-      { name: 'Camp 4', alt: 7700, lat: 28.0914, lon: 86.6649, blurb: 'The 1985 high camp, below the edge of the plateau.' },
+      { name: 'Camp 1', alt: 6000, lat: 28.0771, lon: 86.6681, blurb: 'At the foot of the pillar, above the glacier cwm.' },
+      { name: 'Camp 2', alt: 6500, lat: 28.0810, lon: 86.6664, blurb: 'On the lower pillar, above the 1,200 m cliff of the lower face.' },
+      { name: 'Camp 3', alt: 7100, lat: 28.0855, lon: 86.6645, blurb: 'On the crest of the pillar.' },
+      { name: 'Camp 4', alt: 7450, lat: 28.0877, lon: 86.6636, blurb: 'Under the upper rock barrier.' },
+      { name: 'Camp 5', alt: 7550, lat: 28.0888, lon: 86.6631, blurb: 'The 1985 high camp, moved over the rocky barrier a few days before the summit.' },
     ],
     hazards: ['se-pillar', 'summit-plateau', 'death-zone'],
   },
@@ -141,25 +158,27 @@ const routes = [
     name: 'Southeast Face',
     aka: 'Austrian route, 1978',
     color: '#7dffb3',
-    firstAscent: '11 October 1978, Edi Koblmüller & Alois Furtner (Austria), in alpine style without a permit',
+    firstAscent: '27 October 1978, Edi Koblmüller & Alois Furtner (Austria), in alpine style without a permit; Herbert Haberl turned back at 8,000 m',
     share: 'A few ascents',
-    difficulty: 'Ice slopes and a rock band at 7,000 m, climbed in five days by a two-man team',
-    verticalGain: '≈ 2,100 m from the glacier',
+    difficulty: 'Ice slopes and a rock band at 7,000 m, climbed in a few days by a small team',
+    verticalGain: '≈ 2,750 m from the Lungsampa Glacier',
     summary:
-      'Koblmüller and Furtner climbed the face on the Nepal side in a lightweight push, the second new route on the mountain and one of the earliest alpine-style ascents of an 8,000 m peak; they had no permit and were fined on return.',
+      'Koblmüller and Furtner climbed the face on the Nepal side from a base at 5,000 m on a Gokyo trekking permit, with camps at 6,000 and 7,400 m, and reached the summit at six in the evening: the second new route on the mountain and one of the earliest alpine-style ascents of an 8,000 m peak. They were fined on return, and the claim was disputed for years; Messner backed it.',
     waypoints: [
-      [28.0700, 86.6900], // glacier
-      [28.0797, 86.6783],
-      [28.0845, 86.6725], // C1
-      [28.0869, 86.6696], // C2
-      [28.0894, 86.6666], // C3
-      [28.0918, 86.6637],
+      [28.0705, 86.6780], // Lungsampa Glacier
+      [28.0735, 86.6758],
+      [28.0764, 86.6737],
+      [28.0792, 86.6717], // C1
+      [28.0818, 86.6698],
+      [28.0843, 86.6680],
+      [28.0877, 86.6655], // C2
+      [28.0900, 86.6638],
+      [28.0922, 86.6622],
       [28.0942, 86.6608], // Summit
     ],
     camps: [
-      { name: 'Camp 1', alt: 6600, lat: 28.0845, lon: 86.6725, blurb: 'Below the ice slopes.' },
-      { name: 'Camp 2', alt: 7000, lat: 28.0869, lon: 86.6696, blurb: 'Under the rock band.' },
-      { name: 'Camp 3', alt: 7550, lat: 28.0894, lon: 86.6666, blurb: 'Above the band, on the way to the plateau.' },
+      { name: 'Camp 1', alt: 6000, lat: 28.0792, lon: 86.6717, blurb: 'Above the glacier, below the ice slopes.' },
+      { name: 'Camp 2', alt: 7400, lat: 28.0877, lon: 86.6655, blurb: 'Above the rock band, the last camp before the plateau.' },
     ],
     hazards: ['se-face', 'summit-plateau', 'death-zone'],
   },
@@ -173,10 +192,16 @@ const hazards = [
     incidents: [],
   },
   {
-    id: 'ice-cliff', name: 'The ice cliff', lat: 28.1060, lon: 86.6330, alt: 6700, radius: 250, severity: 3,
+    id: 'ice-cliff', name: 'The ice cliff', lat: 28.1060, lon: 86.6330, alt: 6600, radius: 250, severity: 3,
     kind: 'Serac step · queues',
     blurb: 'A 40 m ice wall between Camps 1 and 2, the only technical obstacle on the normal route, climbed on fixed rope and a ladder. Shipton and Hillary turned back below it in 1952.',
     incidents: [],
+  },
+  {
+    id: 'camp4-1959', name: 'Camp 4, 1959', lat: 28.1020, lon: 86.6420, alt: 7100, radius: 300, severity: 4,
+    kind: 'Avalanche',
+    blurb: 'The snow shelf above the ice cliff where the international women’s expedition of 1959, approaching over the Nangpa La, had its Camp 4.',
+    incidents: ['2 Oct 1959, an avalanche buries Camp 4 at about 7,100 m; Claude Kogan, Claudine van der Straten and Ang Norbu die, and a second Sherpa is killed going up to help'],
   },
   {
     id: 'yellow-band', name: 'Rock band', lat: 28.0985, lon: 86.6507, alt: 7600, radius: 200, severity: 3,
@@ -197,22 +222,22 @@ const hazards = [
     incidents: ['30 Sep 2006, Chinese border guards fire on refugees crossing the pass in full view of climbers at Advanced Base; a 17-year-old nun, Kelsang Namtso, is killed'],
   },
   {
-    id: 'sw-face', name: 'Southwest Face', lat: 28.0800, lon: 86.6605, alt: 7000, radius: 400, severity: 5,
+    id: 'sw-face', name: 'Southwest Face', lat: 28.0938, lon: 86.6482, alt: 7100, radius: 400, severity: 5,
     kind: 'Serac · avalanche · commitment',
     blurb: 'Ice fields under the summit seracs, with no place to stop; the 1990 trio climbed it because they could not afford to be on it in daylight.',
     incidents: [],
   },
   {
-    id: 'se-pillar', name: 'Southeast Pillar', lat: 28.0857, lon: 86.6731, alt: 6700, radius: 350, severity: 4,
+    id: 'se-pillar', name: 'Southeast Pillar', lat: 28.0810, lon: 86.6664, alt: 6500, radius: 350, severity: 4,
     kind: 'Cornice · wind · cold',
     blurb: 'A crest exposed to the winter jet stream; the 1985 team climbed it in −40 °C.',
     incidents: [],
   },
   {
-    id: 'se-face', name: 'Southeast Face', lat: 28.0869, lon: 86.6696, alt: 7000, radius: 350, severity: 4,
+    id: 'se-face', name: 'Southeast Face', lat: 28.0843, lon: 86.6680, alt: 6800, radius: 350, severity: 4,
     kind: 'Avalanche',
     blurb: 'Snow slopes below the rock band that load after every storm from the Nepal side.',
-    incidents: ['1959, an avalanche kills Claude Kogan, Claudine van der Straten and two Sherpas on the international women’s expedition'],
+    incidents: [],
   },
   {
     id: 'death-zone', name: 'The Death Zone', lat: 28.0942, lon: 86.6608, alt: 8000, radius: 900, severity: 5,

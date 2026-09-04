@@ -10,9 +10,9 @@ const peak = {
   summitText: 'A rounded snow summit on a high plateau, invisible from the Baltoro Glacier that gives it its name. Messner and Habeler stood here in 1975 after three days from base camp with no fixed rope or camps, and changed what Himalayan climbing meant.',
   summitBlurb: 'Eleventh highest point on Earth, at the head of the Baltoro Glacier on the Pakistan–China border. About 450 ascents and 35 deaths; usually climbed in the same season as Gasherbrum II from a shared base camp.',
   figuresLead: 'A quiet giant that most people climb as the second half of a Gasherbrum double.',
-  otherLines: 'Lines climbed but not modelled here: the 1985 Polish north face, the 1980 French north-west ridge, and the 1990 Slovenian south face variations.',
+  otherLines: 'Lines climbed but not modelled here: the 1985 Polish north face, the 1980 French south ridge, and the 1990 Slovenian south face variations.',
   historyTitle: 'Ninety years',
-  historyLead: 'From the 1936 French expedition to the winter ascent of 2012.',
+  historyLead: 'From the 1934 reconnaissance to the winter ascent of 2012.',
 }
 
 const routes = [
@@ -21,7 +21,7 @@ const routes = [
     name: 'Japanese Couloir',
     aka: 'Northwest Face · the normal route',
     color: '#ff6a3d',
-    firstAscent: '1981, a Japanese expedition, up the couloir on the north-west face; the standard route ever since',
+    firstAscent: 'Climbed in 1981 (an Italian party first, then the Japanese expedition that gave it its name); the standard route since the mid-1980s',
     share: '≈ 80% of all ascents',
     difficulty: 'The Gasherbrum icefall, then a 600 m couloir at 45-55° to the north-west ridge, and long summit slopes',
     verticalGain: '≈ 3,000 m from Base Camp',
@@ -79,29 +79,36 @@ const routes = [
   {
     id: 'roch',
     name: 'Roch Arête',
-    aka: 'The 1958 American route · the first ascent',
+    aka: 'The 1958 American route · IHE spur / south-east ridge · the first ascent',
     color: '#5fd3ff',
-    firstAscent: '5 July 1958, Pete Schoening & Andy Kauffman (American expedition led by Nick Clinch), by the spur reconnoitred by André Roch in 1936',
+    firstAscent: '5 July 1958, Pete Schoening & Andy Kauffman (American expedition led by Nick Clinch), by the spur reconnoitred by André Roch in 1934',
     share: 'Historic; rarely repeated',
-    difficulty: 'A long glacier and spur to the summit plateau, then the plateau and summit slopes',
-    verticalGain: '≈ 3,000 m from the glacier',
+    difficulty: 'A glacier bench and a long rib to the summit plateau, then the plateau, the upper snow bowl and a short couloir to the crest',
+    verticalGain: '≈ 2,500 m from the glacier',
     summary:
-      'The line of the first ascent: up the spur on the south-east side that the 1936 French and Swiss reconnaissance had identified, to the high plateau, then a long summit day. Schoening, the man whose ice-axe belay had saved five on K2 in 1953, reached the top with Kauffman, the only 8,000 m first ascent by Americans.',
+      'The line of the first ascent: from the upper Abruzzi Glacier up the spur on the south side that the 1934 International Himalayan Expedition (Roch and Ertl) had identified and the French pushed to 6,800 m in 1936, to the high plateau, then a long summit day. Schoening, the man whose ice-axe belay had saved five on K2 in 1953, reached the top with Kauffman, the only 8,000 m first ascent by Americans.',
     waypoints: [
-      [35.6950, 76.7000], // glacier
-      [35.7008, 76.6993], // C1
-      [35.7038, 76.6989],
-      [35.7067, 76.6986], // C2
-      [35.7096, 76.6982],
-      [35.7154, 76.6975], // C3, plateau
-      [35.7184, 76.6971],
-      [35.7213, 76.6968],
+      [35.6860, 76.7000], // upper Abruzzi Glacier bench
+      [35.6890, 76.7000], // C1
+      [35.6920, 76.6950],
+      [35.6948, 76.6928], // C2
+      [35.6975, 76.6921], // C3, ice dome
+      [35.7000, 76.6918], // C4, plateau edge
+      [35.7035, 76.6924],
+      [35.7057, 76.6943],
+      [35.7080, 76.6975], // plateau
+      [35.7120, 76.7000], // C5
+      [35.7152, 76.6985],
+      [35.7184, 76.6971], // upper snow bowl
+      [35.7213, 76.6968], // couloir to the crest
       [35.7242, 76.6964], // Summit
     ],
     camps: [
-      { name: 'Camp 1', alt: 6300, lat: 35.7008, lon: 76.6993, blurb: 'At the foot of the spur on the south side.' },
-      { name: 'Camp 2', alt: 6900, lat: 35.7067, lon: 76.6986, blurb: 'On the crest of the spur.' },
-      { name: 'Camp 3', alt: 7150, lat: 35.7154, lon: 76.6975, blurb: 'On the summit plateau, the 1958 top camp.' },
+      { name: 'Camp 1', alt: 5640, lat: 35.6890, lon: 76.7000, blurb: 'At the base of the arête, above the bench of the upper Abruzzi Glacier.' },
+      { name: 'Camp 2', alt: 6400, lat: 35.6948, lon: 76.6928, blurb: 'Behind a rock buttress on the rib.' },
+      { name: 'Camp 3', alt: 6700, lat: 35.6975, lon: 76.6921, blurb: 'On an ice dome on the crest of the spur.' },
+      { name: 'Camp 4', alt: 6860, lat: 35.7000, lon: 76.6918, blurb: 'At the edge of the southern plateau.' },
+      { name: 'Camp 5', alt: 7160, lat: 35.7120, lon: 76.7000, blurb: 'The 1958 top camp on the plateau; from here Schoening and Kauffman crossed the upper snow bowl and took a couloir just east of the summit to the crest.' },
     ],
     hazards: ['roch-spur', 'summit-slopes', 'death-zone'],
   },
@@ -181,7 +188,7 @@ const hazards = [
     id: 'summit-slopes', name: 'Summit slopes', lat: 35.7258, lon: 76.6943, alt: 7800, radius: 300, severity: 4,
     kind: 'Whiteout · length',
     blurb: 'Broad snow slopes and a plateau where the summit is hard to find in cloud and the way back easy to lose.',
-    incidents: ['9 Mar 2012, the first winter ascent by Bielecki and Gołąb; two Polish climbers on the same team die in a storm here days later'],
+    incidents: ['9 Mar 2012, the first winter ascent by Bielecki and Gołąb; the same day Göschl, Hählen and Nisar Hussain of a second expedition vanish near the summit'],
   },
   {
     id: 'nw-face', name: 'Northwest Face', lat: 35.7360, lon: 76.6820, alt: 6800, radius: 300, severity: 4,
@@ -190,7 +197,7 @@ const hazards = [
     incidents: [],
   },
   {
-    id: 'roch-spur', name: 'Roch spur', lat: 35.7067, lon: 76.6986, alt: 6900, radius: 350, severity: 3,
+    id: 'roch-spur', name: 'Roch spur', lat: 35.7000, lon: 76.6918, alt: 6860, radius: 350, severity: 3,
     kind: 'Cornice · exposure',
     blurb: 'A long, exposed spur to the plateau, corniced along its crest.',
     incidents: [],
@@ -218,14 +225,15 @@ const hazards = [
 
 const timeline = [
   { year: 1892, title: 'Hidden Peak', text: 'Martin Conway’s expedition, the first to explore the upper Baltoro, names the mountain Hidden Peak because it cannot be seen until the head of the glacier.' },
-  { year: 1936, title: 'The French', text: 'A French expedition led by Henry de Ségogne reaches about 6,800 m on the south-east spur; André Roch identifies the line that would be climbed in 1958.' },
+  { year: 1934, title: 'Reconnaissance', text: 'André Roch and Hans Ertl of Dyhrenfurth’s International Himalayan Expedition climb the south spur to about 6,300 m, the line that would be followed in 1958.' },
+  { year: 1936, title: 'The French', text: 'A French expedition led by Henry de Ségogne pushes the IHE spur, reconnoitred by Roch and Ertl in 1934, to about 6,800 m.' },
   { year: 1958, title: 'First ascent', text: 'Pete Schoening and Andy Kauffman reach the summit on 5 July for Nick Clinch’s small American expedition, the only first ascent of an 8,000 m peak by Americans.' },
   { year: 1975, title: 'Alpine style', text: 'Reinhold Messner and Peter Habeler climb the north-west face in three days with one tent and no fixed rope: the first alpine-style ascent of an 8,000 m peak.' },
   { year: 1977, title: 'Southwest ridge', text: 'Andrej Štremfelj and Nejc Zaplotnik open a new route for a Yugoslav expedition.' },
-  { year: 1982, title: 'Dacher and Messner', text: 'Michl Dacher and Reinhold Messner climb the mountain in a lightweight push; Messner’s second ascent of it.' },
+  { year: 1982, title: 'The north face', text: 'A German expedition (Günter Sturm, Michl Dacher and Sigi Hupfauer) climbs a new route on the north face; Marie-José Valençot becomes the first woman on the summit, and Sylvain Saudan makes the first ski descent from the top of an 8,000 m peak.' },
   { year: 1983, title: 'The Polish fortnight', text: 'Jerzy Kukuczka and Wojciech Kurtyka climb a new route on the south-west face on 23 July, a week after a new route on Gasherbrum II.' },
   { year: 1984, title: 'The double traverse', text: 'Messner and Hans Kammerlander traverse Gasherbrum II and Gasherbrum I without returning to base camp, the first traverse of two 8,000 m peaks.' },
-  { year: 2012, title: 'Winter', text: 'Adam Bielecki and Janusz Gołąb make the first winter ascent on 9 March. Days later a storm kills two climbers of an international team on the same slopes.' },
+  { year: 2012, title: 'Winter', text: 'Adam Bielecki and Janusz Gołąb make the first winter ascent on 9 March. The same day Gerfried Göschl, Cedric Hählen and Nisar Hussain Sadpara of a second expedition disappear near the summit.' },
   { year: 2013, title: 'Lost', text: 'Three Spanish climbers disappear on the summit day in July; the summer’s second tragedy on the Karakoram 8,000ers after the Nanga Parbat attack.' },
 ]
 

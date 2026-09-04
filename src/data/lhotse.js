@@ -32,7 +32,7 @@ const routes = [
       [28.0025, 86.8555], // Base Camp
       [27.9972, 86.8668], // Khumbu Icefall
       [27.9918, 86.8782], // C1
-      [27.9905, 86.8830],
+      [27.9870, 86.8830], // floor of the Western Cwm
       [27.9847, 86.8933], // C2
       [27.9793, 86.9047],
       [27.9758, 86.9122], // foot of the face
@@ -93,10 +93,10 @@ const routes = [
     color: '#ffc14d',
     firstAscent: '22–24 April 1990, claimed by Tomo Česen (Slovenia), solo and without oxygen; unverified, and doubted by most of the climbing world',
     share: 'One claimed ascent',
-    difficulty: 'Ice runnels and a rock headwall on the right side of the face, climbed at night to avoid rockfall',
+    difficulty: 'Ice runnels and a rock headwall on the left side of the face, climbed at night to avoid rockfall',
     verticalGain: '≈ 3,300 m from the glacier',
     summary:
-      'Česen reported climbing the right-hand side of the face alone in 46 hours, mostly at night, with two bivouacs and no rope, and descending the same way. With no summit photographs and contradicting accounts, the ascent remains the most argued-over in Himalayan history; it is shown here as claimed.',
+      'Česen reported climbing the left-hand side of the face alone in 46 hours, mostly at night, with two bivouacs and no rope, and descending the same way. With no summit photographs and contradicting accounts, the ascent remains the most argued-over in Himalayan history; it is shown here as claimed.',
     waypoints: [
       [27.9320, 86.9250], // glacier
       [27.9394, 86.9271],
@@ -133,7 +133,9 @@ const routes = [
       [27.9525, 86.9600],
       [27.9540, 86.9580], // C3
       [27.9555, 86.9560],
-      [27.9570, 86.9500], // Lhotse Shar
+      [27.9570, 86.9500], // east ridge
+      [27.9580, 86.9470],
+      [27.9588, 86.9438], // Lhotse Shar
     ],
     camps: [
       { name: 'Base Camp', alt: 5500, lat: 27.9300, lon: 86.9700, blurb: 'On the Lhotse Shar Glacier below Island Peak, a trekking peak that stands in the shadow of the wall.' },
@@ -160,10 +162,9 @@ const routes = [
       [27.9647, 86.9299],
       [27.9637, 86.9310],
       [27.9622, 86.9328], // below the main summit
-      [27.9615, 86.9350],
-      [27.9612, 86.9383],
-      [27.9609, 86.9417],
-      [27.9607, 86.9433], // Lhotse Middle
+      [27.9615, 86.9350], // ridge camp
+      [27.9610, 86.9365],
+      [27.9607, 86.9376], // Lhotse Middle
     ],
     camps: [
       { name: 'Camp 4', alt: 7800, lat: 27.9667, lon: 86.9276, blurb: 'The normal route’s high camp, shared with the West Face climbers.' },

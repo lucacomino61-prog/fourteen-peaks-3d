@@ -62,24 +62,34 @@ const routes = [
       'From Pangpema at the head of the Kangchenjunga Glacier, up to the North Col and along the north ridge that the Germans tried in the 1930s. Scott, Boardman and Tasker climbed it in 1979 as a four-person team with no oxygen, a new standard for the great peaks; Boardman and Tasker died on Everest three years later.',
     waypoints: [
       [27.7580, 88.1180], // Pangpema
-      [27.7452, 88.1130],
-      [27.7386, 88.1183],
-      [27.7320, 88.1236], // C1
-      [27.7280, 88.1400], // C2
-      [27.7212, 88.1475], // North Col
-      [27.7181, 88.1475], // C3
-      [27.7150, 88.1475],
-      [27.7100, 88.1475], // C4
-      [27.7060, 88.1475],
+      [27.7530, 88.1198],
+      [27.7500, 88.1209],
+      [27.7470, 88.1220], // Kangchenjunga Glacier
+      [27.7443, 88.1252],
+      [27.7415, 88.1285],
+      [27.7388, 88.1318],
+      [27.7360, 88.1350], // C1, below the Twins
+      [27.7352, 88.1395],
+      [27.7345, 88.1440], // C2, foot of the wall
+      [27.7335, 88.1500], // on the wall
+      [27.7320, 88.1550], // North Col
+      [27.7270, 88.1540],
+      [27.7240, 88.1550],
+      [27.7215, 88.1545], // C3, the 7,475 m snow cave
+      [27.7180, 88.1550], // rocky plateau, 7,775 m
+      [27.7150, 88.1520],
+      [27.7125, 88.1520], // C4, bivouac cave in the summit cone
+      [27.7090, 88.1500],
+      [27.7060, 88.1470], // toward the west-ridge notch
       [27.7025, 88.1475], // Summit
     ],
     camps: [
       { name: 'Pangpema', alt: 5140, lat: 27.7580, lon: 88.1180, blurb: 'The north base camp, on the moraine above the Kangchenjunga Glacier, facing the whole north face.' },
-      { name: 'Camp 1', alt: 6100, lat: 27.7320, lon: 88.1236, blurb: 'On the glacier below the north face, out of the worst of the serac fall.' },
-      { name: 'Camp 2', alt: 6400, lat: 27.7280, lon: 88.1400, blurb: 'Below the slopes leading to the North Col.' },
-      { name: 'North Col', alt: 6900, lat: 27.7212, lon: 88.1475, blurb: 'The saddle between Kangchenjunga and the Twins, reached in 1979 up a serac-threatened ice slope.' },
-      { name: 'Camp 3', alt: 7400, lat: 27.7181, lon: 88.1475, blurb: 'On the broad north ridge, exposed to the wind from Tibet.' },
-      { name: 'Camp 4', alt: 7900, lat: 27.7100, lon: 88.1475, blurb: 'Below the rock steps of the upper ridge; the 1979 summit push started here, in a snow cave.' },
+      { name: 'Camp 1', alt: 5700, lat: 27.7360, lon: 88.1350, blurb: 'On the glacier below the Twins, out of the worst of the serac fall.' },
+      { name: 'Camp 2', alt: 5800, lat: 27.7345, lon: 88.1440, blurb: 'In the cirque at the foot of the 900 m wall that leads to the North Col.' },
+      { name: 'North Col', alt: 6900, lat: 27.7320, lon: 88.1550, blurb: 'The saddle between Kangchenjunga and the Twins, reached in 1979 up a serac-threatened ice wall.' },
+      { name: 'Camp 3', alt: 7475, lat: 27.7215, lon: 88.1545, blurb: 'A snow cave where the ridge steepens into the rock step the 1979 team called the Castle. The summit push began here.' },
+      { name: 'Camp 4', alt: 7900, lat: 27.7125, lon: 88.1520, blurb: 'The bivouac cave in the summit cone where the 1979 team sat out a storm, 600 m of easier ground below the notch on the west ridge.' },
     ],
     hazards: ['north-col-slopes', 'north-ridge', 'sacred-summit', 'death-zone'],
   },
@@ -135,7 +145,7 @@ const routes = [
       [27.7138, 88.1565],
       [27.7161, 88.1542], // C4
       [27.7184, 88.1520],
-      [27.7150, 88.1475], // joins the north ridge
+      [27.7180, 88.1550], // joins the north ridge on the crest
     ],
     camps: [
       { name: 'Zemu base', alt: 5400, lat: 27.7100, lon: 88.2100, blurb: 'On the Zemu Glacier in Sikkim, below the east face, where Bauer’s teams camped in 1929.' },
@@ -162,17 +172,18 @@ const routes = [
       [27.6919, 88.1356], // Great Shelf
       [27.6990, 88.1370],
       [27.7040, 88.1400], // col below Yalung Kang
-      [27.7050, 88.1350], // Yalung Kang
+      [27.7053, 88.1372], // Yalung Kang
       [27.7040, 88.1400],
       [27.7025, 88.1475], // Main summit
-      [27.6983, 88.1508], // Central
-      [27.6950, 88.1530], // South
+      [27.6995, 88.1495],
+      [27.6964, 88.1510], // Central
+      [27.6917, 88.1542], // South
     ],
     camps: [
       { name: 'Great Shelf', alt: 7150, lat: 27.6919, lon: 88.1356, blurb: 'The staging camp for the traverse, shared with the normal route.' },
-      { name: 'Yalung Kang', alt: 8505, lat: 27.7050, lon: 88.1350, blurb: 'The west summit, an 8,000 m peak in its own right, first climbed in 1973.' },
-      { name: 'Kangchenjunga Central', alt: 8482, lat: 27.6983, lon: 88.1508, blurb: 'The middle summit, first climbed in 1978 by a Polish team.' },
-      { name: 'Kangchenjunga South', alt: 8476, lat: 27.6950, lon: 88.1530, blurb: 'The southern top, also first climbed by the Poles in 1978.' },
+      { name: 'Yalung Kang', alt: 8505, lat: 27.7053, lon: 88.1372, blurb: 'The west summit, an 8,000 m peak in its own right, first climbed in 1973.' },
+      { name: 'Kangchenjunga Central', alt: 8482, lat: 27.6964, lon: 88.1510, blurb: 'The middle summit, first climbed in 1978 by a Polish team.' },
+      { name: 'Kangchenjunga South', alt: 8476, lat: 27.6917, lon: 88.1542, blurb: 'The southern top, also first climbed by the Poles in 1978.' },
     ],
     hazards: ['ridge-traverse', 'sacred-summit', 'death-zone'],
     finish: { title: 'Kangchenjunga South', alt: 8476, body: 'The fourth summit of the traverse. From here the 1989 team descended back across the ridge to the Shelf, having spent longer above 8,000 m than anyone before or since.' },
@@ -205,13 +216,13 @@ const hazards = [
     incidents: ['2023, dozens of claimed ascents disputed after drone footage of the ridge'],
   },
   {
-    id: 'north-col-slopes', name: 'North Col slopes', lat: 27.7255, lon: 88.1300, alt: 6500, radius: 350, severity: 5,
+    id: 'north-col-slopes', name: 'North Col slopes', lat: 27.7335, lon: 88.1500, alt: 6300, radius: 350, severity: 5,
     kind: 'Serac · avalanche',
-    blurb: 'The ice slopes below the North Col are overhung by seracs that calve without warning.',
+    blurb: 'The 900 m ice wall west of the North Col is overhung by seracs that calve without warning.',
     incidents: ['1931, Hermann Schaller and Pasang Sherpa killed on the spur above'],
   },
   {
-    id: 'north-ridge', name: 'North ridge', lat: 27.7150, lon: 88.1475, alt: 7600, radius: 320, severity: 4,
+    id: 'north-ridge', name: 'North ridge', lat: 27.7180, lon: 88.1550, alt: 7700, radius: 320, severity: 4,
     kind: 'Wind · exposure · rock steps',
     blurb: 'A long crest above 7,000 m in the full force of the wind off the Tibetan plateau, with rock steps at 7,900 m that the 1979 team climbed without ropes.',
     incidents: [],

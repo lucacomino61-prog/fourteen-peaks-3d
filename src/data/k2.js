@@ -68,20 +68,20 @@ const routes = [
       'A more direct line up the spur just left of the Abruzzi. It avoids House’s Chimney and the Black Pyramid, joining the normal route on the Shoulder below Camp 4, but its lower slopes are swept by avalanches after snowfall.',
     waypoints: [
       [35.8500, 76.5220], // Base Camp
-      [35.8542, 76.5158],
-      [35.8585, 76.5154], // C1
-      [35.8629, 76.5150],
-      [35.8651, 76.5148], // C2
-      [35.8672, 76.5147],
-      [35.8694, 76.5145], // C3
-      [35.8716, 76.5143],
+      [35.8542, 76.5178],
+      [35.8585, 76.5174], // C1
+      [35.8629, 76.5170],
+      [35.8651, 76.5168], // C2
+      [35.8672, 76.5167],
+      [35.8694, 76.5165], // C3
+      [35.8716, 76.5163],
       [35.8738, 76.5150],
       [35.8755, 76.5186], // joins Abruzzi at C4
     ],
     camps: [
-      { name: 'Camp 1', alt: 6050, lat: 35.8585, lon: 76.5154, blurb: 'Above the avalanche-prone lower snowfield.' },
-      { name: 'Camp 2', alt: 6480, lat: 35.8651, lon: 76.5148, blurb: 'A cramped ledge on the crest of the spur.' },
-      { name: 'Camp 3', alt: 7050, lat: 35.8694, lon: 76.5145, blurb: 'Below the final snow slopes to the Shoulder.' },
+      { name: 'Camp 1', alt: 6050, lat: 35.8585, lon: 76.5174, blurb: 'Above the avalanche-prone lower snowfield.' },
+      { name: 'Camp 2', alt: 6480, lat: 35.8651, lon: 76.5168, blurb: 'A cramped ledge on the crest of the spur.' },
+      { name: 'Camp 3', alt: 7050, lat: 35.8694, lon: 76.5165, blurb: 'Below the final snow slopes to the Shoulder.' },
     ],
     hazards: ['cesen-avalanche', 'shoulder', 'bottleneck', 'serac-traverse', 'death-zone'],
     joins: 'abruzzi',
@@ -99,23 +99,23 @@ const routes = [
       'An elegant, direct ridge rising from the K2 Glacier in China. Technically purer than the Abruzzi but the approach through the Shaksgam valley takes weeks, and rescue is impossible.',
     waypoints: [
       [35.9150, 76.5075], // Glacier / ABC
-      [35.9078, 76.5088],
-      [35.9015, 76.5099], // C1
-      [35.8972, 76.5106],
-      [35.8951, 76.5110], // C2
-      [35.8930, 76.5114],
-      [35.8909, 76.5118], // C3
-      [35.8888, 76.5122],
-      [35.8867, 76.5125], // C4
-      [35.8846, 76.5129],
+      [35.9114, 76.5089],
+      [35.9078, 76.5103],
+      [35.9015, 76.5114], // C1
+      [35.8972, 76.5121],
+      [35.8951, 76.5125], // C2
+      [35.8925, 76.5130], // C3
+      [35.8903, 76.5134],
+      [35.8880, 76.5138], // C4
+      [35.8852, 76.5137],
       [35.8825, 76.5133], // Summit
     ],
     camps: [
       { name: 'Advanced Base', alt: 5300, lat: 35.9150, lon: 76.5075, blurb: 'On the K2 Glacier, reached from Sughet Jangal after crossing the Shaksgam River.' },
-      { name: 'Camp 1', alt: 5850, lat: 35.9015, lon: 76.5099, blurb: 'Where the ridge steepens above the glacier.' },
-      { name: 'Camp 2', alt: 6750, lat: 35.8951, lon: 76.5110, blurb: 'On the crest, exposed on both sides.' },
-      { name: 'Camp 3', alt: 7400, lat: 35.8909, lon: 76.5118, blurb: 'Below the upper snow slopes.' },
-      { name: 'Camp 4', alt: 7950, lat: 35.8867, lon: 76.5125, blurb: 'Top of the ridge; from here the summit slopes lead directly up.' },
+      { name: 'Camp 1', alt: 5850, lat: 35.9015, lon: 76.5114, blurb: 'Where the ridge steepens above the glacier.' },
+      { name: 'Camp 2', alt: 6750, lat: 35.8951, lon: 76.5125, blurb: 'On the crest, exposed on both sides.' },
+      { name: 'Camp 3', alt: 7400, lat: 35.8925, lon: 76.5130, blurb: 'Below the upper snow slopes.' },
+      { name: 'Camp 4', alt: 7950, lat: 35.8880, lon: 76.5138, blurb: 'Top of the ridge; from here the summit slopes lead directly up.' },
     ],
     hazards: ['north-ridge-exposure', 'death-zone'],
   },
@@ -131,24 +131,26 @@ const routes = [
     summary:
       'The pillar rising from the Negrotto Col to the summit, one of the hardest lines on any 8,000 m peak. Named by Reinhold Messner, who abandoned it in 1979. Wróż died on the descent in 1986; it was repeated once, by Jordi Corominas in 2004.',
     waypoints: [
-      [35.8600, 76.4950], // Savoia side
-      [35.8620, 76.4970],
-      [35.8664, 76.5005], // Negrotto Col
-      [35.8693, 76.5028],
-      [35.8708, 76.5040], // C2
-      [35.8723, 76.5052],
-      [35.8737, 76.5063], // C3
-      [35.8752, 76.5075],
-      [35.8766, 76.5086], // C4
-      [35.8781, 76.5098],
-      [35.8796, 76.5110],
+      [35.8450, 76.5100], // De Filippi Glacier above Base Camp
+      [35.8485, 76.5095],
+      [35.8520, 76.5090],
+      [35.8570, 76.5075], // foot of the slope
+      [35.8600, 76.5055],
+      [35.8620, 76.5040], // Negrotto Col
+      [35.8650, 76.5055],
+      [35.8690, 76.5075], // C2
+      [35.8720, 76.5090], // C3
+      [35.8745, 76.5105],
+      [35.8755, 76.5110], // C4
+      [35.8770, 76.5120],
+      [35.8795, 76.5130], // top of the buttress
       [35.8825, 76.5133], // Summit
     ],
     camps: [
-      { name: 'Negrotto Col', alt: 6300, lat: 35.8664, lon: 76.5005, blurb: 'The saddle between K2 and Angelus Peak, reached from the Savoia Glacier by a dangerous couloir.' },
-      { name: 'Camp 2', alt: 6900, lat: 35.8708, lon: 76.5040, blurb: 'Bivouac ledges on the pillar.' },
-      { name: 'Camp 3', alt: 7450, lat: 35.8737, lon: 76.5063, blurb: 'Below the hardest mixed pitches.' },
-      { name: 'Camp 4', alt: 7900, lat: 35.8766, lon: 76.5086, blurb: 'Where the pillar merges into the summit snowfields.' },
+      { name: 'Negrotto Col', alt: 6300, lat: 35.8620, lon: 76.5040, blurb: 'The saddle between K2 and Angelus Peak, reached from the De Filippi Glacier above Base Camp by a 50-60° snow and ice slope.' },
+      { name: 'Camp 2', alt: 6900, lat: 35.8690, lon: 76.5075, blurb: 'Bivouac ledges on the pillar.' },
+      { name: 'Camp 3', alt: 7450, lat: 35.8720, lon: 76.5090, blurb: 'Below the hardest mixed pitches.' },
+      { name: 'Camp 4', alt: 7900, lat: 35.8755, lon: 76.5110, blurb: 'Where the pillar merges into the summit snowfields.' },
     ],
     hazards: ['negrotto-couloir', 'death-zone'],
   },
@@ -162,25 +164,26 @@ const routes = [
     difficulty: 'Long mixed ridge, traverses onto the south-west face high up',
     verticalGain: '≈ 3,500 m from the Savoia Glacier',
     summary:
-      'A vast ridge climbed from the Savoia Glacier. The Japanese expedition fixed thousands of metres of rope and finished across the upper south-west face. Its first Pakistani summiteer, Nazir Sabir, became a national hero.',
+      'A vast ridge climbed from the Savoia Glacier. The Japanese expedition fixed thousands of metres of rope and finished across the upper south-west face. Nazir Sabir, the second Pakistani to climb K2, became a national hero.',
     waypoints: [
-      [35.8840, 76.4780], // Savoia glacier
-      [35.8837, 76.4871], // C1
-      [35.8835, 76.4919],
-      [35.8833, 76.4967], // C2
-      [35.8831, 76.4990],
-      [35.8830, 76.5014], // C3
-      [35.8829, 76.5038],
-      [35.8828, 76.5062], // C4
-      [35.8820, 76.5090],
-      [35.8815, 76.5115],
+      [35.8660, 76.4790], // Savoia glacier
+      [35.8675, 76.4840], // C1
+      [35.8710, 76.4890],
+      [35.8735, 76.4930], // C2
+      [35.8750, 76.4950],
+      [35.8770, 76.4985], // C3
+      [35.8785, 76.5020],
+      [35.8800, 76.5050], // C4
+      [35.8802, 76.5070], // Camp V of 1981, the fork at the base of the rock face
+      [35.8805, 76.5090],
+      [35.8812, 76.5115],
       [35.8825, 76.5133], // Summit
     ],
     camps: [
-      { name: 'Camp 1', alt: 6050, lat: 35.8837, lon: 76.4871, blurb: 'On the lower ridge above the Savoia Glacier.' },
-      { name: 'Camp 2', alt: 6730, lat: 35.8833, lon: 76.4967, blurb: 'Snow ridge; heavily corniced.' },
-      { name: 'Camp 3', alt: 7350, lat: 35.8830, lon: 76.5014, blurb: 'Below the rock towers of the upper ridge.' },
-      { name: 'Camp 4', alt: 7900, lat: 35.8828, lon: 76.5062, blurb: 'Where the line leaves the ridge for the south-west face.' },
+      { name: 'Camp 1', alt: 6050, lat: 35.8675, lon: 76.4840, blurb: 'On the lower ridge above the Savoia Glacier.' },
+      { name: 'Camp 2', alt: 6730, lat: 35.8735, lon: 76.4930, blurb: 'Snow ridge; heavily corniced.' },
+      { name: 'Camp 3', alt: 7350, lat: 35.8770, lon: 76.4985, blurb: 'Below the rock towers of the upper ridge.' },
+      { name: 'Camp 4', alt: 7900, lat: 35.8800, lon: 76.5050, blurb: 'Where the line leaves the ridge for the south-west face. The 1981 team placed a last camp just above, at 8,047 m, at the foot of the final rock face.' },
     ],
     hazards: ['west-ridge-cornice', 'death-zone'],
   },
@@ -224,25 +227,25 @@ const hazards = [
     incidents: [],
   },
   {
-    id: 'cesen-avalanche', name: 'Česen Lower Slopes', lat: 35.8585, lon: 76.5154, alt: 6000, radius: 320, severity: 4,
+    id: 'cesen-avalanche', name: 'Česen Lower Slopes', lat: 35.8585, lon: 76.5174, alt: 6000, radius: 320, severity: 4,
     kind: 'Avalanche',
     blurb: 'Open 45° snow slopes that load after every storm. Teams wait for the slopes to settle before crossing.',
     incidents: ['2010s, several teams caught in slab releases between Camp 1 and 2'],
   },
   {
-    id: 'negrotto-couloir', name: 'Negrotto Couloir', lat: 35.8640, lon: 76.4985, alt: 6000, radius: 220, severity: 4,
+    id: 'negrotto-couloir', name: 'Negrotto Col slope', lat: 35.8580, lon: 76.5070, alt: 5750, radius: 220, severity: 4,
     kind: 'Avalanche · serac',
-    blurb: 'The approach couloir to the Negrotto Col from the Savoia Glacier, a funnel for everything that falls off the west face.',
-    incidents: ['1986, the Magic Line team narrowly escapes a serac fall here'],
+    blurb: 'The 50-60° snow and ice slope below the Negrotto Col, above the De Filippi Glacier, where two Americans died in an avalanche in 1986.',
+    incidents: ['21 Jun 1986, an avalanche at the foot of the slope kills John Smolich and Alan Pennington'],
   },
   {
-    id: 'north-ridge-exposure', name: 'Knife-edge Ridge', lat: 35.8951, lon: 76.5110, alt: 6750, radius: 320, severity: 4,
+    id: 'north-ridge-exposure', name: 'Knife-edge Ridge', lat: 35.8951, lon: 76.5125, alt: 6750, radius: 320, severity: 4,
     kind: 'Exposure · cornice · isolation',
     blurb: 'Kilometres of corniced crest with 2,000 m drops on both sides, and no possibility of rescue, the nearest road is a week away.',
     incidents: ['1982, Yanagisawa dies falling on the descent after the first ascent'],
   },
   {
-    id: 'west-ridge-cornice', name: 'Corniced Crest', lat: 35.8833, lon: 76.4967, alt: 6730, radius: 300, severity: 3,
+    id: 'west-ridge-cornice', name: 'Corniced Crest', lat: 35.8735, lon: 76.4930, alt: 6730, radius: 300, severity: 3,
     kind: 'Cornice collapse',
     blurb: 'Long stretches of overhanging snow on the ridge crest; the line often runs below the cornice on the south side.',
     incidents: [],

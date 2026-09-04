@@ -1,0 +1,34 @@
+{
+  "name": "k2",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "oxlint",
+    "preview": "vite preview",
+    "terrain": "node scripts/fetch-terrain.mjs && node scripts/fetch-copernicus.mjs && node scripts/build-albedo.mjs",
+    "probe": "node scripts/probe.mjs",
+    "assets": "node scripts/encode-height.mjs && node scripts/bake-light.mjs && node scripts/make-webp.mjs && node scripts/make-thumbs.mjs"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.8",
+    "@react-three/fiber": "^9.7.0",
+    "fflate": "^0.8.3",
+    "gsap": "^3.15.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "three": "^0.185.1",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^6.1.0",
+    "geotiff": "^3.0.5",
+    "oxlint": "^1.79.0",
+    "sharp": "^0.35.4",
+    "vite": "^8.2.2"
+  }
+}

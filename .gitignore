@@ -1,0 +1,41 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+.tile-cache
+public/terrain/*-preview*.jpg
+public/terrain/preview-*
+public/terrain/crop*
+public/terrain/check-align.jpg
+public/terrain/height-srtm.bin
+public/terrain/albedo-esri.jpg
+public/terrain/albedo-fixed*.jpg
+public/terrain/*/preview-*
+public/terrain/*/*-preview.jpg
+public/terrain/*/crop*
+public/terrain/*/check-align.jpg
+public/terrain/*/height-srtm.bin
+public/terrain/*/*-esri*
+# pipeline sources; the app ships height.q16 + WebP only (regenerate with `npm run assets`)
+terrain-src/

@@ -8,7 +8,7 @@ const peak = {
   range: 'Himalaya, Dhaulagiri Himal', countries: 'Nepal',
   tagline: 'The seventh highest mountain on Earth, once believed the highest of all: a colossal white wedge above the deepest gorge in the world.',
   summitText: 'A corniced crest above 4,000 m walls on every side. Annapurna stands across the Kali Gandaki, the gorge between the two summits the deepest on Earth. The Swiss reached this point in 1960 with the help of an aeroplane; the ridge below has killed more than seventy people since.',
-  summitBlurb: 'Seventh highest point on Earth and, for thirty years after its survey in 1808, believed the highest. About 600 ascents and 80 deaths, the second worst ratio of the fourteen after Annapurna.',
+  summitBlurb: 'Seventh highest point on Earth and, for thirty years after its survey in 1808, believed the highest. About 600 ascents and 80 deaths, one of the worst ratios of the fourteen.',
   figuresLead: 'A mountain climbed by a few hundred people, on which one climber in seven has not come home.',
   otherLines: 'Lines climbed but not modelled here: the East Face (Kurtyka, MacIntyre, Wilczyński and Ghilini, 1980, alpine style), the Pear Buttress of the 1950s attempts, and the Japanese north-west ridge.',
   historyTitle: 'Two hundred years',
@@ -242,15 +242,15 @@ const timeline = [
   { year: 1808, title: 'The highest mountain', text: 'British surveyors measure Dhaulagiri from the plains and declare it the highest mountain in the world, a title it holds until Kangchenjunga is measured thirty years later.' },
   { year: 1950, title: 'Herzog looks away', text: 'The French expedition finds no feasible line on Dhaulagiri after weeks of searching, and turns to Annapurna instead.' },
   { year: 1954, title: 'Argentina', text: 'An Argentine expedition reaches about 8,000 m on the Pear Buttress; Francisco Ibáñez dies of frostbite complications.' },
-  { year: 1960, title: 'The aeroplane', text: 'Max Eiselin’s Swiss expedition flies its supplies to the North-east Col in a Pilatus Porter. On 13 May Kurt Diemberger, Peter Diener, Ernst Forrer, Albin Schelbert, Nyima Dorje and Nawang Dorje reach the summit.' },
-  { year: 1969, title: 'The American disaster', text: 'An avalanche at the foot of the south-east ridge kills seven, including expedition leader Boyd Everett.' },
+  { year: 1960, highlight: true, title: 'The aeroplane', text: 'Max Eiselin’s Swiss expedition flies its supplies to the North-east Col in a Pilatus Porter. On 13 May Kurt Diemberger, Peter Diener, Ernst Forrer, Albin Schelbert, Nyima Dorje and Nawang Dorje reach the summit.' },
+  { year: 1969, highlight: true, title: 'The American disaster', text: 'An avalanche at the foot of the south-east ridge kills seven, including expedition leader Boyd Everett.' },
   { year: 1978, title: 'New lines', text: 'Japanese expeditions climb the south-west pillar and the south-east ridge in the same year.' },
   { year: 1980, title: 'East Face', text: 'Voytek Kurtyka, Alex MacIntyre, Ludwik Wilczyński and René Ghilini climb the east face in alpine style, a landmark of the lightweight revolution.' },
   { year: 1984, title: 'West Face', text: 'A Czechoslovak expedition climbs the 4,000 m west face.' },
   { year: 1985, title: 'Winter', text: 'Jerzy Kukuczka and Andrzej Czok make the first winter ascent on 21 January.' },
   { year: 1998, title: 'Mauduit', text: 'Chantal Mauduit, with six 8,000 m peaks, dies with Ang Tshering when an avalanche buries their tent at Camp 2.' },
   { year: 1999, title: 'Humar', text: 'Tomaž Humar climbs the south face alone over nine days, live on Slovenian television, and escapes onto the ridge at 8,000 m. In the autumn Ginette Harrison is killed by an avalanche on the normal route.' },
-  { year: 2010, title: 'Bad week', text: 'Three climbers die within days on the descent from the summit; the mountain’s fatality rate remains the second worst of the fourteen.' },
+  { year: 2010, title: 'Bad week', text: 'Three climbers die within days on the descent from the summit; the mountain’s fatality rate remains among the worst of the fourteen.' },
 ]
 
 const stats = [
@@ -259,7 +259,7 @@ const stats = [
   { label: 'Summits', value: '≈ 600', note: 'nearly all by the north-east ridge' },
   { label: 'Deaths', value: '≈ 80', note: 'about one for every seven summits' },
   { label: 'Winter ascent', value: '1985', note: 'Kukuczka & Czok' },
-  { label: 'Kali Gandaki', value: '7,000 m', note: 'deep between here and Annapurna' },
+  { label: 'Kali Gandaki', value: '≈ 5,500 m', note: 'deep between here and Annapurna' },
 ]
 
 const sources = [

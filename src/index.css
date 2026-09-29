@@ -14,9 +14,10 @@
   --danger: #ff3b3b;
   --warn: #ffb64d;
 
-  --font-display: 'Bricolage Grotesque', 'Archivo', system-ui, sans-serif;
-  --font-ui: 'Archivo', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  /* self-hosted variable fonts (@fontsource-variable, imported in main.jsx) */
+  --font-display: 'Bricolage Grotesque Variable', 'Archivo Variable', system-ui, sans-serif;
+  --font-ui: 'Archivo Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, Menlo, monospace;
 
   --step--1: clamp(0.875rem, 0.85rem + 0.11vw, 0.9375rem);
   --step-0: clamp(1rem, 0.95rem + 0.22vw, 1.125rem);
@@ -90,7 +91,9 @@ a { color: inherit; text-decoration: none; }
 .switch:active { transform: scale(0.94); }
 .switch-prev { left: var(--gutter); }
 .switch-next { right: var(--gutter); }
-.hero-index { display: flex; gap: 16px; font-size: 12px; color: var(--text-3); letter-spacing: 0.04em; }
+/* small type over bright snow: a notch lighter than the page's labels, with the markers' halo */
+.hero-index, .hero-side { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 0 14px rgba(0, 0, 0, 0.75); }
+.hero-index { display: flex; gap: 16px; font-size: 12px; color: var(--text-2); letter-spacing: 0.04em; }
 .hero-index .hero-loading { color: var(--accent-2); }
 @media (max-width: 760px) { .hero > .switch { top: auto; bottom: 1.25rem; margin-top: 0; width: 44px; height: 44px; } .hero-next { display: none; } }
 .grain { position: fixed; inset: 0; z-index: 50; pointer-events: none; opacity: 0.045;
@@ -150,8 +153,8 @@ section { position: relative; }
 .hero h1 small { white-space: nowrap; font-family: var(--font-mono); font-size: max(0.13em, 13px); font-weight: 400; letter-spacing: 0.02em; color: var(--text-2); line-height: 1.4; transform: translateY(-0.9em); }
 .hero p { font-size: var(--step-1); color: var(--text-2); max-width: 32ch; line-height: 1.35; text-wrap: pretty; }
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-.hero-side { position: absolute; right: var(--gutter); bottom: clamp(3rem, 8vh, 6rem); display: grid; gap: 6px; text-align: right; font-family: var(--font-mono); font-size: 12px; color: var(--text-3); line-height: 1.5; }
-.hero-side b { font-weight: 500; color: var(--text-2); }
+.hero-side { position: absolute; right: var(--gutter); bottom: clamp(3rem, 8vh, 6rem); display: grid; gap: 6px; text-align: right; font-family: var(--font-mono); font-size: 12px; color: var(--text-2); line-height: 1.5; }
+.hero-side b { font-weight: 500; color: var(--text); }
 @media (max-width: 760px) { .hero-side { display: none; } .hero { padding-bottom: 5rem; } }
 
 /* ascent */
@@ -294,7 +297,8 @@ section { position: relative; }
 }
 
 /* markers (inside canvas Html) */
-.mk { position: relative; display: flex; align-items: center; gap: 8px; transform: translate(6px, 0); transition: opacity 260ms ease; }
+/* the dot's centre sits on the 3D point (half the dot's width back, half the row's height up) */
+.mk { position: relative; display: flex; align-items: center; gap: 8px; transform: translate(-3.5px, -50%); transition: opacity 260ms ease; }
 .mk[data-hidden='1'] { opacity: 0; }
 .mk-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mk); box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.35); flex: none; }
 .mk-label { display: grid; line-height: 1.1; white-space: nowrap; font-family: var(--font-ui); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 0 12px rgba(0, 0, 0, 0.7); }
@@ -302,16 +306,21 @@ section { position: relative; }
 .mk-label i { font-style: normal; font-family: var(--font-mono); font-size: 11px; color: var(--text-2); }
 .mk-big .mk-label b { font-size: 16px; }
 .mk-big .mk-dot { width: 9px; height: 9px; }
+.mk-big { transform: translate(-4.5px, -50%); }
 .mk.is-selected .mk-label b { color: var(--mk); }
 .mk-dim { opacity: 0.45; }
 .mk-dim .mk-label i { display: none; }
 .mk-dim .mk-label b { font-size: 11px; font-weight: 400; }
 .stage[data-mode='explorer'] .mk { pointer-events: auto; cursor: pointer; }
-.hz { display: flex; align-items: center; gap: 7px; transition: opacity 260ms ease; }
+/* icon on the 3D point, name to its left: camp labels run right, so a hazard at a camp never covers it */
+.hz { display: flex; flex-direction: row-reverse; align-items: center; gap: 7px; transform: translate(calc(-100% + 8px), -50%); transition: opacity 260ms ease; }
 .hz[data-hidden='1'] { opacity: 0; }
 .hz-icon { width: 16px; height: 16px; border-radius: 50%; background: var(--hz); color: #140505; font: 700 11px/16px var(--font-mono); text-align: center; flex: none; }
 .hz-label { font-size: 12px; color: #fff; white-space: nowrap; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9); }
 .stage[data-mode='explorer'] .hz { pointer-events: auto; cursor: pointer; }
+/* a name crowded out by a more important one (scene/Declutter.jsx): the dot or icon stays */
+.mk-label, .hz-label { transition: opacity 200ms ease; }
+.mk[data-crowded='1'] .mk-label, .hz[data-crowded='1'] .hz-label { opacity: 0; }
 
 /* content sections */
 .content { background: var(--bg-0); }

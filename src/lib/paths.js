@@ -1,5 +1,15 @@
 import * as THREE from 'three'
 
+/** Route lines float this far above the ground so they don't sink into 30 m texels. */
+export const ROUTE_LIFT_M = 22
+
+/** Every route of a mountain draped onto its terrain, by route id. */
+export function buildPaths(terrain, routes) {
+  const out = {}
+  for (const r of routes) out[r.id] = drapePath(terrain, r.waypoints, { stepM: 30, liftM: ROUTE_LIFT_M, smooth: 3 })
+  return out
+}
+
 /** Densify a lat/lon polyline onto the terrain surface. Returns { points: Vector3[], cumulative: number[] (km), length } */
 export function drapePath(terrain, waypoints, { stepM = 30, liftM = 20, smooth = 3 } = {}) {
   const raw = []

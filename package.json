@@ -1,5 +1,5 @@
 {
-  "name": "k2",
+  "name": "fourteen-peaks-3d",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -13,6 +13,9 @@
     "assets": "node scripts/encode-height.mjs && node scripts/bake-light.mjs && node scripts/make-webp.mjs && node scripts/make-thumbs.mjs"
   },
   "dependencies": {
+    "@fontsource-variable/archivo": "^5.3.0",
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "@react-three/drei": "^10.7.8",
     "@react-three/fiber": "^9.7.0",
     "fflate": "^0.8.3",

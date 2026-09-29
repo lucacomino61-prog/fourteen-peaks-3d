@@ -2,25 +2,14 @@ import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import Terrain from './Terrain'
-import Routes, { buildPaths } from './Routes'
+import Routes from './Routes'
 import Camps from './Camps'
 import Hazards from './Hazards'
 import CameraRig from './CameraRig'
-import { loadTerrain } from '../lib/terrain'
+import Declutter from './Declutter'
+import { buildPaths } from '../lib/paths'
 import { useStore, MountainCtx } from '../store'
 import { byId } from '../data'
-
-export function useTerrain(id) {
-  const [state, setState] = useState({ terrain: null, loading: true })
-  useEffect(() => {
-    let alive = true
-    setState((s) => ({ ...s, loading: true }))
-    loadTerrain(id, (full) => { if (alive) setState({ terrain: full, loading: false }) })
-      .then((t) => { if (alive) setState({ terrain: t, loading: false }) })
-    return () => { alive = false }
-  }, [id])
-  return state
-}
 
 /** Decide the quality tier once, before the canvas exists, with a throwaway context. */
 function probeQuality() {
@@ -77,6 +66,7 @@ export default function Scene({ terrain }) {
           </group>
         </Suspense>
         <CameraRig terrain={terrain} paths={paths} controls={controls} />
+        <Declutter />
       </MountainCtx.Provider>
       <OrbitControls
         ref={controls}

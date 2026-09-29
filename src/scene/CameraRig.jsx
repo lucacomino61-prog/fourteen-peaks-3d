@@ -19,14 +19,24 @@ function routePose(terrain, paths, summit, id, far = 1, portrait = false) {
   }
   const path = paths[id]
   const base = path.points[0]
-  const mid = pointAt(path, 0.5)
+  // Aim at the middle of the line, but never more than 3.5 km short of the summit, so the summit
+  // stays in the frame while the explorer orbits; then stand 8.5 km back (× far), closer when
+  // needed to keep the summit inside the 11 km where the terrain dissolves into the sky
+  // (Terrain.jsx). The midpoint aim used to lose the summit off the top on 28 of the 70 routes.
+  const mid = new THREE.Box3().setFromPoints(path.points).getCenter(new THREE.Vector3())
+  const off = Math.hypot(summit.x - mid.x, summit.z - mid.z)
+  if (off > 3.5) mid.lerp(summit, 1 - 3.5 / off)
+  mid.y = Math.max(mid.y, summit.y - 1.2)
   // look from the side the route faces: direction from summit towards the base, flattened
   _v.set(base.x - summit.x, 0, base.z - summit.z).normalize()
-  const dist = Math.max(4.2, path.length * 0.85) * far
+  const near = Math.hypot(summit.x - mid.x, summit.z - mid.z), rise = summit.y - (mid.y + 0.2)
+  let dist = 8.5 * far
+  while (dist > 4.2 && (near + dist) ** 2 + (0.42 * dist - rise) ** 2 > 10.5 ** 2) dist -= 0.1
   const pos = new THREE.Vector3(mid.x + _v.x * dist, mid.y + dist * 0.42, mid.z + _v.z * dist)
   const ground = terrain.heightAtScene(pos.x, pos.z) / 1000 + 0.3
   if (pos.y < ground) pos.y = ground
-  return { pos, target: new THREE.Vector3(mid.x, mid.y + 0.2 - drop, mid.z) }
+  // a smaller drop than the overview's: more would push the summit off the top of a phone
+  return { pos, target: new THREE.Vector3(mid.x, mid.y + 0.2 - drop * 0.6, mid.z) }
 }
 
 export default function CameraRig({ terrain, paths, controls }) {
@@ -71,7 +81,7 @@ export default function CameraRig({ terrain, paths, controls }) {
   }, [gl])
 
   // phones: vertical swipes over the hero still scroll the page, horizontal ones turn the mountain
-  useEffect(() => { gl.domElement.style.touchAction = mode === 'hero' ? 'pan-y' : 'none' }, [gl, mode])
+  useEffect(() => { gl.domElement.style.setProperty('touch-action', mode === 'hero' ? 'pan-y' : 'none') }, [gl, mode])
 
   useEffect(() => {
     const c = controls.current

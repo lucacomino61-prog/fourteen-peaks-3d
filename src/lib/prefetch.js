@@ -1,31 +1,28 @@
-// Background warm-up of the other mountains once the current one is ready: the browser cache
-// then serves every later switch instantly. One file at a time, low priority, skipped on
-// data-saver or slow connections, and restarted from the new position whenever the user switches.
+// Once a mountain is up, fetch what the arrows need next: the first-paint files of the next and
+// previous mountains (about 0.7 MB each), so a switch paints at once from the browser cache.
+// Everything else streams in only when a mountain is actually opened. One file at a time, low
+// priority, skipped on data-saver or slow connections, restarted whenever the user switches.
 import { mountains } from '../data'
 
-const TIER_FILES = {
-  high: ['albedo.webp', 'detail16.webp', 'detail17.webp'],
-  medium: ['albedo-2k.webp', 'detail16-2k.webp', 'detail17.webp'],
-  low: ['albedo-2k.webp'],
-}
-const FIRST = ['height-lo.q16', 'light.webp', 'albedo-1k.webp', 'thumb.webp', 'height.q16']
+// what loadTerrain and the first frame of the terrain need
+const FIRST_PAINT = ['height.json', 'detail16.json', 'detail17.json', 'height-lo.q16', 'albedo-1k.webp']
 
 let controller = null
 const done = new Set()
 
-export function warmOthers(currentId, quality) {
+export function warmNeighbours(currentId) {
   if (controller) controller.abort()
   const c = navigator.connection
   if (c && (c.saveData || /^(slow-)?2g$|^3g$/.test(c.effectiveType || ''))) return
   controller = new AbortController()
   const { signal } = controller
   const i = mountains.findIndex((m) => m.id === currentId)
-  // next, previous, then the rest in order
-  const order = [...mountains.slice(i + 1), ...mountains.slice(0, i)]
-  const files = [...FIRST, ...(TIER_FILES[quality] || TIER_FILES.medium)]
+  const n = mountains.length
+  const neighbours = new Set([mountains[(i + 1) % n], mountains[(i - 1 + n) % n]])
+  const idle = () => new Promise((r) => (window.requestIdleCallback || ((fn) => setTimeout(fn, 200)))(r))
   ;(async () => {
-    for (const m of order) {
-      for (const f of files) {
+    for (const m of neighbours) {
+      for (const f of FIRST_PAINT) {
         const url = `/terrain/${m.id}/${f}`
         if (done.has(url)) continue
         if (signal.aborted) return
@@ -33,10 +30,8 @@ export function warmOthers(currentId, quality) {
           await fetch(url, { signal, priority: 'low', cache: 'force-cache' })
           done.add(url)
         } catch { if (signal.aborted) return }
-        await new Promise((r) => (window.requestIdleCallback || ((fn) => setTimeout(fn, 200)))(r))
+        await idle()
       }
     }
   })()
 }
-
-export function stopWarming() { if (controller) controller.abort() }

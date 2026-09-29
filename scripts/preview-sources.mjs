@@ -4,10 +4,9 @@ import path from 'node:path'
 import sharp from 'sharp'
 const PEAK_ID = process.env.PEAK || 'k2'
 const DIR = `terrain-src/${PEAK_ID}`   // pipeline sources (not shipped)
-const OUT = `public/terrain/${PEAK_ID}` // shipped assets
 
 const meta = JSON.parse(await fs.readFile(`${DIR}/height.json`, 'utf8'))
-const { width: W, bbox, zoom: Z0 } = meta
+const { width: W, bbox } = meta
 const OUT = path.resolve(DIR)
 const CACHE = path.resolve('.tile-cache')
 
@@ -28,8 +27,8 @@ async function fetchTile(url, cachePath) {
 
 async function stitch(name, z, urlFn) {
   const x0 = Math.round(lon2x(bbox.west, z)), x1 = Math.round(lon2x(bbox.east, z))
-  const y0 = Math.round(lat2y(bbox.north, z)), y1 = Math.round(lat2y(bbox.south, z))
-  const n = x1 - x0
+  const y0 = Math.round(lat2y(bbox.north, z))
+  const n = x1 - x0 // the tile is square in Mercator, so the row count equals the column count
   const comps = []
   for (let ty = 0; ty < n; ty++)
     for (let tx = 0; tx < n; tx++) {

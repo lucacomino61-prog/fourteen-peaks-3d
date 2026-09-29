@@ -1,14 +1,28 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { useLoader, useFrame, useThree } from '@react-three/fiber'
-import { useStore } from '../store'
+import { useStore, useMountain } from '../store'
+import { deathZoneModelAltitude } from '../lib/calibrate'
 
 const common = /* glsl */ `
 uniform sampler2D uHeight;
 uniform vec2  uTexel;
 uniform vec2  uSpacing;
 uniform vec4  uPatchRect;   // base-uv rect covered by the dense inner patch
-float H(vec2 uv) { return texture2D(uHeight, uv).r * 0.001; }
+// Heights are a 32-bit float texture. A GPU without OES_texture_float_linear cannot filter it
+// (it would read as zero), so there it is sampled nearest and blended here instead.
+float H(vec2 uv) {
+#ifdef MANUAL_BILINEAR
+  vec2 st = uv / uTexel - 0.5;
+  vec2 f = fract(st);
+  vec2 p = (floor(st) + 0.5) * uTexel;
+  float a = texture2D(uHeight, p).r, b = texture2D(uHeight, p + vec2(uTexel.x, 0.0)).r;
+  float c = texture2D(uHeight, p + vec2(0.0, uTexel.y)).r, d = texture2D(uHeight, p + uTexel).r;
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y) * 0.001;
+#else
+  return texture2D(uHeight, uv).r * 0.001;
+#endif
+}
 float hash21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float vnoise(vec2 p) {
   vec2 i = floor(p), f = fract(p);
@@ -182,7 +196,7 @@ void main() {
   float horizon = smoothstep(11.0, 19.0, camDist);
 
   if (uBandStrength > 0.001) {
-    float hh = texture2D(uHeight, vUv).r * 0.001;
+    float hh = H(vUv);
     float band = smoothstep(uBandAlt - 0.02, uBandAlt + 0.02, hh);
     float edge = 1.0 - smoothstep(0.0, 0.014, abs(hh - uBandAlt));
     vec3 tint = col * vec3(1.35, 0.42, 0.38) + vec3(0.10, 0.0, 0.0);
@@ -196,7 +210,7 @@ void main() {
 }
 `
 
-export const SUN_DIR = new THREE.Vector3(-0.62, 0.26, 0.6).normalize()
+const SUN_DIR = new THREE.Vector3(-0.62, 0.26, 0.6).normalize()
 
 // texture sets per tier (WebP). First paint always uses the 1K albedo, then the rest streams in.
 const TIERS = {
@@ -226,10 +240,17 @@ function rectGeometry(geo, rect, seg) {
   return g
 }
 
+/** Nearest sampling for a float heightmap on GPUs that cannot filter it; the shader blends instead. */
+function nearestHeights(tex) {
+  if (tex.magFilter === THREE.NearestFilter) return
+  tex.magFilter = tex.minFilter = THREE.NearestFilter
+  tex.needsUpdate = true
+}
+
 const HIDDEN_LAYER = 31
 
 /** ms since navigation for each loading stage of a mountain (read with ?debug=1 or window.__k2perf) */
-export function perfSummary(id) {
+function perfSummary(id) {
   const out = {}
   for (const m of performance.getEntriesByType('mark')) if (m.name.endsWith(':' + id)) out[m.name.replace(':' + id, '')] = Math.round(m.startTime)
   return out
@@ -239,14 +260,17 @@ if (typeof window !== 'undefined') window.__k2perf = perfSummary
 export default function Terrain({ terrain, quality = 'high' }) {
   const tier = TIERS[quality] || TIERS.high
   const { gl, camera } = useThree()
+  const { peak } = useMountain()
   const hasDetail = !!terrain.detail && !!tier.detail
   const hasDetail2 = !!terrain.detail2 && !!tier.detail2
+  const floatLinear = useMemo(() => gl.extensions.has('OES_texture_float_linear'), [gl])
+  // the model's summit sits below the surveyed one, so the 8,000 m line moves down with it
+  const bandAlt = useMemo(() => deathZoneModelAltitude(terrain, peak), [terrain, peak])
   // first paint: the 1K albedo (≈ 300 KB), loaded through suspense
   const first = useLoader(THREE.TextureLoader, terrain.base + 'albedo-1k.webp')
   const { geo, heightTexture } = terrain
   const patchRect = terrain.detail?.uv || { u0: 0.25, v0: 0.45, u1: 0.55, v1: 0.75 }
   const group = useRef()
-  const [compiled, setCompiled] = useState(false)
 
   const baseGeometry = useMemo(() => {
     const g = new THREE.PlaneGeometry(geo.sizeX, geo.sizeZ, tier.base, tier.base)
@@ -294,38 +318,41 @@ export default function Terrain({ terrain, quality = 'high' }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [first, terrain.id])
 
-  useEffect(() => {
+  // before the first frame with this heightmap (the 512² one, then the full one)
+  useLayoutEffect(() => {
+    if (!floatLinear) nearestHeights(heightTexture)
     uniforms.uHeight.value = heightTexture
     uniforms.uTexel.value.set(1 / geo.W, 1 / geo.H)
     uniforms.uSpacing.value.set(geo.sizeX / geo.W, geo.sizeZ / geo.H)
-  }, [uniforms, heightTexture, geo])
+    uniforms.uBandAlt.value = bandAlt / 1000
+  }, [uniforms, heightTexture, geo, floatLinear, bandAlt])
 
   const materials = useMemo(() => {
     const defines = {}
     if (hasDetail) defines.HAS_DETAIL = 1
     if (hasDetail2) defines.HAS_DETAIL2 = 1
+    if (!floatLinear) defines.MANUAL_BILINEAR = 1
     const mk = (extra) => new THREE.ShaderMaterial({
       vertexShader: vert, fragmentShader: frag, uniforms, transparent: true, depthWrite: true,
       defines: { ...defines, ...extra },
     })
     return { base: mk({}), patch: mk({ PATCH: 1 }) }
-  }, [uniforms, tier, hasDetail, hasDetail2])
+  }, [uniforms, hasDetail, hasDetail2, floatLinear])
 
   // Compile off the main thread where the driver allows (KHR_parallel_shader_compile), with the
   // meshes parked on a layer the camera does not draw, so the page stays responsive meanwhile.
   useEffect(() => {
     let alive = true
-    setCompiled(false)
     const g = group.current
     if (!g) return
     g.traverse((o) => o.layers.set(HIDDEN_LAYER))
     performance.mark(`terrain:compile-start:${terrain.id}`)
-    const done = () => { if (!alive) return; g.traverse((o) => o.layers.set(0)); setCompiled(true); performance.mark(`terrain:ready:${terrain.id}`); useStore.setState({ terrainReady: true }); if (location.search.includes('debug')) console.table(perfSummary(terrain.id)) }
+    const done = () => { if (!alive) return; g.traverse((o) => o.layers.set(0)); performance.mark(`terrain:ready:${terrain.id}`); useStore.setState({ terrainReady: true }); if (location.search.includes('debug')) console.table(perfSummary(terrain.id)) }
     useStore.setState({ terrainReady: false })
     if (gl.compileAsync) gl.compileAsync(g, camera).then(done, done)
     else done()
     return () => { alive = false }
-  }, [materials, gl, camera])
+  }, [materials, gl, camera, terrain.id])
 
   // stream the full-resolution textures in after first paint: albedo → detail → summit detail
   useEffect(() => {

@@ -18,7 +18,8 @@ function Marker({ terrain, pos, label, alt, color, id, routeId, kind = 'camp', b
       tick.current = 0
       const vis = terrain.lineOfSight(camera.position, pos)
       const dist = camera.position.distanceTo(pos)
-      const far = dist > (big ? 30 : 9)
+      // camps keep their names as far as the terrain is drawn crisp (it dissolves from 11 km)
+      const far = dist > (big ? 30 : 11)
       if (wrap.current) {
         wrap.current.dataset.hidden = !vis || far ? '1' : '0'
         wrap.current.dataset.near = dist < 2.5 ? '1' : '0'
@@ -37,7 +38,8 @@ function Marker({ terrain, pos, label, alt, color, id, routeId, kind = 'camp', b
         <sphereGeometry args={[1, 12, 12]} />
         <meshBasicMaterial color={color} toneMapped={false} />
       </mesh>
-      <Html center zIndexRange={[20, 0]} style={{ pointerEvents: 'none' }}>
+      {/* not centred: .mk puts its dot on the point (over the sphere) and the label to the right */}
+      <Html zIndexRange={[20, 0]} style={{ pointerEvents: 'none' }}>
         <div
           ref={wrap}
           className={`mk mk-${kind} ${isSel ? 'is-selected' : ''} ${big ? 'mk-big' : ''} ${dim && !isSel ? 'mk-dim' : ''}`}

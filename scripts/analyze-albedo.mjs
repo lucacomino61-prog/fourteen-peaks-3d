@@ -2,7 +2,6 @@
 import sharp from 'sharp'
 const PEAK_ID = process.env.PEAK || 'k2'
 const DIR = `terrain-src/${PEAK_ID}`   // pipeline sources (not shipped)
-const OUT = `public/terrain/${PEAK_ID}` // shipped assets
 const { data, info } = await sharp(`${DIR}/albedo.jpg`).raw().toBuffer({ resolveWithObject: true })
 const W = info.width, T = 256, N = W / T
 const grid = []

@@ -263,8 +263,8 @@ const hazards = [
 ]
 
 const timeline = [
-  { year: 1950, title: 'The first eight-thousander', text: 'Maurice Herzog and Louis Lachenal reach the summit on 3 June by the north face, the first 8,000 m peak ever climbed, three years before Everest. Both lose their toes; Herzog his fingers. His book, Annapurna, becomes the best-selling mountaineering book of all time.' },
-  { year: 1970, title: 'The South Face', text: 'Chris Bonington’s expedition climbs the 3,000 m south face, the start of big-wall climbing in the Himalaya. Don Whillans and Dougal Haston summit on 27 May; Ian Clough is killed by a serac the next day.' },
+  { year: 1950, highlight: true, title: 'The first eight-thousander', text: 'Maurice Herzog and Louis Lachenal reach the summit on 3 June by the north face, the first 8,000 m peak ever climbed, three years before Everest. Both lose their toes; Herzog his fingers. His book, Annapurna, becomes the best-selling mountaineering book of all time.' },
+  { year: 1970, highlight: true, title: 'The South Face', text: 'Chris Bonington’s expedition climbs the 3,000 m south face, the start of big-wall climbing in the Himalaya. Don Whillans and Dougal Haston summit on 27 May; Ian Clough is killed by a serac the next day.' },
   { year: 1977, title: 'The Dutch Rib', text: 'Van Rijswick and Sonam Sherpa reach the summit on 13 October by a rib east of the Sickle gully that avoids the worst of the serac. It becomes the modern normal route.' },
   { year: 1978, title: 'A Woman’s Place', text: 'Arlene Blum’s American Women’s Himalayan Expedition puts Irene Miller and Vera Komarkova on the summit on 15 October, the first Americans. Two days later Vera Watson and Alison Chadwick-Onyszkiewicz fall to their deaths.' },
   { year: 1984, title: 'The traverse', text: 'Erhard Loretan and Norbert Joos climb the entire east ridge over all three summits in alpine style and descend the north face.' },

@@ -255,12 +255,12 @@ const hazards = [
 const timeline = [
   { year: 1892, title: 'Named', text: 'Martin Conway, seeing the mountain’s mile-wide summit from the Baltoro, names it Broad Peak after the Breithorn.' },
   { year: 1954, title: 'First attempt', text: 'Karl Herrligkoffer’s German expedition reaches about 6,900 m on the west spur in October cold.' },
-  { year: 1957, title: 'Four men', text: 'Hermann Buhl, Kurt Diemberger, Marcus Schmuck and Fritz Wintersteller reach the summit on 9 June with no porters, oxygen or fixed camps. Buhl dies on Chogolisa three weeks later when a cornice breaks.' },
+  { year: 1957, highlight: true, title: 'Four men', text: 'Hermann Buhl, Kurt Diemberger, Marcus Schmuck and Fritz Wintersteller reach the summit on 9 June with no porters, oxygen or fixed camps. Buhl dies on Chogolisa three weeks later when a cornice breaks.' },
   { year: 1975, title: 'Central', text: 'Five Poles climb the 8,011 m central summit; three die in a storm on the descent.' },
   { year: 1977, title: 'Second ascent', text: 'A Japanese expedition makes the second ascent of the main summit, twenty years after the first.' },
   { year: 1984, title: 'The traverse', text: 'Jerzy Kukuczka and Wojciech Kurtyka traverse all three summits in alpine style over five days.' },
   { year: 1994, title: 'Carsolio', text: 'Carlos Carsolio solos a new route on the west face.' },
-  { year: 2013, title: 'Winter', text: 'Four Poles make the first winter ascent on 5 March. Maciej Berbeka, who had reached the fore-summit in winter 25 years earlier, and Tomasz Kowalski die on the descent.' },
+  { year: 2013, highlight: true, title: 'Winter', text: 'Four Poles make the first winter ascent on 5 March. Maciej Berbeka, who had reached the fore-summit in winter 25 years earlier, and Tomasz Kowalski die on the descent.' },
   { year: 2019, title: 'Commercial seasons', text: 'Fixed ropes to the col and shared logistics with K2 bring dozens of summits a year; the true summit remains a long way from the fore-summit where many turn back.' },
 ]
 

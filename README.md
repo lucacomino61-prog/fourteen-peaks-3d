@@ -19,8 +19,11 @@ npm install
 npm run dev
 ```
 
-The terrain assets in `public/terrain/<id>/` are committed (≈ 30 MB per mountain). To rebuild
-them from source data for one mountain (`PEAK` selects the folder and coordinates):
+The terrain assets in `public/terrain/<id>/` are committed (about 15 MB per mountain). Neighbours
+share a tile: Lhotse uses Everest's heightmap and imagery, Broad Peak K2's, Gasherbrum I
+Gasherbrum II's; each keeps its own summit layers and thumbnail. The pipeline sources
+(`terrain-src/`, JPEG and Float32 heightmaps) are not in the repository; to rebuild one mountain
+from the original data (network needed; `PEAK` selects the folder and coordinates):
 
 ```bash
 PEAK=everest npm run terrain
@@ -32,7 +35,7 @@ That runs three scripts:
 
 | script | what it does |
 | --- | --- |
-| `scripts/fetch-terrain.mjs` | Downloads the AWS Terrain Tiles (SRTM-derived) and Esri World Imagery for a 31 km tile around K2 at Web-Mercator zoom 13/14 and writes `height.json`. |
+| `scripts/fetch-terrain.mjs` | Downloads the AWS Terrain Tiles (SRTM-derived) and Esri World Imagery for a 2048-pixel tile (32–35 km) around the peak at Web-Mercator zoom 13/14 and writes `height.json`. |
 | `scripts/fetch-copernicus.mjs` | Replaces the SRTM heights with **Copernicus DEM GLO-30** (TanDEM-X based, far cleaner in the Karakoram), resampled bilinearly onto the same grid → `height.bin` (Float32, 2048², metres). |
 | `scripts/build-albedo.mjs` | Builds the satellite texture from Esri **Clarity** imagery: zoom 14 where it is seamless, blended into zoom 13 in the east where the z14 mosaic switches capture → `albedo.jpg`. |
 
@@ -52,7 +55,12 @@ That runs three scripts:
   so there is one shader program and no recompile.
 - The terrain program is compiled with `renderer.compileAsync` (KHR_parallel_shader_compile) while
   the meshes sit on a camera-invisible layer, so the page stays responsive during the compile.
-- The next and previous mountains' heightmap and 1K albedo are prefetched in idle time.
+- Once a mountain is up, the next and previous mountains' first-paint files (512² heightmap, 1K
+  albedo, the small JSON) are prefetched in idle time, about 0.7 MB each, so the arrows switch at
+  once. Nothing else is fetched until a mountain is opened; Save-Data and 2G/3G skip it.
+- Fonts (Bricolage Grotesque, Archivo, JetBrains Mono) are self-hosted from `@fontsource-variable`.
+- Three.js, React, GSAP and the other dependencies build into separate chunks, so a deploy that
+  only changes the site re-downloads only the site's own code.
 - `?peak=<id>` deep-links a mountain; the overview grid (`All fourteen`) lists them by height with
   shaded-relief thumbnails (`thumb.webp`).
 - Regenerate the shipped assets from the JPEG/`height.bin` sources with `npm run assets`
@@ -64,11 +72,22 @@ That runs three scripts:
   `src/scene/Terrain.jsx` displaces a plane with it (1 scene unit = 1 km). Normals are computed per
   texel in the fragment shader; sun shadow and ambient occlusion come from the baked `light.webp`;
   altitude-weighted fog, a cold-shadow grade and a distance dissolve into the CSS sky do the mood.
+- A GPU without `OES_texture_float_linear` cannot filter a 32-bit float texture (it would sample as
+  zero and the mountain would vanish). There the heightmap is sampled nearest and the shader blends
+  the four texels itself (`MANUAL_BILINEAR`). To test it, hide the extension from `getExtension`.
 - Routes (`src/data/<id>.js`) are lat/lon waypoint lists draped onto the surface
   (`src/lib/paths.js`); camp altitudes were checked against the DEM so they match documented values.
+- The DEM rounds off sharp summits: near each peak it tops out 24–242 m below the surveyed height.
+  The altimeter therefore follows the ground between stops but is pinned to each card's documented
+  altitude, and the Death Zone layer starts where the corrected altitude crosses 8,000 m
+  (`src/lib/calibrate.js`), so it appears on every one of the fourteen.
 - `src/scene/CameraRig.jsx` drives the camera: slow orbit in the hero, a path-following flight
-  along the Abruzzi Spur scrubbed by scroll (`src/ui/Ascent.jsx`), then hands over to
-  OrbitControls in the explorer with fly-to poses per route.
+  along the chosen route scrubbed by scroll (`src/ui/Ascent.jsx`), then hands over to
+  OrbitControls in the explorer with fly-to poses per route. A pose aims at most 3.5 km short of
+  the summit and keeps the camera within 10.5 km of it, so the summit stays in frame and clear of
+  the distance dissolve at every angle of the explorer's orbit.
+- Marker and hazard names are HTML (`@react-three/drei` `<Html>`); `src/scene/Declutter.jsx`
+  hides the text of any name that would land on a more important one, keeping its dot.
 - Quality tiers (`high` / `medium` / `low`) pick mesh density, shadow steps and DPR from the GPU
   string and viewport width.
 
@@ -77,6 +96,8 @@ That runs three scripts:
 - Elevation: Copernicus DEM GLO-30, © DLR e.V. 2010–2014 and © Airbus Defence and Space GmbH
   2014–2018, provided under COPERNICUS by the European Union and ESA.
 - Imagery: Esri World Imagery (Clarity) — Esri, Maxar, Earthstar Geographics, and the GIS User
-  Community. Check Esri's terms before commercial use.
+  Community. The textures in `public/terrain/` are derived from it and remain under Esri's terms;
+  check them before any reuse or commercial use.
 - Route and camp positions are approximate reconstructions from published expedition accounts,
   fitted to the terrain. Not for navigation.
+- Licence terms for the code and the data: see `LICENSE`.

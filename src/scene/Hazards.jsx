@@ -35,7 +35,7 @@ function Zone({ terrain, h }) {
       if (wrap.current) {
         const vis = terrain.lineOfSight(camera.position, center)
         const dist = camera.position.distanceTo(center)
-        wrap.current.dataset.hidden = !vis || dist > 7 ? '1' : '0'
+        wrap.current.dataset.hidden = !vis || dist > 11 ? '1' : '0'
       }
     }
   })
@@ -44,7 +44,8 @@ function Zone({ terrain, h }) {
     <group>
       <Line ref={line} points={pts} color={color} lineWidth={isSel ? 2.4 : 1.4} transparent opacity={0.7} depthWrite={false} />
       <Line points={pts} color={color} lineWidth={6} transparent opacity={0.12} depthWrite={false} />
-      <Html position={center} center zIndexRange={[15, 0]} style={{ pointerEvents: 'none' }}>
+      {/* not centred: .hz puts its icon on the point and the label to the left, clear of a camp on the same spot */}
+      <Html position={center} zIndexRange={[15, 0]} style={{ pointerEvents: 'none' }}>
         <div ref={wrap} className={`hz ${isSel ? 'is-selected' : ''}`} style={{ '--hz': color }}
           onClick={(e) => { e.stopPropagation(); set({ selected: { type: 'hazard', id: h.id } }) }}>
           <span className="hz-icon">!</span>

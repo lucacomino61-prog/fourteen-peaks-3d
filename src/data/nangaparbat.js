@@ -278,11 +278,11 @@ const hazards = [
 
 const timeline = [
   { year: 1895, title: 'Mummery', text: 'Albert Mummery, the finest climber of his day, attempts the Diamir Face and vanishes with two Gurkhas while crossing to the Rakhiot side: the first deaths on any 8,000 m peak.' },
-  { year: 1934, title: 'The storm', text: 'A German expedition is caught by a storm above the Silver Saddle. Willy Merkl, Uli Wieland, Willo Welzenbach and six Sherpas die in the retreat; the Sherpa Gaylay stays with Merkl to the end.' },
+  { year: 1934, highlight: true, title: 'The storm', text: 'A German expedition is caught by a storm above the Silver Saddle. Willy Merkl, Uli Wieland, Willo Welzenbach and six Sherpas die in the retreat; the Sherpa Gaylay stays with Merkl to the end.' },
   { year: 1937, title: 'Buried', text: 'An avalanche buries Camp 4 at night on 15 June; seven Germans and nine Sherpas die. The mountain becomes a German national obsession.' },
-  { year: 1953, title: 'Buhl', text: 'Hermann Buhl reaches the summit alone on 3 July, without oxygen, after seventeen hours from Camp 5. He spends the night standing on a ledge and returns after forty-one hours, frostbitten and hallucinating.' },
+  { year: 1953, highlight: true, title: 'Buhl', text: 'Hermann Buhl reaches the summit alone on 3 July, without oxygen, after seventeen hours from Camp 5. He spends the night standing on a ledge and returns after forty-one hours, frostbitten and hallucinating.' },
   { year: 1962, title: 'Diamir Face', text: 'Toni Kinshofer, Siegfried Löw and Anderl Mannhardt climb the Diamir Face; Löw dies in a fall on the descent.' },
-  { year: 1970, title: 'The Rupal Face', text: 'Reinhold and Günther Messner climb the highest wall in the world and descend the far side. Günther is killed by an avalanche near the bottom; Reinhold, with frostbitten feet, is found by villagers days later.' },
+  { year: 1970, highlight: true, title: 'The Rupal Face', text: 'Reinhold and Günther Messner climb the highest wall in the world and descend the far side. Günther is killed by an avalanche near the bottom; Reinhold, with frostbitten feet, is found by villagers days later.' },
   { year: 1976, title: 'Schell route', text: 'Four Austrians climb a new route around the Rupal Face by the Mazeno Gap and the south-west ridge.' },
   { year: 1978, title: 'Alone', text: 'Reinhold Messner climbs a new line on the Diamir Face solo, the first solo ascent of an 8,000 m peak from base camp.' },
   { year: 2005, title: 'Central pillar, and a body', text: 'Vince Anderson and Steve House climb the central pillar of the Rupal Face in alpine style. On the Diamir side, melting ice releases Günther Messner’s remains.' },

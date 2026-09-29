@@ -1,12 +1,5 @@
 import { Line } from '@react-three/drei'
-import { drapePath } from '../lib/paths'
 import { useStore, useMountain } from '../store'
-
-export function buildPaths(terrain, routes) {
-  const out = {}
-  for (const r of routes) out[r.id] = drapePath(terrain, r.waypoints, { stepM: 30, liftM: 22, smooth: 3 })
-  return out
-}
 
 export default function Routes({ paths }) {
   const { routes } = useMountain()

@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { fractionNear, pointAt } from '../lib/paths'
+import { ROUTE_LIFT_M, fractionNear, pointAt } from '../lib/paths'
 import { useStore, useMountain } from '../store'
 import { Warning, ArrowRight } from './Icons'
 
 gsap.registerPlugin(ScrollTrigger)
 
+/** Ground altitude of the elevation model (m) at fraction t along a draped route. */
+const modelAlt = (path, t) => pointAt(path, t).y * 1000 - ROUTE_LIFT_M
 
 /** Build the scroll stops for one route: overview, then camps and hazards in order along the line, then the finish. */
 function buildStops(terrain, route, path, H, peak) {
@@ -42,10 +44,14 @@ function buildStops(terrain, route, path, H, peak) {
 
   const first = merged[0]
   const overview = { key: 'overview', t: 0, overview: true, title: route.name, alt: first?.alt || 5000, body: route.summary, route }
-  return [overview, ...merged.filter((m) => m.t < 0.975), end]
+  const stops = [overview, ...merged.filter((m) => m.t < 0.975), end]
+  // The model rounds off the summits (lib/calibrate.js), so the altimeter follows the ground
+  // between stops but is pinned to the documented altitude on each stop's card.
+  for (const s of stops) s.gap = s.alt - modelAlt(path, s.t)
+  return stops
 }
 
-function StopCard({ s, i, n, route, active, H }) {
+function StopCard({ s, i, n, route, active }) {
   const hz = s.hazard
   return (
     <article className={`ascent-card ${active ? 'is-active' : ''} ${s.overview ? 'is-overview' : ''}`} aria-hidden={!active} style={{ '--c': route.color }}>
@@ -103,8 +109,7 @@ export default function Ascent({ terrain }) {
         useStore.setState({ progress: t })
         setActive(Math.round(seg))
         if (altRef.current) {
-          const p = pointAt(path, t)
-          const alt = Math.round(p.y * 1000 - 22)
+          const alt = Math.round(modelAlt(path, t) + stops[i].gap + (stops[i + 1].gap - stops[i].gap) * f)
           altRef.current.textContent = alt.toLocaleString()
           if (dotRef.current) dotRef.current.style.bottom = `${Math.min(100, Math.max(0, ((alt - minAlt) / (maxAlt - minAlt)) * 100))}%`
         }
@@ -165,7 +170,7 @@ export default function Ascent({ terrain }) {
             </button>
           ))}
         </div>
-        {stops.map((s, i) => <StopCard key={s.key} s={s} i={i} n={stops.length} route={route} active={i === active} H={H} />)}
+        {stops.map((s, i) => <StopCard key={s.key} s={s} i={i} n={stops.length} route={route} active={i === active} />)}
         <div className="altimeter" aria-live="off">
           <small>altitude</small>
           <b><span ref={altRef}>{minAlt.toLocaleString()}</span> m</b>

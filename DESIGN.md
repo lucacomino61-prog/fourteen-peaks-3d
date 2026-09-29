@@ -1,6 +1,6 @@
-# DESIGN.md — K2 & Everest in 3D
+# DESIGN.md — The fourteen 8,000 m peaks in 3D
 
-Recorded from the built surface (2026-09-04). Governs any extension of this site.
+Recorded from the built surface (2026-09-04, updated 2026-09-29). Governs any extension of this site.
 
 ## World
 
@@ -19,17 +19,20 @@ Mode: **Experience** (the 3D leads) with **Read** duties (routes, hazards, histo
 | `--bg-1..3` | `#0b0e17`, `#10141f`, `#161b28` | surfaces, 5–8% steps |
 | `--line` / `--line-strong` | `rgba(190,205,235,.14 / .28)` | hairlines, borders |
 | `--text` / `--text-2` / `--text-3` | `#e8ebf2` / `#a9b1c3` / `#6f7890` | body / secondary / labels |
-| `--accent` / `--accent-2` | `#ff6a3d` / `#ffb08f` | Abruzzi orange: primary action, active state, altimeter dot |
+| `--accent` / `--accent-2` | `#ff6a3d` / `#ffb08f` | warm orange: primary action, active state, altimeter dot, key years |
 | `--danger` / `--warn` | `#ff3b3b` / `#ffb64d` | hazard severity 5 / 3–4, Death Zone band |
-| route colours | Abruzzi `#ff6a3d`, Česen `#ffc14d`, North `#5fd3ff`, Magic `#c77dff`, West `#7dffb3` | the only other chroma on the page; used identically in 3D lines, markers, list swatches and section bars |
+| route colours | set per route in `src/data/<id>.js` | the only other chroma on the page; used identically in 3D lines, markers, list swatches and section bars |
 
 Single theme: dark, locked. The fixed stage carries a radial sky gradient; content sections after the
-explorer sit on `--bg-0` while the stage dims to 35%.
+explorer sit on `--bg-0` while the stage dims to 35%. Small text over the terrain (hero index and
+side notes) uses `--text-2`, never `--text-3`, with the markers' dark halo: it sits on bright snow.
 
 ## Type
 
-- Display: **Bricolage Grotesque** (opsz 12–96, weights 300–600). Hero "K2" at `--step-hero`
-  weight 300, tracking −0.045em, line-height 0.85. Section heads at `--step-5` weight 400.
+Self-hosted variable fonts (`@fontsource-variable`).
+
+- Display: **Bricolage Grotesque** (optical size axis, weights 300–600): nav brand, section heads
+  at `--step-5` weight 400, menu and card titles.
 - UI / body: **Archivo** 400–600, body `--step-0`, line-height 1.55, measure ≤ 60ch.
 - Data: **JetBrains Mono** for altitudes, coordinates, altimeter, small labels only (never as a
   "technical" costume for prose).
@@ -47,27 +50,38 @@ Hairline dividers (`--line`), never boxed cards for content.
   dark fill; press `scale(.97)` 160ms ease-out.
 - **Ascent card**: floating instrument bottom-left, blurred dark glass, altitude in mono + title +
   copy + hazard line; only one active; fade/rise 320–420ms.
-- **Altimeter**: bottom-right mono readout with vertical rail, 8,000 m tick in red.
+- **Altimeter**: bottom-right mono readout with vertical rail, 8,000 m tick in red. It follows the
+  ground between stops and shows each card's documented altitude at the stop (the elevation model
+  rounds off summits, so its raw heights run low near the top).
 - **Explorer panel**: opaque dark (no backdrop blur; Chrome/WebGL paint bug), route rows with colour
   swatch + eye toggle, layer toggles (accent when on, danger for Death Zone).
 - **Detail sheet**: bottom-right, 2px top border in the item's colour.
-- **3D markers**: dot + label with heavy text shadow; hidden when terrain occludes the point or the
-  camera is far; non-active routes' camp labels dimmed in the explorer.
-- **Hazard zones**: pulsing rings draped on the terrain, colour by severity, `!` chip label.
+- **3D markers**: the dot sits on the point, over its 3D sphere, with the label to the right and a
+  heavy text shadow; hidden when terrain occludes the point or it is more than 11 km away (where
+  the terrain starts to dissolve); non-active routes' camp labels dimmed in the explorer.
+- **Hazard zones**: pulsing rings draped on the terrain, colour by severity; the `!` chip sits on
+  the zone's centre with the name to its left, so a hazard at a camp never covers the camp's label.
+- **Label placement**: a name that would land on a more important one hides its text and keeps its
+  dot or chip (summit, then the active route's camps, then hazards, then dimmed camps).
+- **History**: key years (first ascent and what defines each mountain) marked in the accent, set
+  per entry with `highlight: true`.
 
 ## Motion
 
-One authored moment: the camera. Hero orbit (slow), scroll-scrubbed flight up the Abruzzi Spur,
-eased fly-to poses in the explorer (1.6s cubic). UI transitions ≤ 420ms ease-out, transforms and
-opacity only. `prefers-reduced-motion` collapses UI transitions to 1ms; the scroll flight remains
-(it is the content), with `scroll-behavior: auto`.
+One authored moment: the camera. Hero orbit (slow, drag to turn), scroll-scrubbed flight up the
+chosen route, eased fly-to poses in the explorer (1.6s cubic). A route's pose aims at most 3.5 km
+short of the summit and keeps the camera within 10.5 km of it, so the summit stays in the frame
+and out of the distance dissolve as the explorer orbits. UI transitions ≤ 420ms ease-out,
+transforms and opacity only. `prefers-reduced-motion` collapses UI transitions to 1ms; the scroll
+flight remains (it is the content), with `scroll-behavior: auto`.
 
 ## Mountain switcher
 
 The hero is a product page for one peak at a time: edge arrows (48 px ghost circles, keyboard
-left/right), a mono index line (`01 / 02 · range`), and a "Next: <peak>" ghost button. Switching
-resets scroll, route and selection; the 3D stage dims to 25% while the new terrain loads and the
-shader program is reused so there is no recompile. Long peak names use a smaller hero size token.
+left/right), a mono index line (`01 / 14 · range`) that opens the overview, and "Routes and
+information"; "Next: <peak>" sits in the side notes. Switching resets scroll, route and selection;
+the 3D stage dims to 25% while the new terrain loads and the shader program is reused, so there
+is no recompile.
 
 ## Overview grid
 
@@ -79,7 +93,7 @@ columns on phones, auto-fill 17rem columns on desktop. Escape or the close butto
 
 Breakpoint 760px. Below it: nav links hidden, hero side notes hidden, explorer panel and detail
 become bottom sheets (≤ 46vh), camera pulls back ×1.7 and aims lower so the mountain sits above
-the sheet, quality tier `low` (320-segment mesh, no shadow march).
+the sheet, quality tier `low` (320-segment mesh, 2K base texture only).
 
 ## Performance tiers
 

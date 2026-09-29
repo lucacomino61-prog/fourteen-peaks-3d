@@ -5,7 +5,6 @@ import fs from 'node:fs/promises'
 import sharp from 'sharp'
 const PEAK_ID = process.env.PEAK || 'k2'
 const DIR = `terrain-src/${PEAK_ID}`   // pipeline sources (not shipped)
-const OUT = `public/terrain/${PEAK_ID}` // shipped assets
 
 const meta = JSON.parse(await fs.readFile(`${DIR}/height.json`, 'utf8'))
 const { bbox, width: W, height: H, metresPerPx } = meta

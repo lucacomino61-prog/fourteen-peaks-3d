@@ -3,7 +3,13 @@ import { useStore, useMountain } from '../store'
 import { mountains } from '../data'
 import { ArrowDown, Compass, ArrowLeft, ArrowRight, X } from './Icons'
 
-export function Nav({ current }) {
+/** Switch to the next (1) or previous (-1) mountain and go back to the top of the page. */
+function stepMountain(dir) {
+  useStore.getState().stepMountain(dir)
+  window.scrollTo({ top: 0, behavior: 'auto' })
+}
+
+export function Nav() {
   const { peak } = useMountain()
   const routesOpen = useStore((s) => s.routesOpen)
   return (
@@ -19,24 +25,22 @@ export function Nav({ current }) {
 
 export function Hero({ loading }) {
   const { peak, id } = useMountain()
-  const step = useStore((s) => s.stepMountain)
   const index = mountains.findIndex((m) => m.id === id)
   const next = mountains[(index + 1) % mountains.length]
   const prev = mountains[(index - 1 + mountains.length) % mountains.length]
-  const go = (dir) => { step(dir); window.scrollTo({ top: 0, behavior: 'auto' }) }
   useEffect(() => {
     const onKey = (e) => {
       if (useStore.getState().mode !== 'hero') return
-      if (e.key === 'ArrowRight') go(1)
-      if (e.key === 'ArrowLeft') go(-1)
+      if (e.key === 'ArrowRight') stepMountain(1)
+      if (e.key === 'ArrowLeft') stepMountain(-1)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
   return (
     <section id="top" className="hero" aria-label={peak.name}>
-      <button className="switch switch-prev" onClick={() => go(-1)} aria-label={`Previous mountain: ${prev.peak.name}`}><ArrowLeft /></button>
-      <button className="switch switch-next" onClick={() => go(1)} aria-label={`Next mountain: ${next.peak.name}`}><ArrowRight /></button>
+      <button className="switch switch-prev" onClick={() => stepMountain(-1)} aria-label={`Previous mountain: ${prev.peak.name}`}><ArrowLeft /></button>
+      <button className="switch switch-next" onClick={() => stepMountain(1)} aria-label={`Next mountain: ${next.peak.name}`}><ArrowRight /></button>
       <div className="hero-min">
         <div className="hero-index mono">
           <button className="hero-index-btn" onClick={() => useStore.setState({ overviewOpen: true })}>{String(index + 1).padStart(2, '0')} / {String(mountains.length).padStart(2, '0')}</button>
@@ -57,7 +61,7 @@ export function Hero({ loading }) {
 }
 
 /** Scroll the page so the route section starts at the top. */
-export function goToAscent() {
+function goToAscent() {
   const el = document.getElementById('ascent')
   if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY, behavior: 'auto' })
 }
@@ -67,9 +71,7 @@ export function RoutesMenu() {
   const { routes, peak, id } = useMountain()
   const index = mountains.findIndex((m) => m.id === id)
   const open = useStore((s) => s.routesOpen)
-  const step = useStore((s) => s.stepMountain)
   const close = () => useStore.setState({ routesOpen: false })
-  const jump = (dir) => { step(dir); window.scrollTo({ top: 0, behavior: 'auto' }) }
   const active = useStore((s) => s.activeRoute)
   const choose = useStore((s) => s.chooseRoute)
   const ref = useRef()
@@ -113,8 +115,8 @@ export function RoutesMenu() {
         <li><button onClick={() => useStore.setState({ routesOpen: false, overviewOpen: true })}>All fourteen peaks <small>the overview grid</small></button></li>
       </ul>
       <div className="routes-menu-foot">
-        <button onClick={() => jump(-1)}><ArrowLeft /> {mountains[(index - 1 + mountains.length) % mountains.length].peak.name}</button>
-        <button onClick={() => jump(1)}>{mountains[(index + 1) % mountains.length].peak.name} <ArrowRight /></button>
+        <button onClick={() => stepMountain(-1)}><ArrowLeft /> {mountains[(index - 1 + mountains.length) % mountains.length].peak.name}</button>
+        <button onClick={() => stepMountain(1)}>{mountains[(index + 1) % mountains.length].peak.name} <ArrowRight /></button>
       </div>
     </div>
   )
@@ -140,8 +142,6 @@ export function Figures() {
   )
 }
 
-const KEY_YEARS = new Set([1954, 1986, 2008, 2021, 1953, 1996, 2014, 2019])
-
 export function History() {
   const { timeline, peak } = useMountain()
   return (
@@ -153,7 +153,7 @@ export function History() {
         </div>
         <div className="timeline">
           {timeline.map((t) => (
-            <div key={t.year} className={`tl-item ${KEY_YEARS.has(t.year) ? 'is-key' : ''}`}>
+            <div key={t.year} className={`tl-item ${t.highlight ? 'is-key' : ''}`}>
               <div className="year">{t.year}</div>
               <div className="body"><h3>{t.title}</h3><p>{t.text}</p></div>
             </div>
@@ -164,14 +164,15 @@ export function History() {
   )
 }
 
-export function Footer() {
+export function Footer({ tile }) {
   const { sources, peak } = useMountain()
+  const size = tile ? `a ${Math.round(tile.km)} km square around ${peak.name} at about ${Math.round(tile.metresPerPx)} m per pixel` : `a square of about 32 km around ${peak.name}`
   return (
     <footer className="footer">
       <div className="wrap cols">
         <div>
           <h3>About the model</h3>
-          <p>The terrain is a 31 km square around {peak.name} at roughly 15 m per pixel, displaced from a real digital elevation model and draped with satellite imagery. Route lines and camp positions are approximate: they were reconstructed from published expedition accounts and fitted to the elevation data so that camp altitudes match documented values. Use it to understand the mountain, not to navigate it.</p>
+          <p>The terrain is {size}, displaced from a real digital elevation model and draped with satellite imagery. The elevation model rounds off sharp summits, so near the top the 3D mountain stands up to about 250 m lower than its surveyed height; the altitudes quoted on the page are the documented ones. Route lines and camp positions are approximate: they were reconstructed from published expedition accounts and fitted to the elevation data so that camp altitudes match documented values. Use it to understand the mountain, not to navigate it.</p>
         </div>
         <div>
           <h3>Data</h3>

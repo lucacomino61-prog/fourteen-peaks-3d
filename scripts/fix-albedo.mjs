@@ -3,7 +3,6 @@
 import sharp from 'sharp'
 const PEAK_ID = process.env.PEAK || 'k2'
 const DIR = `terrain-src/${PEAK_ID}`   // pipeline sources (not shipped)
-const OUT = `public/terrain/${PEAK_ID}` // shipped assets
 
 const SRC = `${DIR}/albedo.jpg`
 const { data, info } = await sharp(SRC).raw().toBuffer({ resolveWithObject: true })

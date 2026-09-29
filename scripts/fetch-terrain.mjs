@@ -12,7 +12,6 @@ import path from 'node:path'
 import sharp from 'sharp'
 const PEAK_ID = process.env.PEAK || 'k2'
 const DIR = `terrain-src/${PEAK_ID}`   // pipeline sources (not shipped)
-const OUT = `public/terrain/${PEAK_ID}` // shipped assets
 
 const PEAKS = { k2: { lat: 35.8825, lon: 76.5133 }, everest: { lat: 27.9881, lon: 86.9250 }, annapurna: { lat: 28.5961, lon: 83.8203 }, kangchenjunga: { lat: 27.7025, lon: 88.1475 }, lhotse: { lat: 27.9617, lon: 86.9333 }, makalu: { lat: 27.8897, lon: 87.0885 }, chooyu: { lat: 28.0942, lon: 86.6608 }, dhaulagiri: { lat: 28.6983, lon: 83.4875 }, manaslu: { lat: 28.5497, lon: 84.5597 }, nangaparbat: { lat: 35.2375, lon: 74.5892 }, gasherbrum1: { lat: 35.7242, lon: 76.6964 }, gasherbrum2: { lat: 35.7583, lon: 76.6533 }, broadpeak: { lat: 35.8114, lon: 76.5650 }, shishapangma: { lat: 28.3525, lon: 85.7792 } }
 const K2 = PEAKS[PEAK_ID]

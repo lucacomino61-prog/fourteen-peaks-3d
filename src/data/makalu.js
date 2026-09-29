@@ -260,13 +260,13 @@ const hazards = [
 
 const timeline = [
   { year: 1954, title: 'Two attempts', text: 'An American team tries the south-east ridge and a New Zealand party under Edmund Hillary reconnoitres the mountain; Hillary is evacuated with broken ribs and pneumonia.' },
-  { year: 1955, title: 'The model expedition', text: 'Jean Franco’s French expedition puts Jean Couzy and Lionel Terray on the summit on 15 May, then every other member over the next two days, by the north-west ridge. Nobody is hurt.' },
+  { year: 1955, highlight: true, title: 'The model expedition', text: 'Jean Franco’s French expedition puts Jean Couzy and Lionel Terray on the summit on 15 May, then every other member over the next two days, by the north-west ridge. Nobody is hurt.' },
   { year: 1970, title: 'Southeast Ridge', text: 'A Japanese expedition completes the ridge of the 1954 attempts; Yūichi Ozaki and Atsushi Tanaka summit on 23 May.' },
   { year: 1971, title: 'West Pillar', text: 'Robert Paragot’s French team climbs the granite pillar in spring cold; Bernard Mellet and Yannick Seigneur reach the summit on 23 May, the first technical rock route on an 8,000 m peak.' },
   { year: 1975, title: 'South Face', text: 'Aleš Kunaver’s Yugoslav expedition climbs the south face in October; seven climbers summit, the first Yugoslavs on an 8,000 m peak.' },
   { year: 1981, title: 'Kukuczka alone', text: 'Jerzy Kukuczka climbs a new line on the north-west face solo on 15 October, one of the boldest ascents of his career.' },
   { year: 1997, title: 'West Face', text: 'Sergey Efimov’s Russian expedition climbs the west face direct and receives a Piolet d’Or; Salavat Khabibullin dies on the descent.' },
-  { year: 2009, title: 'Winter', text: 'Simone Moro and Denis Urubko make the first winter ascent on 9 February, after weeks of wind at the Makalu La.' },
+  { year: 2009, highlight: true, title: 'Winter', text: 'Simone Moro and Denis Urubko make the first winter ascent on 9 February, after weeks of wind at the Makalu La.' },
   { year: 2019, title: 'Commercial season', text: 'Fixed ropes to the summit and oxygen bring a record season; two climbers die on the descent from the couloir.' },
   { year: 2023, title: 'Record year', text: 'More than 100 people reach the summit in a single spring for the first time; several deaths above Camp 4 follow the same pattern as the previous decade.' },
 ]

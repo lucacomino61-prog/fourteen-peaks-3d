@@ -250,11 +250,11 @@ const hazards = [
 
 const timeline = [
   { year: 1952, title: 'Reconnaissance', text: 'Eric Shipton’s team, with Edmund Hillary, reaches the ice cliff at 6,650 m on the north-west face and turns back, wary of crossing into Tibet.' },
-  { year: 1954, title: 'Three men', text: 'Herbert Tichy, Sepp Jöchler and Pasang Dawa Lama reach the summit on 19 October without oxygen, after crossing the Nangpa La: the smallest expedition ever to make an 8,000 m first ascent.' },
+  { year: 1954, highlight: true, title: 'Three men', text: 'Herbert Tichy, Sepp Jöchler and Pasang Dawa Lama reach the summit on 19 October without oxygen, after crossing the Nangpa La: the smallest expedition ever to make an 8,000 m first ascent.' },
   { year: 1958, title: 'Second ascent', text: 'Pasang Dawa Lama climbs the mountain again with Sonam Gyatso for an Indian expedition.' },
   { year: 1959, title: 'The women’s expedition', text: 'An international women’s expedition led by Claude Kogan ends when an avalanche kills Kogan, Claudine van der Straten and two Sherpas at Camp 4.' },
   { year: 1978, title: 'Southeast Face', text: 'Edi Koblmüller and Alois Furtner climb a new route on the Nepal side in alpine style, without a permit.' },
-  { year: 1985, title: 'Winter', text: 'Maciej Berbeka and Maciej Pawlikowski make the first winter ascent on 12 February by a new route up the south-east pillar; Kukuczka and Heinrich follow on the 15th, the permit already expired.' },
+  { year: 1985, highlight: true, title: 'Winter', text: 'Maciej Berbeka and Maciej Pawlikowski make the first winter ascent on 12 February by a new route up the south-east pillar; Kukuczka and Heinrich follow on the 15th, the permit already expired.' },
   { year: 1990, title: 'Southwest Face', text: 'Loretan, Troillet and Kurtyka climb the face in a two-day push with no tent or rope.' },
   { year: 1994, title: 'The commercial peak', text: 'With a road to Base Camp and an easy line, Cho Oyu becomes the standard first 8,000 m peak for guided clients; hundreds summit every autumn.' },
   { year: 2006, title: 'Nangpa La', text: 'On 30 September climbers at Advanced Base watch Chinese border guards shoot at a line of Tibetan refugees crossing the pass. Film of the killing reaches the world within days.' },

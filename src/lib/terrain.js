@@ -68,7 +68,26 @@ function buildTerrain(id, base, meta, detail, detail2, buf, W, H, lo) {
     const p = geo.uvToScene(bx / (W - 1), by / (H - 1))
     return new THREE.Vector3(p.x, best / 1000, p.z)
   }
-  return { id, base, meta, detail, detail2, geo, height, heightTexture, elevationAt, surface, heightAtScene, lineOfSight, snapToPeak, lo }
+  /** Where a ray (unit direction, scene units) first meets the ground inside the tile, or null. */
+  const hitTest = (origin, dir, maxKm = 40) => {
+    const halfX = geo.sizeX / 2, halfZ = geo.sizeZ / 2
+    const above = (t) => origin.y + dir.y * t - heightAtScene(origin.x + dir.x * t, origin.z + dir.z * t) / 1000
+    let prev = 0.02, t = prev
+    if (above(t) < 0) return null
+    while (t < maxKm) {
+      t += 0.015 + t * 0.012 // finer close to the camera, coarser far away
+      const x = origin.x + dir.x * t, z = origin.z + dir.z * t
+      if (Math.abs(x) > halfX || Math.abs(z) > halfZ) return null
+      if (above(t) < 0) {
+        let a = prev, b = t
+        for (let i = 0; i < 10; i++) { const m = (a + b) / 2; if (above(m) < 0) b = m; else a = m }
+        return new THREE.Vector3(origin.x + dir.x * b, origin.y + dir.y * b, origin.z + dir.z * b)
+      }
+      prev = t
+    }
+    return null
+  }
+  return { id, base, meta, detail, detail2, geo, height, heightTexture, elevationAt, surface, heightAtScene, lineOfSight, snapToPeak, hitTest, lo }
 }
 
 /**

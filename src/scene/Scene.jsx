@@ -34,6 +34,8 @@ export default function Scene({ terrain }) {
   const mode = useStore((s) => s.mode)
   const flying = useStore((s) => s.flying)
   const terrainReady = useStore((s) => s.terrainReady)
+  const motion = useStore((s) => s.motion)
+  const loupeHold = useStore((s) => s.loupeHold)
   const set = useStore((s) => s.set)
   const mountain = byId[terrain.id]
   const { routes, peak } = mountain
@@ -45,6 +47,8 @@ export default function Scene({ terrain }) {
 
   return (
     <Canvas
+      // rendered from GSAP's ticker (lib/clock.js), the one animation clock
+      frameloop="never"
       dpr={[1, tier === 'high' ? 1.75 : 1]}
       gl={{ antialias: true, powerPreference: 'high-performance', stencil: false, alpha: true }}
       camera={{ position: [summit.x + 4, summit.y + 1, summit.z + 6], fov: 40, near: 0.05, far: 120 }}
@@ -70,8 +74,8 @@ export default function Scene({ terrain }) {
       </MountainCtx.Provider>
       <OrbitControls
         ref={controls}
-        enabled={mode === 'explorer'}
-        autoRotate={mode === 'explorer' && !touched && !flying}
+        enabled={mode === 'explorer' && !loupeHold}
+        autoRotate={mode === 'explorer' && !touched && !flying && motion === 'on'}
         autoRotateSpeed={0.35}
         onStart={() => setTouched(true)}
         minDistance={0.6}

@@ -30,6 +30,12 @@ export function makeGeo(meta) {
       const { u, v } = toUv(lat, lon)
       return uvToScene(u, v)
     },
+    /** scene {x,z} → lat/lon (the inverse of toScene) */
+    toLatLon(x, z) {
+      const u = x / sizeX + 0.5, v = 0.5 - z / sizeZ
+      const m = mN - (1 - v) * (mN - mS)
+      return { lat: (2 * Math.atan(Math.exp(m)) - Math.PI / 2) * (180 / Math.PI), lon: bbox.west + u * (bbox.east - bbox.west) }
+    },
   }
 }
 

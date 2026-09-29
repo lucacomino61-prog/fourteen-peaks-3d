@@ -3,6 +3,8 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ROUTE_LIFT_M, fractionNear, pointAt } from '../lib/paths'
 import { useStore, useMountain } from '../store'
+import { jumpTo } from '../lib/clock'
+import { fmt, pad2 } from '../lib/format'
 import { Warning, ArrowRight } from './Icons'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -51,12 +53,12 @@ function buildStops(terrain, route, path, H, peak) {
   return stops
 }
 
-function StopCard({ s, i, n, route, active }) {
+function StopCard({ s, i, n, route, num, active }) {
   const hz = s.hazard
   return (
-    <article className={`ascent-card ${active ? 'is-active' : ''} ${s.overview ? 'is-overview' : ''}`} aria-hidden={!active} style={{ '--c': route.color }}>
-      <div className="alt"><b>{s.alt.toLocaleString()} m</b><i>{route.name} · {i + 1} of {n}</i></div>
-      <h3>{s.title}{s.overview && <span>{route.aka}</span>}</h3>
+    // the altitude is the altimeter's to show; the card names the stop (and tells screen readers the height)
+    <article className={`ascent-card ${active ? 'is-active' : ''} ${s.overview ? 'is-overview' : ''}`} aria-hidden={!active} data-alt={s.alt}>
+      <h3>{s.title}<span className="visually-hidden">, {fmt(s.alt)}&nbsp;m</span>{s.overview && <span>{route.aka}</span>}</h3>
       <p>{s.body}</p>
       {s.overview && (
         <dl className="facts">
@@ -72,6 +74,7 @@ function StopCard({ s, i, n, route, active }) {
           <div><b>{hz.kind}</b>{hz.incidents[0] ? <><br />{hz.incidents[0]}</> : null}</div>
         </div>
       )}
+      <p className="stop-foot mono">{pad2(num)} {route.name} · {i + 1} of {n}</p>
     </article>
   )
 }
@@ -86,6 +89,7 @@ export default function Ascent({ terrain }) {
   const path = route ? paths?.[route.id] : null
   const stops = useMemo(() => (path && route ? buildStops(terrain, route, path, H, peak) : []), [terrain, route, path, H, peak])
   const choose = useStore((s) => s.chooseRoute)
+  const motion = useStore((s) => s.motion)
   const [active, setActive] = useState(0)
   const root = useRef()
   const altRef = useRef()
@@ -99,7 +103,7 @@ export default function Ascent({ terrain }) {
       trigger: el,
       start: 'top top',
       end: 'bottom bottom',
-      scrub: 0.6,
+      scrub: motion === 'on' ? 0.6 : true, // stopped animations: the flight follows the scroll exactly
       onUpdate(self) {
         const n = stops.length
         const seg = self.progress * (n - 1)
@@ -110,22 +114,22 @@ export default function Ascent({ terrain }) {
         setActive(Math.round(seg))
         if (altRef.current) {
           const alt = Math.round(modelAlt(path, t) + stops[i].gap + (stops[i + 1].gap - stops[i].gap) * f)
-          altRef.current.textContent = alt.toLocaleString()
+          altRef.current.textContent = fmt(alt)
           if (dotRef.current) dotRef.current.style.bottom = `${Math.min(100, Math.max(0, ((alt - minAlt) / (maxAlt - minAlt)) * 100))}%`
         }
       },
     })
     ScrollTrigger.refresh()
     return () => st.kill()
-  }, [stops, path, minAlt, maxAlt])
+  }, [stops, path, minAlt, maxAlt, motion])
 
   const pick = (id) => {
     if (id === activeRoute) return
     choose(id)
     setActive(0)
-    const top = root.current?.getBoundingClientRect().top + window.scrollY
-    window.scrollTo({ top, behavior: 'auto' })
+    jumpTo(root.current.getBoundingClientRect().top + window.scrollY)
   }
+  const num = routes.findIndex((r) => r.id === activeRoute) + 1
   // the section changes height when a route is chosen: the mode triggers need new positions
   useEffect(() => { ScrollTrigger.refresh() }, [activeRoute])
 
@@ -140,10 +144,10 @@ export default function Ascent({ terrain }) {
               <p>Each route is climbed camp by camp as you scroll. Pick one to draw it on the mountain.</p>
             </div>
             <ul className="choose-list">
-              {routes.map((r) => (
+              {routes.map((r, i) => (
                 <li key={r.id}>
-                  <button className="choose-item" style={{ '--c': r.color }} onClick={() => pick(r.id)}>
-                    <span className="sw" />
+                  <button className="choose-item" onClick={() => pick(r.id)}>
+                    <span className="num mono">{pad2(i + 1)}</span>
                     <span className="txt">
                       <b>{r.name}</b>
                       <small>{r.aka}</small>
@@ -164,23 +168,23 @@ export default function Ascent({ terrain }) {
     <section id="ascent" className="ascent" ref={root} data-active="1" aria-label="Climb each route camp by camp">
       <div className="ascent-sticky">
         <div className="ascent-tabs" role="tablist" aria-label="Route">
-          {routes.map((r) => (
-            <button key={r.id} role="tab" aria-selected={r.id === activeRoute} className="tab" style={{ '--c': r.color }} onClick={() => pick(r.id)}>
-              <i /><span>{r.name}</span>
+          {routes.map((r, i) => (
+            <button key={r.id} role="tab" aria-selected={r.id === activeRoute} className="tab" onClick={() => pick(r.id)}>
+              <i className="mono">{pad2(i + 1)}</i><span>{r.name}</span>
             </button>
           ))}
         </div>
-        {stops.map((s, i) => <StopCard key={s.key} s={s} i={i} n={stops.length} route={route} active={i === active} />)}
+        {stops.map((s, i) => <StopCard key={s.key} s={s} i={i} n={stops.length} route={route} num={num} active={i === active} />)}
         <div className="altimeter" aria-live="off">
-          <small>altitude</small>
-          <b><span ref={altRef}>{minAlt.toLocaleString()}</span> m</b>
+          <small className="mono">altitude, metres</small>
+          <b className="mono"><span ref={altRef}>{fmt(minAlt)}</span></b>
           <div className="rail">
             <i style={{ bottom: '0%' }} />
             <i className="dz" style={{ bottom: `${((8000 - minAlt) / (maxAlt - minAlt)) * 100}%` }} title="8,000 m" />
             <i style={{ bottom: '100%' }} />
             <b ref={dotRef} style={{ bottom: '0%' }} />
           </div>
-          <small>8,000 m line in red</small>
+          <small className="mono">the orange tick is 8,000&nbsp;m</small>
         </div>
       </div>
       <div className="ascent-track" style={{ marginTop: '-100dvh' }}>

@@ -2,8 +2,7 @@ import { useMemo, useRef } from 'react'
 import { Line, Html } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useStore, useMountain } from '../store'
-
-const SEV = { 3: '#ffb64d', 4: '#ff7a45', 5: '#ff3b3b' }
+import { hazardColor } from '../lib/palette'
 
 function ring(terrain, lat, lon, radiusM, n = 56) {
   const pts = []
@@ -22,13 +21,14 @@ function Zone({ terrain, h }) {
   const set = useStore((s) => s.set)
   const selected = useStore((s) => s.selected)
   const isSel = selected?.id === h.id
-  const color = SEV[h.severity] || SEV[3]
+  const color = hazardColor(h.severity)
+  const grave = h.severity >= 5 // solid signal ring; lesser hazards are dashed snow
   const pts = useMemo(() => ring(terrain, h.lat, h.lon, h.radius), [terrain, h])
   const center = useMemo(() => terrain.surface(h.lat, h.lon, 30), [terrain, h])
   const tick = useRef(0)
 
   useFrame(({ camera, clock }, dt) => {
-    if (line.current) line.current.material.opacity = 0.55 + Math.sin(clock.elapsedTime * 2.4 + h.radius) * 0.25
+    if (line.current) line.current.material.opacity = useStore.getState().motion === 'on' ? 0.55 + Math.sin(clock.elapsedTime * 2.4 + h.radius) * 0.25 : 0.7
     tick.current += dt
     if (tick.current > 0.15) {
       tick.current = 0
@@ -42,15 +42,15 @@ function Zone({ terrain, h }) {
 
   return (
     <group>
-      <Line ref={line} points={pts} color={color} lineWidth={isSel ? 2.4 : 1.4} transparent opacity={0.7} depthWrite={false} />
+      <Line ref={line} points={pts} color={color} lineWidth={isSel ? 2.4 : 1.4} transparent opacity={0.7} depthWrite={false} dashed={!grave} dashSize={0.05} gapSize={0.035} />
       <Line points={pts} color={color} lineWidth={6} transparent opacity={0.12} depthWrite={false} />
       {/* not centred: .hz puts its icon on the point and the label to the left, clear of a camp on the same spot */}
       <Html position={center} zIndexRange={[15, 0]} style={{ pointerEvents: 'none' }}>
-        <div ref={wrap} className={`hz ${isSel ? 'is-selected' : ''}`} style={{ '--hz': color }}
+        <button type="button" tabIndex={-1} ref={wrap} className={`hz ${isSel ? 'is-selected' : ''} ${grave ? 'hz-grave' : ''}`} style={{ '--hz': color }}
           onClick={(e) => { e.stopPropagation(); set({ selected: { type: 'hazard', id: h.id } }) }}>
-          <span className="hz-icon">!</span>
+          <span className="hz-icon" aria-hidden>!</span>
           <span className="hz-label">{h.name}</span>
-        </div>
+        </button>
       </Html>
     </group>
   )

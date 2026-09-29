@@ -3,6 +3,8 @@ import { Html } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useStore, useMountain } from '../store'
+import { SNOW, routeColor } from '../lib/palette'
+import { fmt } from '../lib/format'
 
 function Marker({ terrain, pos, label, alt, color, id, routeId, kind = 'camp', big = false, dim = false }) {
   const ref = useRef()
@@ -26,7 +28,8 @@ function Marker({ terrain, pos, label, alt, color, id, routeId, kind = 'camp', b
       }
     }
     if (ref.current) {
-      const s = 0.012 + Math.sin(clock.elapsedTime * 2.2) * 0.002
+      // the dots breathe, unless animations are stopped
+      const s = 0.012 + (useStore.getState().motion === 'on' ? Math.sin(clock.elapsedTime * 2.2) * 0.002 : 0)
       const dist = camera.position.distanceTo(pos)
       ref.current.scale.setScalar(s * Math.max(0.5, dist * 0.35))
     }
@@ -40,7 +43,10 @@ function Marker({ terrain, pos, label, alt, color, id, routeId, kind = 'camp', b
       </mesh>
       {/* not centred: .mk puts its dot on the point (over the sphere) and the label to the right */}
       <Html zIndexRange={[20, 0]} style={{ pointerEvents: 'none' }}>
-        <div
+        {/* a real button for the pointer; keyboard users reach the same details from the explorer's list */}
+        <button
+          type="button"
+          tabIndex={-1}
           ref={wrap}
           className={`mk mk-${kind} ${isSel ? 'is-selected' : ''} ${big ? 'mk-big' : ''} ${dim && !isSel ? 'mk-dim' : ''}`}
           style={{ '--mk': color }}
@@ -49,9 +55,9 @@ function Marker({ terrain, pos, label, alt, color, id, routeId, kind = 'camp', b
           <span className="mk-dot" />
           <span className="mk-label">
             <b>{label}</b>
-            <i>{alt.toLocaleString()} m</i>
+            <i>{fmt(alt)}&nbsp;m</i>
           </span>
-        </div>
+        </button>
       </Html>
     </group>
   )
@@ -69,18 +75,18 @@ export default function Camps({ terrain }) {
     const out = []
     for (const r of routes)
       r.camps.forEach((c, i) =>
-        out.push({ ...c, routeId: r.id, color: r.color, id: `${r.id}:${i}:${c.name}`, pos: terrain.surface(c.lat, c.lon, 12) }))
+        out.push({ ...c, routeId: r.id, id: `${r.id}:${i}:${c.name}`, pos: terrain.surface(c.lat, c.lon, 12) }))
     return out
   }, [terrain, routes])
 
   const show = showCamps && mode !== 'hero'
   return (
     <group>
-      <Marker terrain={terrain} pos={summit} label={peak.name} alt={peak.elevation} color="#ffffff" id="summit" kind="summit" big />
+      <Marker terrain={terrain} pos={summit} label={peak.name} alt={peak.elevation} color={SNOW} id="summit" kind="summit" big />
       {show &&
         camps
           .filter((c) => visible.includes(c.routeId) && (mode !== 'ascent' || c.routeId === active))
-          .map((c) => <Marker key={c.id} terrain={terrain} pos={c.pos} label={c.name} alt={c.alt} color={c.color} id={c.id} routeId={c.routeId} dim={mode === 'explorer' && c.routeId !== active} />)}
+          .map((c) => <Marker key={c.id} terrain={terrain} pos={c.pos} label={c.name} alt={c.alt} color={routeColor(c.routeId === active)} id={c.id} routeId={c.routeId} dim={mode === 'explorer' && c.routeId !== active} />)}
     </group>
   )
 }

@@ -1,99 +1,115 @@
 # DESIGN.md — The fourteen 8,000 m peaks in 3D
 
-Recorded from the built surface (2026-09-04, updated 2026-09-29). Governs any extension of this site.
+Recorded from the built surface (2026-09-04; award redesign 2026-09-29). Governs any extension of this site.
 
-## World
+## Direction
 
-Expedition cartography at night. The mountain (real terrain, real imagery, low warm sun, cold blue
-shadows, valley fog) is the page; the interface annotates it the way an expedition map or an
-altimeter would: hairlines, monospaced measurements, one warm accent. Nothing is framed in cards
-except the two floating instruments (ascent card, explorer panel) that must sit on top of the 3D.
+**World:** expedition cartography at night. The mountain (real terrain, real imagery, low warm sun,
+cold blue shadows, valley fog) is the page; the interface annotates it the way an expedition map or
+an altimeter would: hairlines, monospaced measurements, one signal colour.
 
-Mode: **Experience** (the 3D leads) with **Read** duties (routes, hazards, history).
+**Vocabulary:** the Awwwards-winner vocabulary measured in the Award Site Anatomy study
+(`~/.claude/skills/awwwards-blueprints`): poster display type, two colours, one named signature
+moment borrowing a winner's technique, one animation clock, a Stop-animations switch, a list view of
+every index, a loader with a skip. Gate: `node ~/.claude/skills/awwwards-blueprints/scripts/audit.mjs <url>`
+(2026-09-29: 0 fail, 29 pass, 1 warn; the warn is weight, 10.9 MB by the fourth scroll step at the
+medium tier, which is the terrain itself; first paint is about 1 MB: the 512² heightmap and the 1K albedo).
+
+**Signature — the contour loupe** (Lando Norris's cursor reveal, turned into cartography). A round
+loupe follows the pointer over the ground and redraws what is under it as a two-colour contour map:
+snow paper shaded by the relief, ink contours every 100 m, index contours every 500 m, the 8,000 m
+line in the signal colour, and a read-out of the corrected altitude and position (`≈ 8,350 m ·
+35.879° N 76.515° E`). The terrain shader draws the map (`contourMap` in `src/scene/Terrain.jsx`),
+the ring and read-out are HTML (`src/ui/Loupe.jsx`) moved in the same frame, the pointer state is
+`src/lib/loupe.js`. Phones: press and hold 350 ms to lift it above the finger, drag, let go. Keyboard
+and phones: the explorer's **Contour map** layer draws the whole terrain as the map. Hero and
+explorer only (where the canvas takes the pointer).
 
 ## Colour
 
+Two colours carry the page; one signal marks only what needs marking.
+
 | token | value | role |
 | --- | --- | --- |
-| `--bg-0` | `#07090f` | page ground, sky bottom |
-| `--bg-1..3` | `#0b0e17`, `#10141f`, `#161b28` | surfaces, 5–8% steps |
-| `--line` / `--line-strong` | `rgba(190,205,235,.14 / .28)` | hairlines, borders |
-| `--text` / `--text-2` / `--text-3` | `#e8ebf2` / `#a9b1c3` / `#6f7890` | body / secondary / labels |
-| `--accent` / `--accent-2` | `#ff6a3d` / `#ffb08f` | warm orange: primary action, active state, altimeter dot, key years |
-| `--danger` / `--warn` | `#ff3b3b` / `#ffb64d` | hazard severity 5 / 3–4, Death Zone band |
-| route colours | set per route in `src/data/<id>.js` | the only other chroma on the page; used identically in 3D lines, markers, list swatches and section bars |
+| `--night` | `#0b0d12` | page ground, panels, the map's ink |
+| `--snow` | `#ecebe6` | text, lines, the map's paper, inactive routes, camps, lesser hazards |
+| `--signal` | `#ff5b2e` | the active route and its camps, the altimeter dot and its 8,000 m tick, the map's 8,000 m line, the Death Zone band, severity-5 hazards, key years, focus ring |
+| `--snow-2` / `--snow-3` | snow at 74% / 58% | secondary text / labels (9.8:1 and 6:1 on night) |
+| `--line` / `--line-strong` | snow at 14% / 30% | hairlines, borders |
 
-Single theme: dark, locked. The fixed stage carries a radial sky gradient; content sections after the
-explorer sit on `--bg-0` while the stage dims to 35%. Small text over the terrain (hero index and
-side notes) uses `--text-2`, never `--text-3`, with the markers' dark halo: it sits on bright snow.
+Routes are told apart by **number** (01–05 in tabs, menus, lists and cards), never by hue. Lesser
+hazards are dashed snow rings; grave ones solid signal. The same values live in `src/lib/palette.js`
+for the 3D. Dark only.
 
 ## Type
 
 Self-hosted variable fonts (`@fontsource-variable`).
 
-- Display: **Bricolage Grotesque** (optical size axis, weights 300–600): nav brand, section heads
-  at `--step-5` weight 400, menu and card titles.
-- UI / body: **Archivo** 400–600, body `--step-0`, line-height 1.55, measure ≤ 60ch.
-- Data: **JetBrains Mono** for altitudes, coordinates, altimeter, small labels only (never as a
-  "technical" costume for prose).
-- Fluid scale `--step--1 … --step-5` (Utopia 1.2→1.25); no kickers/eyebrows above headings.
+- **Poster:** Bricolage Grotesque 800, uppercase, tracking −0.045em, line-height 0.82: the peak's
+  name set **behind** the mountain in the stage, under the transparent canvas, so the ridge cuts the
+  letters and the far ridges dissolve over them. Fitted to 92% of the width (long names take the
+  75% end of the width axis first), at most 480 px or half the viewport height. Hero only; the
+  hero's visually hidden `h1` carries the same text.
+- **Display:** Bricolage Grotesque for section heads at `--step-display` (56 → 192 px), weight 400,
+  tracking −0.045em; uppercase 700 for names (nav, menu, cards, list).
+- **Text:** Archivo 400–600, body `--step-0`, line-height 1.55, measure ≤ 62ch.
+- **Measurements:** JetBrains Mono with tabular figures: the altimeter (poster-size, up to 152 px),
+  the loader's count, altitudes, coordinates, labels. Numbers are written `8,611 m` with a
+  non-breaking space whatever the browser's locale (`src/lib/format.js`).
 
 ## Space and shape
 
-Utopia fluid space tokens `--space-xs … --space-3xl`; sections at `--space-3xl`; gutter
-`--gutter`; wrapper 80rem. One radius: 4px (bottom sheets on mobile: 12px top corners).
-Hairline dividers (`--line`), never boxed cards for content.
+Utopia fluid space tokens `--space-xs … --space-3xl`; gutter `--gutter`; wrapper 80rem. Controls are
+pills (99px radius); panels and cards 4px (bottom sheets on phones 12px top corners). Hairlines, not
+boxes, for content. Touch targets ≥ 44 px on phones (the 3D markers grow a padded target).
 
 ## Components
 
-- **Buttons**: 44px, radius 4, primary = accent fill with near-black text; ghost = hairline + blurred
-  dark fill; press `scale(.97)` 160ms ease-out.
-- **Ascent card**: floating instrument bottom-left, blurred dark glass, altitude in mono + title +
-  copy + hazard line; only one active; fade/rise 320–420ms.
-- **Altimeter**: bottom-right mono readout with vertical rail, 8,000 m tick in red. It follows the
-  ground between stops and shows each card's documented altitude at the stop (the elevation model
-  rounds off summits, so its raw heights run low near the top).
-- **Explorer panel**: opaque dark (no backdrop blur; Chrome/WebGL paint bug), route rows with colour
-  swatch + eye toggle, layer toggles (accent when on, danger for Death Zone).
-- **Detail sheet**: bottom-right, 2px top border in the item's colour.
-- **3D markers**: the dot sits on the point, over its 3D sphere, with the label to the right and a
-  heavy text shadow; hidden when terrain occludes the point or it is more than 11 km away (where
-  the terrain starts to dissolve); non-active routes' camp labels dimmed in the explorer.
-- **Hazard zones**: pulsing rings draped on the terrain, colour by severity; the `!` chip sits on
-  the zone's centre with the name to its left, so a hazard at a camp never covers the camp's label.
-- **Label placement**: a name that would land on a more important one hides its text and keeps its
-  dot or chip (summit, then the active route's camps, then hazards, then dimmed camps).
-- **History**: key years (first ascent and what defines each mountain) marked in the accent, set
-  per entry with `highlight: true`.
+- **Nav:** peak name (display, uppercase) + height (mono) · Menu · Stop animations (pill with a dot;
+  pressed = a signal square; icon-only on phones) · All fourteen.
+- **Hero:** the poster name behind the mountain; bottom-left `02 / 14 · range` (opens the overview)
+  and the snow pill "Routes and information"; bottom-right mono side notes with a halo; edge arrows.
+  The summit marker shows only the height here (the poster already names the peak).
+- **Loader** (first load only): the peak's name, an altimeter counting up to the summit's height as
+  the terrain arrives, "Skip"; when ready the count tops out and a round portal opens onto the
+  mountain (a radial mask on `--hole`, 800 ms); stopped animations: it simply goes.
+- **Routes menu:** numbered routes, the active one marked by a signal edge; information links; the
+  neighbours.
+- **Ascent:** numbered route tabs (the active one outlined in signal); one glass card at a time with
+  a signal left edge; the altimeter at poster size, pinned to each card's documented altitude.
+- **Explorer:** opaque panel, numbered route rows (signal edge on the active one) with eye toggles;
+  layers Camps · Hazard zones · Contour map · Death Zone (signal); detail sheet with a top edge in
+  the item's colour.
+- **3D markers:** the dot sits on its point with the name to the right; hazard chips sit on their
+  point with the name to the left; a name that would land on a more important one hides its text
+  (`src/scene/Declutter.jsx`: summit, active camps, hazards, dimmed camps). Names show to 11 km.
+- **Overview:** "The fourteen" as a grid of shaded-relief cards or a **list** (rank, peak, height,
+  countries, first ascent, routes, deaths); a modal that traps and returns focus.
+- **Numbers, History, Footer:** display heads; stats as big display values over mono labels between
+  hairlines; timeline years in mono, key years (`highlight: true` in the data) in signal.
 
 ## Motion
 
-One authored moment: the camera. Hero orbit (slow, drag to turn), scroll-scrubbed flight up the
-chosen route, eased fly-to poses in the explorer (1.6s cubic). A route's pose aims at most 3.5 km
-short of the summit and keeps the camera within 10.5 km of it, so the summit stays in the frame
-and out of the distance dissolve as the explorer orbits. UI transitions ≤ 420ms ease-out,
-transforms and opacity only. `prefers-reduced-motion` collapses UI transitions to 1ms; the scroll
-flight remains (it is the content), with `scroll-behavior: auto`.
+One authored moment: the camera. Hero orbit (slow, drag to turn), the scroll-scrubbed flight up the
+chosen route, eased fly-to poses in the explorer (a pose aims at most 3.5 km short of the summit and
+keeps the camera within 10.5 km of it). UI transitions ≤ 300 ms ease-out, transforms and opacity
+only.
 
-## Mountain switcher
+**One clock** (`src/lib/clock.js`): GSAP's ticker owns requestAnimationFrame; Lenis (smooth wheel
+scrolling, `autoRaf: false`) and the 3D (`<Canvas frameloop="never">` + `advance`) are stepped from
+it. Measured: one loop, ~60 requestAnimationFrame calls a second. Programmatic scrolls go through
+`jumpTo`. The explorer's stage and the scrollable overlays carry `data-lenis-prevent`.
 
-The hero is a product page for one peak at a time: edge arrows (48 px ghost circles, keyboard
-left/right), a mono index line (`01 / 14 · range`) that opens the overview, and "Routes and
-information"; "Next: <peak>" sits in the side notes. Switching resets scroll, route and selection;
-the 3D stage dims to 25% while the new terrain loads and the shader program is reused, so there
-is no recompile.
-
-## Overview grid
-
-`All fourteen` (nav, and the hero index) opens a full-screen overlay: cards ranked by height with
-shaded-relief thumbnails, name, height, countries; the current peak outlined in the accent. Two
-columns on phones, auto-fill 17rem columns on desktop. Escape or the close button dismisses it.
+**Stop animations** (`html[data-motion="off"]`, remembered; on from the start under
+`prefers-reduced-motion`): no Lenis, no hero auto-turn or explorer auto-rotate, camera cuts instead
+of eases, the scroll flight follows the scroll exactly, no pulsing markers, rings or Death Zone edge,
+CSS transitions at 0.01 ms, the loader just goes.
 
 ## Responsive
 
-Breakpoint 760px. Below it: nav links hidden, hero side notes hidden, explorer panel and detail
-become bottom sheets (≤ 46vh), camera pulls back ×1.7 and aims lower so the mountain sits above
-the sheet, quality tier `low` (320-segment mesh, 2K base texture only).
+Breakpoint 760px. Below it: side notes hidden, the poster sits higher, the explorer panel and detail
+become bottom sheets (≤ 46vh), the altimeter moves to the top right, the list view keeps rank,
+peak and height, the camera pulls back ×1.7, quality tier `low`.
 
 ## Performance tiers
 

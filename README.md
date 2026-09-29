@@ -8,6 +8,13 @@ Flow: the page opens on the bare mountain (drag to turn it 360°, it keeps turni
 Nothing is drawn until a route is picked from the Routes menu in the nav (or the chooser below the
 hero); the pick draws the line and scrolls into its camp-by-camp ascent. The explorer is free orbit.
 
+The design follows the Awwwards-winner vocabulary (see `DESIGN.md`): two colours (night and snow)
+and one signal orange, the peak's name at poster size behind the mountain, one animation clock, a
+Stop-animations switch in the nav, a list view of the fourteen, and a loader that counts up to the
+summit with a skip. The signature is the **contour loupe**: a round loupe that redraws the ground
+under the pointer as a two-colour contour map with the corrected altitude (press and hold on a
+phone; the explorer's "Contour map" layer draws the whole mountain that way).
+
 Mountains live in `src/data/<id>.js` (peak facts, routes, hazards, timeline, stats) and
 `public/terrain/<id>/` (heightmap + textures). Add one by creating both and listing it in
 `src/data/index.js`.
@@ -61,6 +68,10 @@ That runs three scripts:
 - Fonts (Bricolage Grotesque, Archivo, JetBrains Mono) are self-hosted from `@fontsource-variable`.
 - Three.js, React, GSAP and the other dependencies build into separate chunks, so a deploy that
   only changes the site re-downloads only the site's own code.
+- One animation clock (`src/lib/clock.js`): GSAP's ticker owns requestAnimationFrame and steps
+  Lenis (smooth wheel scrolling) and the 3D render (`<Canvas frameloop="never">` + `advance`).
+  "Stop animations" (and `prefers-reduced-motion`) turns off Lenis, auto-rotation, easing and
+  pulses; programmatic scrolls go through `jumpTo`.
 - `?peak=<id>` deep-links a mountain; the overview grid (`All fourteen`) lists them by height with
   shaded-relief thumbnails (`thumb.webp`).
 - Regenerate the shipped assets from the JPEG/`height.bin` sources with `npm run assets`
@@ -88,6 +99,10 @@ That runs three scripts:
   the distance dissolve at every angle of the explorer's orbit.
 - Marker and hazard names are HTML (`@react-three/drei` `<Html>`); `src/scene/Declutter.jsx`
   hides the text of any name that would land on a more important one, keeping its dot.
+- The contour loupe: `src/lib/loupe.js` tracks the pointer (mouse hover; touch press-and-hold),
+  `Terrain.jsx` casts a ray onto the heightfield (`terrain.hitTest`), draws the map inside the ring
+  in the fragment shader (`contourMap`: 100 m and 500 m contours from the calibrated height, the
+  8,000 m line in signal) and moves the HTML ring and read-out (`src/ui/Loupe.jsx`) in the same frame.
 - Quality tiers (`high` / `medium` / `low`) pick mesh density, shadow steps and DPR from the GPU
   string and viewport width.
 

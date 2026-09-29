@@ -8,8 +8,24 @@ const INITIAL = (() => {
   return mountains[0]
 })()
 
+// the visible Stop-animations switch: remembered, and off from the start under reduced motion
+const INITIAL_MOTION = (() => {
+  try { const v = localStorage.getItem('fp-motion'); if (v === 'on' || v === 'off') return v } catch {}
+  return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches ? 'off' : 'on'
+})()
+if (typeof document !== 'undefined') document.documentElement.dataset.motion = INITIAL_MOTION
+
 export const useStore = create((set, get) => ({
   mode: 'hero', // 'hero' | 'ascent' | 'explorer' | 'idle'
+  motion: INITIAL_MOTION, // 'on' | 'off'
+  setMotion: (motion) => {
+    try { localStorage.setItem('fp-motion', motion) } catch {}
+    document.documentElement.dataset.motion = motion
+    set({ motion })
+  },
+  showContours: false, // the explorer's contour-map layer: the whole terrain drawn as the map
+  loupeHold: false, // a finger is holding the loupe: the drag moves the loupe, not the camera
+  overviewView: 'grid', // 'grid' | 'list' in the All-fourteen overlay
   progress: 0, // 0..1 along the ascent
   mountainId: INITIAL.id,
   overviewOpen: false,

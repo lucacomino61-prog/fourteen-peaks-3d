@@ -4,7 +4,9 @@ import * as THREE from 'three'
 import { pointAt } from '../lib/paths'
 import { useStore, useMountain } from '../store'
 
-const reduced = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
+// with animations stopped (the nav switch, or reduced motion) the camera jumps instead of easing
+// and the hero no longer turns by itself
+const still = () => useStore.getState().motion === 'off'
 const _pos = new THREE.Vector3(), _look = new THREE.Vector3(), _r = new THREE.Vector3(), _a = new THREE.Vector3(), _v = new THREE.Vector3()
 
 /** A good camera pose for viewing a whole route */
@@ -65,7 +67,7 @@ export default function CameraRig({ terrain, paths, controls }) {
       el.style.cursor = 'grabbing'
     }
     const move = (e) => {
-      if (!spin.current.dragging) return
+      if (!spin.current.dragging || useStore.getState().loupeHold) return // a held loupe moves, not the mountain
       const dx = e.clientX - px, dy = e.clientY - py
       px = e.clientX; py = e.clientY
       spin.current.yaw += dx * 0.006
@@ -113,9 +115,9 @@ export default function CameraRig({ terrain, paths, controls }) {
       const f = flying.current
       if (f && c) {
         const d = Math.min(dt, 0.1)
-        f.t = Math.min(1, f.t + d / 1.6)
+        f.t = still() ? 1 : Math.min(1, f.t + d / 1.6)
         const e = 1 - Math.pow(1 - f.t, 3)
-        const k = Math.min(1, d * (2.5 + e * 3))
+        const k = still() ? 1 : Math.min(1, d * (2.5 + e * 3))
         camera.position.lerp(f.pos, k)
         c.target.lerp(f.target, k)
         c.update()
@@ -132,7 +134,7 @@ export default function CameraRig({ terrain, paths, controls }) {
       // 360° product view: slow auto-rotation, paused for a few seconds after the user drags
       const sp = spin.current
       const idle = t - sp.lastInput > 3
-      if (idle && !sp.dragging) sp.auto += Math.min(dt, 0.1) * (reduced ? 0.02 : 0.07)
+      if (idle && !sp.dragging && !still()) sp.auto += Math.min(dt, 0.1) * 0.07
       const a = -0.5 + sp.auto + sp.yaw
       const dist = 7.2 * far
       const lift = 0.7 * far + sp.pitch * 2.2
@@ -156,8 +158,10 @@ export default function CameraRig({ terrain, paths, controls }) {
       const baseAng = Math.atan2(b.x - summit.x, b.z - summit.z)
       const ang = baseAng + THREE.MathUtils.lerp(0.28, -0.32, p)
       const end = p > 0.96 ? (p - 0.96) * 25 : 0
-      const dist = THREE.MathUtils.lerp(1.6, 1.05, p) * (1 + end * 1.6) * far
-      const lift = THREE.MathUtils.lerp(0.42, 0.2, p) * (1 + end * 1.2) * far
+      // start further back and higher so the base texture resolves (it smeared at 1.6 km), closing in as we climb
+      const q = THREE.MathUtils.smoothstep(p, 0, 0.35)
+      const dist = THREE.MathUtils.lerp(2.5, THREE.MathUtils.lerp(1.6, 1.05, p), q) * (1 + end * 1.6) * far
+      const lift = THREE.MathUtils.lerp(0.75, THREE.MathUtils.lerp(0.42, 0.2, p), q) * (1 + end * 1.2) * far
       _pos.set(_r.x + Math.sin(ang) * dist, _r.y + lift, _r.z + Math.cos(ang) * dist)
       const ground = terrain.heightAtScene(_pos.x, _pos.z) / 1000 + 0.12
       if (_pos.y < ground) _pos.y = ground
@@ -166,7 +170,7 @@ export default function CameraRig({ terrain, paths, controls }) {
       if (end > 0) _look.lerp(summit, end).y -= 0.25 * end
     }
 
-    const k = first.current ? 1 : 1 - Math.exp(-Math.min(dt, 0.1) * 2.6)
+    const k = first.current || still() ? 1 : 1 - Math.exp(-Math.min(dt, 0.1) * 2.6)
     first.current = false
     camera.position.lerp(_pos, k)
     look.current.lerp(_look, k)

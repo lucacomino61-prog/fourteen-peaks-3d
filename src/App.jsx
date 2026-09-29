@@ -8,6 +8,9 @@ import Ascent from './ui/Ascent'
 import Explorer from './ui/Explorer'
 import { Nav, Hero, Figures, History, Footer, RoutesMenu } from './ui/Sections'
 import Overview from './ui/Overview'
+import Poster from './ui/Poster'
+import LoupeRing, { LoupePaper } from './ui/Loupe'
+import Loader from './ui/Loader'
 import { useTerrain } from './lib/useTerrain'
 import { warmNeighbours } from './lib/prefetch'
 
@@ -51,16 +54,20 @@ export default function App() {
 
   return (
     <>
-      <div className="stage" data-mode={mode} data-loading={loading || !terrainReady ? '1' : '0'}>
-        {terrain ? <Scene terrain={terrain} /> : (
-          <div className="loading">Loading terrain<b>4 million elevation samples</b></div>
-        )}
+      <a className="skip-link" href="#main">Skip to the content</a>
+      {/* in the explorer the wheel zooms the camera, so smooth scrolling keeps out of the stage */}
+      <div className="stage" data-mode={mode} data-loading={loading || !terrainReady ? '1' : '0'} data-lenis-prevent={mode === 'explorer' ? '' : undefined}>
+        <Poster />
+        <LoupePaper />
+        {terrain && <Scene terrain={terrain} />}
+        <LoupeRing />
       </div>
       <div className="grain" aria-hidden />
       <Nav />
       <RoutesMenu />
       <Overview />
-      <main className="page">
+      <Loader progress={terrain ? 0.62 : 0.14} ready={terrainReady} />
+      <main className="page" id="main" tabIndex={-1}>
         <Hero loading={loading || !terrainReady} />
         {terrain && <MountainCtx.Provider value={byId[terrain.id]}><Ascent terrain={terrain} /></MountainCtx.Provider>}
         <Explorer />

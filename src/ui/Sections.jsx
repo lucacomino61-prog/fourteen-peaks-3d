@@ -1,24 +1,34 @@
 import { useEffect, useRef } from 'react'
 import { useStore, useMountain } from '../store'
 import { mountains } from '../data'
+import { jumpTo } from '../lib/clock'
+import { fmt, pad2 } from '../lib/format'
 import { ArrowDown, Compass, ArrowLeft, ArrowRight, X } from './Icons'
 
 /** Switch to the next (1) or previous (-1) mountain and go back to the top of the page. */
 function stepMountain(dir) {
   useStore.getState().stepMountain(dir)
-  window.scrollTo({ top: 0, behavior: 'auto' })
+  jumpTo(0)
 }
 
 export function Nav() {
   const { peak } = useMountain()
   const routesOpen = useStore((s) => s.routesOpen)
+  const motion = useStore((s) => s.motion)
+  const setMotion = useStore((s) => s.setMotion)
+  const mode = useStore((s) => s.mode)
   return (
-    <nav className="nav" aria-label="Sections">
-      <a className="nav-brand" href="#top">{peak.name} <span>{peak.elevation.toLocaleString()} m</span></a>
-      <div className="nav-links">
-        <button className="nav-routes" aria-expanded={routesOpen} aria-controls="routes-menu" onClick={() => useStore.setState({ routesOpen: !routesOpen })}>Menu <i /></button>
+    // over the reading sections the nav is solid, so nothing shows through under it
+    <nav className="nav" aria-label="Site" data-solid={mode === 'idle' ? '1' : '0'}>
+      <a className="nav-brand" href="#top"><b translate="no">{peak.name}</b> <span className="mono">{fmt(peak.elevation)}&nbsp;m</span></a>
+      <button className="nav-menu" aria-expanded={routesOpen} aria-controls="routes-menu" onClick={() => useStore.setState({ routesOpen: !routesOpen })}>Menu <i aria-hidden /></button>
+      <div className="nav-end">
+        {/* the visible Stop-animations switch (html[data-motion]); reduced motion starts it pressed */}
+        <button className="nav-motion" aria-pressed={motion === 'off'} onClick={() => setMotion(motion === 'on' ? 'off' : 'on')} title={motion === 'on' ? 'Stop animations' : 'Animations stopped'}>
+          <i aria-hidden /><span>Stop animations</span>
+        </button>
+        <button className="nav-all" onClick={() => useStore.setState({ overviewOpen: true })}>All fourteen</button>
       </div>
-      <button className="nav-all" onClick={() => useStore.setState({ overviewOpen: true })}>All fourteen</button>
     </nav>
   )
 }
@@ -38,23 +48,22 @@ export function Hero({ loading }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
   return (
-    <section id="top" className="hero" aria-label={peak.name}>
+    <section id="top" className="hero" aria-labelledby="peak-title">
+      {/* the poster name behind the mountain is drawn in the stage (ui/Poster.jsx); this is its text */}
+      <h1 id="peak-title" className="visually-hidden"><span translate="no">{peak.name}</span>, {fmt(peak.elevation)}&nbsp;m</h1>
       <button className="switch switch-prev" onClick={() => stepMountain(-1)} aria-label={`Previous mountain: ${prev.peak.name}`}><ArrowLeft /></button>
       <button className="switch switch-next" onClick={() => stepMountain(1)} aria-label={`Next mountain: ${next.peak.name}`}><ArrowRight /></button>
       <div className="hero-min">
-        <div className="hero-index mono">
-          <button className="hero-index-btn" onClick={() => useStore.setState({ overviewOpen: true })}>{String(index + 1).padStart(2, '0')} / {String(mountains.length).padStart(2, '0')}</button>
+        <p className="hero-index mono">
+          <button className="hero-index-btn" onClick={() => useStore.setState({ overviewOpen: true })} aria-label={`Mountain ${index + 1} of ${mountains.length}: all fourteen`}>{pad2(index + 1)} / {pad2(mountains.length)}</button>
           <span>{peak.range}</span>
           {loading && <span className="hero-loading">loading terrain…</span>}
-        </div>
+        </p>
         <button className="hero-open" onClick={() => useStore.setState({ routesOpen: true })}>Routes and information <ArrowDown /></button>
       </div>
       <div className="hero-side">
-        <div>Drag the mountain to turn it</div>
-        <div>Next: <b>{next.peak.name}</b></div>
-        <div><b>{peak.range}</b>, {peak.countries}</div>
-        <div>Terrain from Copernicus GLO-30</div>
-        <div>Imagery: Esri World Imagery</div>
+        <p>Drag the mountain to turn it. Point at the ground to read it through the loupe.</p>
+        <p className="mono">{peak.countries} · Copernicus GLO-30 · Esri imagery</p>
       </div>
     </section>
   )
@@ -63,7 +72,7 @@ export function Hero({ loading }) {
 /** Scroll the page so the route section starts at the top. */
 function goToAscent() {
   const el = document.getElementById('ascent')
-  if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY, behavior: 'auto' })
+  if (el) jumpTo(el.getBoundingClientRect().top + window.scrollY)
 }
 
 /** The routes menu under the nav: pick a route and the page jumps to its ascent. */
@@ -79,40 +88,39 @@ export function RoutesMenu() {
     if (!open) return
     const close = () => useStore.setState({ routesOpen: false })
     const onKey = (e) => { if (e.key === 'Escape') close() }
-    const onDown = (e) => { if (ref.current && !ref.current.contains(e.target) && !e.target.closest('.nav-routes')) close() }
+    const onDown = (e) => { if (ref.current && !ref.current.contains(e.target) && !e.target.closest('.nav-menu')) close() }
     window.addEventListener('keydown', onKey)
     window.addEventListener('pointerdown', onDown)
     return () => { window.removeEventListener('keydown', onKey); window.removeEventListener('pointerdown', onDown) }
   }, [open])
   const pick = (id) => { choose(id); requestAnimationFrame(goToAscent) }
   return (
-    <div id="routes-menu" className={`routes-menu ${open ? 'is-open' : ''}`} ref={ref} role="dialog" aria-label={`${peak.name}: routes and information`} aria-hidden={!open}>
+    <div id="routes-menu" className={`routes-menu ${open ? 'is-open' : ''}`} ref={ref} role="dialog" aria-label={`${peak.name}: routes and information`} aria-hidden={!open} data-lenis-prevent>
       <div className="routes-menu-head">
-        <span className="mono">{String(index + 1).padStart(2, '0')} / {String(mountains.length).padStart(2, '0')} · {peak.range}</span>
+        <span className="mono">{pad2(index + 1)} / {pad2(mountains.length)} · {peak.range}</span>
         <button className="close" onClick={close} aria-label="Close"><X /></button>
       </div>
       <div className="menu-about">
-        <h3>{peak.name} <small className="mono">{peak.elevation.toLocaleString()} m · {peak.countries}</small></h3>
+        <h2><span translate="no">{peak.name}</span> <small className="mono">{fmt(peak.elevation)}&nbsp;m · {peak.countries}</small></h2>
         <p>{peak.tagline}</p>
       </div>
-      <h4 className="menu-label mono">{routes.length} routes · pick one to climb it</h4>
-      <ul>
+      <h3 className="menu-label mono">{routes.length} routes · pick one to climb it</h3>
+      <ol className="menu-routes">
         {routes.map((r, i) => (
           <li key={r.id}>
-            <button className={`routes-menu-item ${active === r.id ? 'is-active' : ''}`} style={{ '--c': r.color }} onClick={() => pick(r.id)}>
-              <span className="mono num">{String(i + 1).padStart(2, '0')}</span>
-              <span className="sw" />
+            <button className={`routes-menu-item ${active === r.id ? 'is-active' : ''}`} onClick={() => pick(r.id)} aria-current={active === r.id ? 'true' : undefined}>
+              <span className="mono num">{pad2(i + 1)}</span>
               <span className="txt"><b>{r.name}</b><small>{r.aka}</small></span>
             </button>
           </li>
         ))}
-      </ul>
-      <h4 className="menu-label mono">Information</h4>
+      </ol>
+      <h3 className="menu-label mono">Information</h3>
       <ul className="menu-links">
         <li><a href="#explorer" onClick={close}><Compass /> Free explorer <small>orbit, zoom, every route and camp</small></a></li>
         <li><a href="#figures" onClick={close}>The numbers <small>ascents, deaths, fatality rate</small></a></li>
         <li><a href="#history" onClick={close}>History <small>{peak.historyTitle}</small></a></li>
-        <li><button onClick={() => useStore.setState({ routesOpen: false, overviewOpen: true })}>All fourteen peaks <small>the overview grid</small></button></li>
+        <li><button onClick={() => useStore.setState({ routesOpen: false, overviewOpen: true })}>All fourteen peaks <small>grid or list</small></button></li>
       </ul>
       <div className="routes-menu-foot">
         <button onClick={() => stepMountain(-1)}><ArrowLeft /> {mountains[(index - 1 + mountains.length) % mountains.length].peak.name}</button>
@@ -122,20 +130,26 @@ export function RoutesMenu() {
   )
 }
 
+/** "8,611 m" → the number big, the unit small */
+function StatValue({ v }) {
+  const m = /^(.*\S)\s(m|km)$/.exec(v)
+  return m ? <>{m[1]}<span className="unit">{m[2]}</span></> : v
+}
+
 export function Figures() {
   const { stats, peak } = useMountain()
   return (
     <section id="figures" className="section">
       <div className="wrap">
         <div className="section-head">
-          <h2>The numbers</h2>
+          <h2 className="display">The numbers</h2>
           <p>{peak.figuresLead}</p>
         </div>
-        <div className="stats" aria-label="Key figures">
+        <dl className="stats">
           {stats.map((s) => (
-            <div key={s.label}><span>{s.label}</span><b>{s.value}</b><small>{s.note}</small></div>
+            <div key={s.label}><dt className="mono">{s.label}</dt><dd><b><StatValue v={s.value} /></b><small>{s.note}</small></dd></div>
           ))}
-        </div>
+        </dl>
         <p className="routes-other">{peak.otherLines}</p>
       </div>
     </section>
@@ -148,17 +162,17 @@ export function History() {
     <section id="history" className="section">
       <div className="wrap">
         <div className="section-head">
-          <h2>{peak.historyTitle}</h2>
+          <h2 className="display">{peak.historyTitle}</h2>
           <p>{peak.historyLead}</p>
         </div>
-        <div className="timeline">
+        <ol className="timeline">
           {timeline.map((t) => (
-            <div key={t.year} className={`tl-item ${t.highlight ? 'is-key' : ''}`}>
-              <div className="year">{t.year}</div>
+            <li key={t.year} className={`tl-item ${t.highlight ? 'is-key' : ''}`}>
+              <div className="year mono">{t.year}</div>
               <div className="body"><h3>{t.title}</h3><p>{t.text}</p></div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   )
@@ -171,11 +185,11 @@ export function Footer({ tile }) {
     <footer className="footer">
       <div className="wrap cols">
         <div>
-          <h3>About the model</h3>
-          <p>The terrain is {size}, displaced from a real digital elevation model and draped with satellite imagery. The elevation model rounds off sharp summits, so near the top the 3D mountain stands up to about 250 m lower than its surveyed height; the altitudes quoted on the page are the documented ones. Route lines and camp positions are approximate: they were reconstructed from published expedition accounts and fitted to the elevation data so that camp altitudes match documented values. Use it to understand the mountain, not to navigate it.</p>
+          <h2>About the model</h2>
+          <p>The terrain is {size}, displaced from a real digital elevation model and draped with satellite imagery. The elevation model rounds off sharp summits, so near the top the 3D mountain stands up to about 250 m lower than its surveyed height; the altitudes quoted on the page, and in the loupe, are corrected to the documented ones. Route lines and camp positions are approximate: they were reconstructed from published expedition accounts and fitted to the elevation data so that camp altitudes match documented values. Use it to understand the mountain, not to navigate it.</p>
         </div>
         <div>
-          <h3>Data</h3>
+          <h2>Data</h2>
           <ul>{sources.map((s) => <li key={s}>{s}</li>)}</ul>
         </div>
       </div>

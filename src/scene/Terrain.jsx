@@ -2,7 +2,15 @@ import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { useLoader, useFrame, useThree } from '@react-three/fiber'
 import { useStore, useMountain } from '../store'
-import { deathZoneModelAltitude } from '../lib/calibrate'
+import { heightCalibration, modelAltitude, realAltitude } from '../lib/calibrate'
+import { loupe, attachLoupe } from '../lib/loupe'
+import { fmt } from '../lib/format'
+import { NIGHT, SNOW, SIGNAL } from '../lib/palette'
+
+// the site's two colours and its signal, as display values for the contour map
+const srgb = (hex) => { const c = parseInt(hex.slice(1), 16); return new THREE.Vector3(((c >> 16) & 255) / 255, ((c >> 8) & 255) / 255, (c & 255) / 255) }
+const PAPER = srgb(SNOW), INK = srgb(NIGHT), SIGNAL_RGB = srgb(SIGNAL)
+const LOUPE_R = 104, LOUPE_R_TOUCH = 88 // CSS px
 
 const common = /* glsl */ `
 uniform sampler2D uHeight;
@@ -23,7 +31,8 @@ float H(vec2 uv) {
   return texture2D(uHeight, uv).r * 0.001;
 #endif
 }
-float hash21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+// sin-free hash: the sin() version loses precision on integrated GPUs at these arguments
+float hash21(vec2 p) { vec3 p3 = fract(vec3(p.xyx) * 0.1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
 float vnoise(vec2 p) {
   vec2 i = floor(p), f = fract(p);
   f = f * f * (3.0 - 2.0 * f);
@@ -53,7 +62,9 @@ varying vec3 vWorldPos;
 void main() {
   vUv = uv;
   vec3 p = position;
-  p.y = H(uv) + microRelief(uv);
+  // the height alone: micro-relief finer than the vertex spacing striped the snow (moiré);
+  // it lives in the fragment normals instead (getNormal), faded with distance
+  p.y = H(uv);
 #ifndef PATCH
   // sink the coarse mesh under the dense patch so the patch always wins
   p.y -= 0.035 * patchWeight(uv);
@@ -88,10 +99,35 @@ uniform float uExposure;
 uniform float uTime;
 uniform float uBandAlt;
 uniform float uBandStrength;
+uniform vec3  uLoupe;    // contour loupe: centre in drawing-buffer px (origin bottom-left), radius px; 0 = none
+uniform float uMapOn;    // 1 while the loupe or the map layer shows (keeps fwidth in uniform control flow)
+uniform float uMapAll;   // 0..1: the whole terrain drawn as the contour map (the explorer's layer)
+uniform vec3  uCal;      // height calibration (lib/calibrate.js): gap km, ramp base km, 1 / ramp km
+uniform vec3  uPaper;    // snow, display (sRGB) values
+uniform vec3  uInk;      // night
+uniform vec3  uSignal;   // signal orange
 varying vec2 vUv;
 varying vec3 vWorldPos;
 
 float lum(vec3 c) { return dot(c, vec3(0.299, 0.587, 0.114)); }
+
+// corrected altitude (km) for a model altitude: the DEM rounds off the summits
+float realH(float h) { return h + uCal.x * clamp((h - uCal.y) * uCal.z, 0.0, 1.0); }
+
+// The contour map, in two colours: snow paper shaded by the relief, ink contours every 100 m and
+// index contours every 500 m (each fading out where they would crowd into a fill), and the
+// 8,000 m line in the signal colour.
+vec3 contourMap(vec3 n) {
+  float m = realH(H(vUv)) * 1000.0;
+  float c = m / 100.0, w = fwidth(c);
+  float minor = (1.0 - smoothstep(0.5, 1.5, abs(fract(c + 0.5) - 0.5) / max(w, 1e-5))) * (1.0 - smoothstep(0.18, 0.4, w));
+  float ci = m / 500.0, wi = fwidth(ci);
+  float index = (1.0 - smoothstep(0.9, 1.9, abs(fract(ci + 0.5) - 0.5) / max(wi, 1e-5))) * (1.0 - smoothstep(0.2, 0.45, wi));
+  float eight = 1.0 - smoothstep(1.0, 2.2, abs(m - 8000.0) / max(fwidth(m), 1e-4));
+  float shade = clamp(dot(n, uSunDir), 0.0, 1.0);
+  vec3 paper = mix(uInk, uPaper, 0.8 + 0.2 * shade);
+  return mix(mix(paper, uInk, max(minor * 0.5, index * 0.9)), uSignal, eight);
+}
 
 // layered imagery: base → z16 → z17, tone-matched so captures don't seam
 vec3 sampleAlbedo(vec2 uv, float dist, out float bump) {
@@ -199,13 +235,20 @@ void main() {
     float hh = H(vUv);
     float band = smoothstep(uBandAlt - 0.02, uBandAlt + 0.02, hh);
     float edge = 1.0 - smoothstep(0.0, 0.014, abs(hh - uBandAlt));
-    vec3 tint = col * vec3(1.35, 0.42, 0.38) + vec3(0.10, 0.0, 0.0);
+    vec3 tint = col * vec3(1.35, 0.55, 0.36) + vec3(0.10, 0.02, 0.0);
     col = mix(col, tint, band * uBandStrength * 0.8);
-    col += vec3(0.9, 0.15, 0.1) * edge * uBandStrength * (0.6 + 0.4 * sin(uTime * 2.0));
+    col += vec3(1.0, 0.28, 0.08) * edge * uBandStrength * (0.6 + 0.4 * sin(uTime * 2.0));
   }
 
   col = vec3(1.0) - exp(-col * uExposure);
   col = pow(col, vec3(1.0 / 2.2));
+
+  if (uMapOn > 0.5) {
+    vec3 mapCol = contourMap(n);
+    float lm = uMapAll;
+    if (uLoupe.z > 0.0) lm = max(lm, 1.0 - smoothstep(uLoupe.z - 1.0, uLoupe.z + 0.5, distance(gl_FragCoord.xy, uLoupe.xy)));
+    col = mix(col, mapCol, lm);
+  }
   gl_FragColor = vec4(col, 1.0 - horizon);
 }
 `
@@ -264,8 +307,10 @@ export default function Terrain({ terrain, quality = 'high' }) {
   const hasDetail = !!terrain.detail && !!tier.detail
   const hasDetail2 = !!terrain.detail2 && !!tier.detail2
   const floatLinear = useMemo(() => gl.extensions.has('OES_texture_float_linear'), [gl])
-  // the model's summit sits below the surveyed one, so the 8,000 m line moves down with it
-  const bandAlt = useMemo(() => deathZoneModelAltitude(terrain, peak), [terrain, peak])
+  // the model's summit sits below the surveyed one: the 8,000 m line moves down with it, and the
+  // loupe's contours and read-out are corrected by the same ramp
+  const cal = useMemo(() => heightCalibration(terrain, peak), [terrain, peak])
+  const bandAlt = modelAltitude(8000, cal)
   // first paint: the 1K albedo (≈ 300 KB), loaded through suspense
   const first = useLoader(THREE.TextureLoader, terrain.base + 'albedo-1k.webp')
   const { geo, heightTexture } = terrain
@@ -314,6 +359,13 @@ export default function Terrain({ terrain, quality = 'high' }) {
       uTime: { value: 0 },
       uBandAlt: { value: 8.0 },
       uBandStrength: { value: 0 },
+      uLoupe: { value: new THREE.Vector3() },
+      uMapOn: { value: 0 },
+      uMapAll: { value: 0 },
+      uCal: { value: new THREE.Vector3(0, 0, 1) },
+      uPaper: { value: PAPER },
+      uInk: { value: INK },
+      uSignal: { value: SIGNAL_RGB },
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [first, terrain.id])
@@ -325,7 +377,11 @@ export default function Terrain({ terrain, quality = 'high' }) {
     uniforms.uTexel.value.set(1 / geo.W, 1 / geo.H)
     uniforms.uSpacing.value.set(geo.sizeX / geo.W, geo.sizeZ / geo.H)
     uniforms.uBandAlt.value = bandAlt / 1000
-  }, [uniforms, heightTexture, geo, floatLinear, bandAlt])
+    uniforms.uCal.value.set(cal.gapM / 1000, cal.baseM / 1000, 1000 / cal.rampM)
+  }, [uniforms, heightTexture, geo, floatLinear, bandAlt, cal])
+
+  // the contour loupe follows the pointer over the canvas (lib/loupe.js)
+  useEffect(() => attachLoupe(gl.domElement), [gl])
 
   const materials = useMemo(() => {
     const defines = {}
@@ -380,11 +436,45 @@ export default function Terrain({ terrain, quality = 'high' }) {
 
   useEffect(() => () => { materials.base.dispose(); materials.patch.dispose(); baseGeometry.dispose(); patchGeometry.dispose() }, [materials, baseGeometry, patchGeometry])
 
-  useFrame(({ camera, clock }, dt) => {
+  const ndc = useMemo(() => new THREE.Vector2(), [])
+  const ray = useMemo(() => new THREE.Raycaster(), [])
+  useFrame(({ camera, clock, size }, dt) => {
+    const s = useStore.getState()
+    const still = s.motion === 'off'
     uniforms.uCamPos.value.copy(camera.position)
-    uniforms.uTime.value = clock.elapsedTime
-    const want = useStore.getState().showDeathZone ? 1 : 0
-    uniforms.uBandStrength.value += (want - uniforms.uBandStrength.value) * Math.min(1, dt * 4)
+    if (!still) uniforms.uTime.value = clock.elapsedTime // the Death Zone edge stops pulsing
+    const ease = still ? 1 : Math.min(1, dt * 4)
+    uniforms.uBandStrength.value += ((s.showDeathZone ? 1 : 0) - uniforms.uBandStrength.value) * ease
+    uniforms.uMapAll.value += ((s.mode === 'explorer' && s.showContours ? 1 : 0) - uniforms.uMapAll.value) * (still ? 1 : Math.min(1, dt * 6))
+
+    // the loupe: cast from the camera through the pointer; nothing under it, no loupe
+    let r = 0, hit = null
+    if (loupe.active && (s.mode === 'hero' || s.mode === 'explorer')) {
+      ndc.set((loupe.x / size.width) * 2 - 1, 1 - (loupe.y / size.height) * 2)
+      ray.setFromCamera(ndc, camera)
+      hit = terrain.hitTest(ray.ray.origin, ray.ray.direction)
+      if (hit) r = loupe.touch ? LOUPE_R_TOUCH : LOUPE_R
+    }
+    const dpr = gl.getPixelRatio()
+    uniforms.uLoupe.value.set(loupe.x * dpr, (size.height - loupe.y) * dpr, r * dpr)
+    uniforms.uMapOn.value = r > 0 || uniforms.uMapAll.value > 0.001 ? 1 : 0
+
+    // the ring, the paper disc under the canvas (sky inside the ring reads as blank map paper)
+    // and the read-out, all moved in the same frame as the map
+    for (const el of [loupe.ring, loupe.paper]) {
+      if (!el) continue
+      if (r > 0) {
+        el.style.setProperty('--r', `${r}px`)
+        el.style.transform = `translate3d(${loupe.x}px, ${loupe.y}px, 0)`
+        if (el.dataset.on !== '1') el.dataset.on = '1'
+      } else if (el.dataset.on !== '0') el.dataset.on = '0'
+    }
+    if (r > 0 && loupe.read) {
+      const alt = Math.round(realAltitude(hit.y * 1000, cal) / 10) * 10
+      const { lat, lon } = terrain.geo.toLatLon(hit.x, hit.z)
+      const text = `≈ ${fmt(alt)} m · ${lat.toFixed(3)}° N ${lon.toFixed(3)}° E`
+      if (loupe.read.textContent !== text) loupe.read.textContent = text
+    }
   })
 
   return (

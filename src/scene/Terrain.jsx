@@ -594,7 +594,7 @@ export default function Terrain({ terrain, quality = 'high' }) {
     if (!g) return
     g.traverse((o) => o.layers.set(HIDDEN_LAYER))
     performance.mark(`terrain:compile-start:${terrain.id}`)
-    const done = () => { if (!alive) return; g.traverse((o) => o.layers.set(0)); performance.mark(`terrain:ready:${terrain.id}`); useStore.setState({ terrainReady: true }); if (location.search.includes('debug')) console.table(perfSummary(terrain.id)) }
+    const done = () => { if (!alive) return; g.traverse((o) => o.layers.set(0)); performance.mark(`terrain:ready:${terrain.id}`); useStore.setState({ terrainReady: true, readyId: terrain.id }); if (location.search.includes('debug')) console.table(perfSummary(terrain.id)) }
     useStore.setState({ terrainReady: false })
     Promise.all([compileScene(gl, scene, camera), heightReady.current]).then(done, done)
     return () => { alive = false }

@@ -65,10 +65,13 @@ boxes, for content. Touch targets ≥ 44 px on phones (the 3D markers grow a pad
 
 ## Components
 
-- **Nav:** peak name (display, uppercase) + height (mono) · Menu · Stop animations (pill with a dot;
-  pressed = a signal square; icon-only on phones) · All fourteen.
+- **Nav:** peak name (display, uppercase) + height (mono) · Menu · Search (pill with a magnifier;
+  icon-only on phones, in the menu below 420 px) · Stop animations (pill with a dot; pressed = a
+  signal square; icon-only on phones) · All fourteen.
+- **Reading bar:** a 2 px signal hairline across the top edge, filled by the page's scroll.
 - **Hero:** the poster name behind the mountain; bottom-left `02 / 14 · range` (opens the overview)
-  and the snow pill "Routes and information"; bottom-right mono side notes with a halo; edge arrows.
+  and the snow pill "Climb a route →" (the call to action: opens the routes); bottom-right mono side
+  notes with a halo; edge arrows.
   The summit marker shows only the height here (the poster already names the peak).
 - **Loader** (first load only): the peak's name, an altimeter counting up to the summit's height as
   the terrain arrives, "Skip"; when ready the count tops out and a round portal opens onto the
@@ -86,7 +89,23 @@ boxes, for content. Touch targets ≥ 44 px on phones (the 3D markers grow a pad
 - **Overview:** "The fourteen" as a grid of shaded-relief cards or a **list** (rank, peak, height,
   countries, first ascent, routes, deaths); a modal that traps and returns focus.
 - **Numbers, History, Footer:** display heads; stats as big display values over mono labels between
-  hairlines; timeline years in mono, key years (`highlight: true` in the data) in signal.
+  hairlines; timeline years in mono, key years (`highlight: true` in the data) in signal. The footer
+  ends with outline pills (Copy link · Print fact sheet · Suggest a correction; Share on phones) and
+  a small-print bar: Privacy · Terms of use · Source, and "Last updated" in mono.
+- **Dialogs** (native `<dialog>`, panel colour, 14 px radius, night backdrop; full screen on phones):
+  search is a combobox (mono type labels, the highlighted result marked by a signal edge like the
+  active route); the correction form has 48 px fields, labels above, "required" / "optional" in
+  mono, errors as a signal dot + text under the field and a summary box with a signal edge; the
+  discard confirmation is a small dialog over it with a signal "Discard".
+- **Consent card** (only when visit counting is set up): bottom-left panel, "Count my visit" (snow)
+  and "No thanks" (outline) of equal size.
+- **Toast:** a snow pill at the bottom centre, 2.6 s ("Link copied").
+- **Plain pages** (privacy, terms, 404): a solid bar (brand · Back to the mountains), a 68-character
+  reading column under a display head, mono "Last updated". The 404's map is the loupe in miniature:
+  ghost contours in snow, the ground under the ring as night-on-paper contours, the 8,000 m line in
+  signal; the ring turns signal at the summit.
+- **Print:** only the fact sheet, black on white: the name in the display face, mono height, routes
+  with their camps, hazards, the numbers, the history, sources and the page's address.
 
 ## Motion
 
@@ -103,7 +122,10 @@ it. Measured: one loop, ~60 requestAnimationFrame calls a second. Programmatic s
 **Stop animations** (`html[data-motion="off"]`, remembered; on from the start under
 `prefers-reduced-motion`): no Lenis, no hero auto-turn or explorer auto-rotate, camera cuts instead
 of eases, the scroll flight follows the scroll exactly, no pulsing markers, rings or Death Zone edge,
-CSS transitions at 0.01 ms, the loader just goes.
+the loader just goes. CSS transitions take 0 s, not the common 0.01 ms: every element's
+`transition-property` defaults to `all`, so a 0.01 ms duration on `*` gives every element a
+transition, and a size read right after a write returns the old value (it left the poster name at a
+third of its size). CSS animations jump to their end; the toast keeps its 2.6 s, without movement.
 
 ## Responsive
 

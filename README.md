@@ -91,10 +91,50 @@ That runs three scripts:
   Lenis (smooth wheel scrolling) and the 3D render (`<Canvas frameloop="never">` + `advance`).
   "Stop animations" (and `prefers-reduced-motion`) turns off Lenis, auto-rotation, easing and
   pulses; programmatic scrolls go through `jumpTo`.
-- `?peak=<id>` deep-links a mountain; the overview grid (`All fourteen`) lists them by height with
-  shaded-relief thumbnails (`thumb.webp`).
+- Every mountain has its own address (`/k2/`, `/everest/` …; older `?peak=<id>` links move there);
+  the overview grid (`All fourteen`) lists them by height with shaded-relief thumbnails
+  (`thumb.webp`).
 - Regenerate the shipped assets from the JPEG/`height.bin` sources with `npm run assets`
   (encode heights, bake light, WebP, thumbnails).
+
+## Pages, sharing and the launch checklist
+
+- **Pages.** The app (`index.html`) plus three plain pages: `privacy/`, `terms/` and `404.html`,
+  with shared tokens in `src/base.css`. The 404 is an imaginary mountain drawn as contour lines,
+  read through the contour loupe: it starts at 404 m, and its summit (8,404 m) shows the way back.
+  A server that answers unknown addresses with the app sends them to `/404.html` (`main.jsx`).
+- **One page per mountain.** At build time the `site-pages` plugin (`vite.config.js`) writes
+  `dist/<id>/index.html` for each mountain, with its own title, description, canonical link,
+  Open Graph and Twitter tags and JSON-LD (`WebPage` about a `Mountain`), all derived from the
+  data (`src/lib/meta.js`). The app keeps the head in step when you switch (`src/lib/head.js`);
+  Back and Forward move between mountains. It also writes `sitemap.xml` and `robots.txt`, stamps
+  "Last updated" (the date of the last commit) and fills in the privacy text that depends on the
+  build's settings.
+- **Link previews.** `public/og/<id>.jpg` and `home.jpg` (1200×630, 57–105 KB), rendered from the
+  built site by `npm run og` (headless Chrome, animations stopped, the controls hidden).
+- **Search.** `/` or Ctrl/⌘ K (and "Search" in the nav and the menu): peaks, routes, camps,
+  hazards and history years across all fourteen, the mountain on screen first
+  (`src/ui/Search.jsx`, a combobox in a native `<dialog>`). A result opens its mountain and goes
+  to the route's ascent, the camp or hazard in the explorer, or the year (`src/lib/navigate.js`).
+- **Share.** "Copy link" (and the system share sheet on phones) in the footer and the menu; the
+  shared address carries `utm_source`/`utm_medium=share`. "Print fact sheet" prints the mountain as
+  a black-on-white fact sheet (`src/ui/PrintSheet.jsx` and the `print` styles).
+- **Suggest a correction** (`src/ui/Correction.jsx`): checks on send (a summary that takes focus,
+  messages under each field, `aria-invalid`), the button is never disabled, a confirmation before
+  discarding what was written, and a clear sent or failed state. It posts JSON to
+  `VITE_FORM_ENDPOINT` or, without one, opens a prefilled issue in the public repository.
+- **Visit counting and consent** (`src/lib/analytics.js`, `src/ui/Consent.jsx`): off unless the
+  build sets `VITE_ANALYTICS` (Plausible or Umami, both cookieless), and then only after the visitor
+  says yes on a small card; Global Privacy Control and Do Not Track mean no without asking.
+  "Privacy choices" in the footer, and the privacy page, change the answer. Counted events: route
+  chosen, explorer opened, search, share, and each step of the correction form (opened, started,
+  invalid, sent, failed, discarded: its success rate). Campaign tags (`utm_…`) are kept for the
+  visit (`src/lib/utm.js`), sent with events and corrections, and taken out of the address bar.
+- **Reading bar.** A signal hairline at the top edge, a CSS scroll timeline where supported.
+- **Checks.** `npm run check` renders every page in headless Chrome and checks every link (inside
+  the site against `dist/`, and with `-- --external` the outside ones too), then walks the
+  correction form. Settings for the build are in `.env.example`; what the owner still has to decide
+  is in `NEEDS_CONTENT.md`.
 
 ## How the 3D works
 

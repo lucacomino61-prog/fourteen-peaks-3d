@@ -23,9 +23,26 @@ export default function Poster() {
       el.style.fontSize = `${Math.max(56, size)}px`
     }
     fit()
-    document.fonts?.ready.then(fit)
+    // Fit again whenever the name's drawn size changes by itself: on a first visit the display face
+    // arrives after the first fit, and Chrome can report odd metrics for a moment while it swaps in
+    // (a fit taken then left "Everest" at a third of its size), so font events alone aren't enough.
+    // The refit waits for the next frame (resizing inside the observer's callback would loop), and a
+    // fit that changes nothing reports no new size, so this settles at once.
+    const size = () => `${el.offsetWidth}x${el.offsetHeight}`
+    let last = ''
+    let frame = 0
+    let refits = 0, since = performance.now()
+    const ro = typeof ResizeObserver === 'function' && new ResizeObserver(() => {
+      if (size() === last || frame) return
+      // a fit that keeps changing its own result would loop: after a few a second, stop listening
+      if (performance.now() - since > 1000) { refits = 0; since = performance.now() }
+      if (++refits > 6) { ro.disconnect(); return }
+      frame = requestAnimationFrame(() => { frame = 0; fit(); last = size() })
+    })
+    if (ro) ro.observe(el)
+    document.fonts?.ready.then(() => { fit(); last = size() })
     window.addEventListener('resize', fit)
-    return () => window.removeEventListener('resize', fit)
+    return () => { if (ro) ro.disconnect(); cancelAnimationFrame(frame); window.removeEventListener('resize', fit) }
   }, [peak.name])
 
   return (

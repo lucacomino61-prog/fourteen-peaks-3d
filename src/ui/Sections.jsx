@@ -3,7 +3,22 @@ import { useStore, useMountain } from '../store'
 import { mountains } from '../data'
 import { jumpTo } from '../lib/clock'
 import { fmt, pad2 } from '../lib/format'
-import { ArrowDown, Compass, ArrowLeft, ArrowRight, X } from './Icons'
+import { mountainPath, mountainTitle } from '../lib/meta'
+import { share, copyLink } from '../lib/share'
+import { analyticsConfigured } from '../lib/analytics'
+import { Compass, ArrowLeft, ArrowRight, X, Search as SearchIcon, Share as ShareIcon } from './Icons'
+
+const UPDATED = import.meta.env.VITE_LAST_UPDATED
+const REPO_URL = 'https://github.com/lucacomino61-prog/fourteen-peaks-3d'
+const longDate = (iso) => (iso ? new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }) : '')
+
+// a system share sheet (phones, tablets): "Share"; everywhere else the link is copied
+const canShare = typeof navigator !== 'undefined' && !!navigator.share && typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches
+
+/** Share the mountain on screen: the system sheet on a phone, else its link is copied. */
+function shareMountain(m) {
+  share({ title: mountainTitle(m), text: `${m.peak.name}, ${fmt(m.peak.elevation)} m, in real 3D terrain`, path: mountainPath(m.id) })
+}
 
 /** Switch to the next (1) or previous (-1) mountain and go back to the top of the page. */
 function stepMountain(dir) {
@@ -23,6 +38,9 @@ export function Nav() {
       <a className="nav-brand" href="#top"><b translate="no">{peak.name}</b> <span className="mono">{fmt(peak.elevation)}&nbsp;m</span></a>
       <button className="nav-menu" aria-expanded={routesOpen} aria-controls="routes-menu" onClick={() => useStore.setState({ routesOpen: !routesOpen })}>Menu <i aria-hidden /></button>
       <div className="nav-end">
+        <button className="nav-search" onClick={() => useStore.setState({ searchOpen: true, routesOpen: false })} aria-label="Search the fourteen" aria-keyshortcuts="/ Control+K Meta+K">
+          <SearchIcon /><span>Search</span>
+        </button>
         {/* the visible Stop-animations switch (html[data-motion]); reduced motion starts it pressed */}
         <button className="nav-motion" aria-pressed={motion === 'off'} onClick={() => setMotion(motion === 'on' ? 'off' : 'on')} title={motion === 'on' ? 'Stop animations' : 'Animations stopped'}>
           <i aria-hidden /><span>Stop animations</span>
@@ -59,7 +77,7 @@ export function Hero({ loading }) {
           <span>{peak.range}</span>
           {loading && <span className="hero-loading">loading terrain…</span>}
         </p>
-        <button className="hero-open" onClick={() => useStore.setState({ routesOpen: true })}>Routes and information <ArrowDown /></button>
+        <button className="hero-open" onClick={() => useStore.setState({ routesOpen: true })} aria-haspopup="dialog" aria-controls="routes-menu">Climb a route <ArrowRight /></button>
       </div>
       <div className="hero-side">
         <p>Drag the mountain to turn it. Point at the ground to read it through the loupe.</p>
@@ -77,7 +95,8 @@ function goToAscent() {
 
 /** The routes menu under the nav: pick a route and the page jumps to its ascent. */
 export function RoutesMenu() {
-  const { routes, peak, id } = useMountain()
+  const mountain = useMountain()
+  const { routes, peak, id } = mountain
   const index = mountains.findIndex((m) => m.id === id)
   const open = useStore((s) => s.routesOpen)
   const close = () => useStore.setState({ routesOpen: false })
@@ -121,6 +140,9 @@ export function RoutesMenu() {
         <li><a href="#figures" onClick={close}>The numbers <small>ascents, deaths, fatality rate</small></a></li>
         <li><a href="#history" onClick={close}>History <small>{peak.historyTitle}</small></a></li>
         <li><button onClick={() => useStore.setState({ routesOpen: false, overviewOpen: true })}>All fourteen peaks <small>grid or list</small></button></li>
+        <li><button onClick={() => useStore.setState({ routesOpen: false, searchOpen: true })}><SearchIcon /> Search <small>peaks, routes, camps, hazards, years</small></button></li>
+        <li><button onClick={() => { close(); shareMountain(mountain) }}><ShareIcon /> {canShare ? `Share ${peak.name}` : `Copy the link to ${peak.name}`} <small>send its page</small></button></li>
+        <li><button onClick={() => useStore.setState({ routesOpen: false, correctionOpen: true })}>Suggest a correction <small>a wrong altitude, date or line</small></button></li>
       </ul>
       <div className="routes-menu-foot">
         <button onClick={() => stepMountain(-1)}><ArrowLeft /> {mountains[(index - 1 + mountains.length) % mountains.length].peak.name}</button>
@@ -167,7 +189,7 @@ export function History() {
         </div>
         <ol className="timeline">
           {timeline.map((t) => (
-            <li key={t.year} className={`tl-item ${t.highlight ? 'is-key' : ''}`}>
+            <li key={t.year} id={`y${t.year}`} className={`tl-item ${t.highlight ? 'is-key' : ''}`}>
               <div className="year mono">{t.year}</div>
               <div className="body"><h3>{t.title}</h3><p>{t.text}</p></div>
             </li>
@@ -179,7 +201,8 @@ export function History() {
 }
 
 export function Footer({ tile }) {
-  const { sources, peak } = useMountain()
+  const mountain = useMountain()
+  const { sources, peak, id } = mountain
   const size = tile ? `a ${Math.round(tile.km)} km square around ${peak.name} at about ${Math.round(tile.metresPerPx)} m per pixel` : `a square of about 32 km around ${peak.name}`
   return (
     <footer className="footer">
@@ -192,6 +215,21 @@ export function Footer({ tile }) {
           <h2>Data</h2>
           <ul>{sources.map((s) => <li key={s}>{s}</li>)}</ul>
         </div>
+      </div>
+      <div className="wrap foot-actions">
+        {canShare && <button type="button" className="pill" onClick={() => shareMountain(mountain)}><ShareIcon /> Share {peak.name}</button>}
+        <button type="button" className="pill" onClick={() => copyLink(mountainPath(id))}>Copy link</button>
+        <button type="button" className="pill" onClick={() => window.print()}>Print fact sheet</button>
+        <button type="button" className="pill" onClick={() => useStore.setState({ correctionOpen: true })}>Suggest a correction</button>
+      </div>
+      <div className="wrap foot-bar">
+        <nav aria-label="About this site">
+          <a href="/privacy/">Privacy</a>
+          <a href="/terms/">Terms of use</a>
+          {analyticsConfigured && <button type="button" onClick={() => useStore.setState({ consentOpen: 'asked' })}>Privacy choices</button>}
+          <a href={REPO_URL}>Source</a>
+        </nav>
+        {UPDATED && <p className="mono">Last updated <time dateTime={UPDATED}>{longDate(UPDATED)}</time></p>}
       </div>
     </footer>
   )

@@ -39,3 +39,8 @@ public/terrain/*/height-srtm.bin
 public/terrain/*/*-esri*
 # pipeline sources; the app ships height.q16 + WebP only (regenerate with `npm run assets`)
 terrain-src/
+
+# build settings (see .env.example)
+.env
+.env.*
+!.env.example

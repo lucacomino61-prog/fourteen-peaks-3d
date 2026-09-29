@@ -1,12 +1,29 @@
 import { create } from 'zustand'
 import { createContext, useContext } from 'react'
 import { byId, mountains } from './data'
+import { mountainPath } from './lib/meta.js'
 
-// initial mountain from ?peak=<id>, else the first
-const INITIAL = (() => {
-  try { const id = new URLSearchParams(location.search).get('peak'); if (id && byId[id]) return byId[id] } catch {}
-  return mountains[0]
-})()
+/** The mountain in the address: its own page (/k2/), or an older ?peak=k2 link. Null on the home page. */
+export function mountainFromUrl() {
+  try {
+    const seg = location.pathname.split('/').filter(Boolean)[0]
+    if (seg && byId[seg]) return byId[seg]
+    const id = new URLSearchParams(location.search).get('peak')
+    if (id && byId[id]) return byId[id]
+  } catch { /* no location: the first mountain */ }
+  return null
+}
+
+const INITIAL = mountainFromUrl() || mountains[0]
+
+// an older ?peak= link moves to the mountain's own address
+try {
+  const q = new URLSearchParams(location.search)
+  if (q.has('peak') && byId[q.get('peak')]) {
+    q.delete('peak')
+    history.replaceState(null, '', mountainPath(INITIAL.id) + (q.toString() ? `?${q}` : '') + location.hash)
+  }
+} catch { /* keep the address */ }
 
 // the visible Stop-animations switch: remembered, and off from the start under reduced motion
 const INITIAL_MOTION = (() => {
@@ -29,7 +46,12 @@ export const useStore = create((set, get) => ({
   progress: 0, // 0..1 along the ascent
   mountainId: INITIAL.id,
   overviewOpen: false,
+  searchOpen: false,
+  correctionOpen: false,
+  toast: null, // { text, at }: a short confirmation (link copied …)
+  consentOpen: false, // 'first' (asked on arrival) | 'asked' (from the footer) | false
   terrainReady: false,
+  readyId: null, // the mountain whose terrain was last revealed
   activeRoute: null, // nothing is drawn until the user picks a route
   visibleRoutes: [],
   routesOpen: false, // the routes menu under the nav
@@ -43,10 +65,17 @@ export const useStore = create((set, get) => ({
   fly: null, // { route: id | 'overview' }
   flying: false,
   set: (patch) => set(patch),
-  setMountain: (id) => {
+  /** Show another mountain. Its address goes on the history (Back returns to the one before),
+   *  unless the switch came from the history itself (how = 'none'). */
+  setMountain: (id, how = 'push') => {
     const m = byId[id]
     if (!m) return
-    try { history.replaceState(null, '', `?peak=${id}`) } catch {}
+    if (how !== 'none') {
+      try {
+        const url = mountainPath(id)
+        if (location.pathname !== url) history[how === 'replace' ? 'replaceState' : 'pushState'](null, '', url)
+      } catch { /* the page still switches */ }
+    }
     set({ mountainId: id, overviewOpen: false, activeRoute: null, visibleRoutes: [], routesOpen: false, selected: null, hovered: null, progress: 0, mode: 'hero', fly: null, flying: false, paths: null })
   },
   stepMountain: (dir) => {

@@ -1,0 +1,93 @@
+/* Tokens and base styles, shared by the app (index.css) and the plain pages (privacy, terms, 404). */
+
+/* ---------- tokens ---------- */
+:root {
+  --night: #0b0d12;
+  --snow: #ecebe6;
+  --signal: #ff5b2e;
+  --snow-2: rgb(236 235 230 / 0.74); /* secondary text on night: 9.8:1 */
+  --snow-3: rgb(236 235 230 / 0.58); /* labels: 6:1 */
+  --line: rgb(236 235 230 / 0.14);
+  --line-strong: rgb(236 235 230 / 0.3);
+  --panel: rgb(11 13 18 / 0.94);
+  --glass: rgb(11 13 18 / 0.72);
+  --halo: 0 1px 2px rgb(0 0 0 / 0.9), 0 0 14px rgb(0 0 0 / 0.75); /* small type over snow and rock */
+
+  /* self-hosted variable fonts (@fontsource-variable, imported in main.jsx) */
+  --font-display: 'Bricolage Grotesque Variable', 'Archivo Variable', system-ui, sans-serif;
+  --font-ui: 'Archivo Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, Menlo, monospace;
+
+  --step--1: clamp(0.875rem, 0.85rem + 0.11vw, 0.9375rem);
+  --step-0: clamp(1rem, 0.95rem + 0.22vw, 1.125rem);
+  --step-1: clamp(1.25rem, 1.16rem + 0.39vw, 1.5rem);
+  --step-2: clamp(1.56rem, 1.42rem + 0.6vw, 1.95rem);
+  --step-3: clamp(1.95rem, 1.72rem + 0.9vw, 2.44rem);
+  --step-4: clamp(2.44rem, 2.1rem + 1.3vw, 3.2rem);
+  --step-display: clamp(3.5rem, 0.667rem + 12.593vw, 12rem); /* 56 → 192 px section heads */
+
+  --space-xs: clamp(0.875rem, 0.85rem + 0.1vw, 0.9375rem);
+  --space-s: clamp(1.125rem, 1.07rem + 0.23vw, 1.25rem);
+  --space-m: clamp(1.7rem, 1.6rem + 0.35vw, 1.875rem);
+  --space-l: clamp(2.25rem, 2.1rem + 0.45vw, 2.5rem);
+  --space-xl: clamp(3.4rem, 3.2rem + 0.7vw, 3.75rem);
+  --space-2xl: clamp(4.5rem, 4.2rem + 0.9vw, 5rem);
+  --space-3xl: clamp(6.75rem, 6.3rem + 1.4vw, 7.5rem);
+  --gutter: clamp(1.125rem, 0.5625rem + 2.5vw, 2.5rem);
+  --wrap: 80rem;
+  --header-h: 64px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --radius: 4px;
+  color-scheme: dark;
+}
+
+/* ---------- base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root { margin: 0; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: var(--header-h); }
+body {
+  background: var(--night);
+  color: var(--snow);
+  font-family: var(--font-ui);
+  font-size: var(--step-0);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+#root { isolation: isolate; }
+h1, h2, h3, h4, p, ol, ul, dl, dd { margin: 0; }
+ol, ul { padding: 0; list-style: none; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.02em; line-height: 1.05; text-wrap: balance; }
+p { text-wrap: pretty; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+a, button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; box-shadow: 0 0 0 6px rgb(11 13 18 / 0.85); border-radius: 2px; }
+:focus:not(:focus-visible) { outline: none; }
+.mono { font-family: var(--font-mono); font-feature-settings: 'tnum'; }
+.display { font-size: var(--step-display); font-weight: 400; line-height: 0.92; letter-spacing: -0.045em; }
+.wrap { width: min(var(--wrap), 100% - 2 * var(--gutter)); margin-inline: auto; }
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+.skip-link {
+  position: fixed; left: var(--gutter); top: 10px; z-index: 100; display: inline-flex; align-items: center;
+  min-height: 44px; padding: 0 16px; background: var(--snow); color: var(--night); border-radius: 99px;
+  font-size: 14px; font-weight: 600; transform: translateY(-200%);
+}
+.skip-link:focus-visible { transform: none; }
+main:focus { outline: none; }
+
+/* ---------- motion policy: reduced motion and the Stop-animations switch ---------- */
+/* Transitions end at once (0s, not the usual 0.01ms: every element's transition-property defaults to
+   all, so a 0.01ms duration would give every element a transition and make a style read right after
+   a write return the old value; that left the poster name mis-fitted). Animations jump to their end. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0s !important; transition-delay: 0s !important; scroll-behavior: auto !important; }
+}
+html[data-motion='off'] *, html[data-motion='off'] *::before, html[data-motion='off'] *::after {
+  animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0s !important; transition-delay: 0s !important; scroll-behavior: auto !important;
+}

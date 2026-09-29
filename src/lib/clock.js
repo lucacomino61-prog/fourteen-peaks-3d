@@ -34,9 +34,18 @@ export function startClock() {
     // the reading sections and the overview cover the stage: don't draw what nobody sees
     // (battery on phones and laptops); the last frame stays up, dimmed
     const s = useStore.getState()
-    if (s.mode === 'idle' || s.overviewOpen) return
+    if (s.mode === 'idle' || s.overviewOpen || s.searchOpen || s.correctionOpen) return
     advance(time)
   })
+}
+
+let locks = 0
+/** A modal dialog is open: the page under it stays put (native scroll and Lenis both). */
+export function lockScroll(on) {
+  locks = Math.max(0, locks + (on ? 1 : -1))
+  const locked = locks > 0
+  document.documentElement.classList.toggle('is-locked', locked)
+  if (lenis) { if (locked) lenis.stop(); else lenis.start() }
 }
 
 /** Jump the page to y without animation, whether or not Lenis is running. */

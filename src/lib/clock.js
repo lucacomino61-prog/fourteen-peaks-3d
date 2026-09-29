@@ -31,6 +31,10 @@ export function startClock() {
   useStore.subscribe((s, prev) => { if (s.motion !== prev.motion) syncLenis(s.motion) })
   gsap.ticker.add((time) => {
     if (lenis) lenis.raf(time * 1000)
+    // the reading sections and the overview cover the stage: don't draw what nobody sees
+    // (battery on phones and laptops); the last frame stays up, dimmed
+    const s = useStore.getState()
+    if (s.mode === 'idle' || s.overviewOpen) return
     advance(time)
   })
 }
@@ -38,5 +42,5 @@ export function startClock() {
 /** Jump the page to y without animation, whether or not Lenis is running. */
 export function jumpTo(y) {
   if (lenis) lenis.scrollTo(y, { immediate: true, force: true })
-  else window.scrollTo({ top: y, behavior: 'instant' })
+  else window.scrollTo(0, y) // (Safari before 16 rejects behavior: 'instant')
 }

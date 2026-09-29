@@ -556,6 +556,64 @@ section { position: relative; }
   .peak-row > :nth-child(n + 4) { display: none; }
 }
 
+/* ---------- platforms: iOS, Android, desktop ---------- */
+/* The stage takes the LARGE viewport, so the URL bar collapsing or returning while you scroll
+   (iOS Safari, Android Chrome) never resizes the canvas and re-allocates its buffers mid-scroll. */
+.stage { inset: auto; left: 0; top: 0; width: 100%; height: 100vh; height: 100lvh; }
+/* press-and-hold is the loupe on phones, not text selection or the iOS callout */
+.stage { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+/* Safari before 18 only knows the prefixed backdrop filter */
+.hero > .switch { -webkit-backdrop-filter: blur(8px); }
+.ascent-card { -webkit-backdrop-filter: blur(14px); }
+
+/* Safe areas (viewport-fit=cover): the notch, the rounded corners and the home indicator */
+:root {
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --pad-l: max(var(--gutter), env(safe-area-inset-left, 0px));
+  --pad-r: max(var(--gutter), env(safe-area-inset-right, 0px));
+}
+.nav { height: calc(var(--header-h) + var(--safe-t)); padding: var(--safe-t) var(--pad-r) 0 var(--pad-l); }
+.skip-link { top: calc(10px + var(--safe-t)); left: var(--pad-l); }
+.hero { padding-bottom: calc(clamp(3rem, 8vh, 6rem) + var(--safe-b)); padding-left: var(--pad-l); padding-right: var(--pad-r); }
+.switch-prev { left: var(--pad-l); }
+.switch-next { right: var(--pad-r); }
+.hero-side { right: var(--pad-r); bottom: calc(clamp(3rem, 8vh, 6rem) + var(--safe-b)); }
+.routes-menu { top: calc(var(--header-h) + var(--safe-t)); max-height: calc(100dvh - 80px - var(--safe-t) - var(--safe-b)); }
+.ascent-tabs { top: calc(72px + var(--safe-t)); left: var(--pad-l); right: var(--pad-r); }
+.ascent-card { left: var(--pad-l); bottom: calc(clamp(2.5rem, 7vh, 5rem) + var(--safe-b)); max-height: calc(100dvh - 7rem - var(--safe-t) - var(--safe-b)); }
+.altimeter { right: var(--pad-r); bottom: calc(clamp(2.5rem, 7vh, 5rem) + var(--safe-b)); }
+.panel { left: var(--pad-l); top: calc(84px + var(--safe-t)); bottom: calc(28px + var(--safe-b)); }
+.detail { right: var(--pad-r); bottom: calc(28px + var(--safe-b)); }
+.explorer-continue { right: var(--pad-r); top: calc(84px + var(--safe-t)); }
+.loader-skip { right: var(--pad-r); bottom: calc(var(--gutter) + var(--safe-b)); }
+.overview { padding: calc(var(--space-xl) + var(--safe-t)) var(--pad-r) calc(var(--space-2xl) + var(--safe-b)) var(--pad-l); }
+.footer { padding-bottom: calc(var(--space-xl) + var(--safe-b)); }
+@media (max-width: 760px) {
+  .hero > .switch { bottom: calc(1.25rem + var(--safe-b)); }
+  .routes-menu { top: calc(60px + var(--safe-t)); }
+  .ascent-tabs { top: calc(64px + var(--safe-t)); }
+  .ascent-card { bottom: calc(1.25rem + var(--safe-b)); }
+  .altimeter { top: calc(112px + var(--safe-t)); bottom: auto; }
+  .panel { left: 0; right: 0; top: auto; bottom: 0; padding-bottom: var(--safe-b); }
+  .detail { left: 0; right: 0; bottom: 0; padding-bottom: calc(22px + var(--safe-b)); }
+  .explorer-continue { top: calc(72px + var(--safe-t)); }
+  .overview { padding: calc(var(--space-l) + var(--safe-t)) max(14px, env(safe-area-inset-right, 0px)) calc(var(--space-xl) + var(--safe-b)) max(14px, env(safe-area-inset-left, 0px)); }
+}
+/* phones held sideways: little height, so less chrome */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero-side { display: none; }
+  .hero { padding-bottom: calc(1.5rem + var(--safe-b)); }
+  .panel { top: calc(64px + var(--safe-t)); bottom: calc(12px + var(--safe-b)); }
+  .panel-head p { display: none; }
+  .explorer-continue { top: calc(64px + var(--safe-t)); }
+  .ascent-tabs { top: calc(62px + var(--safe-t)); }
+  .ascent-card { bottom: calc(12px + var(--safe-b)); max-height: calc(100dvh - 7.5rem - var(--safe-b)); }
+  .altimeter .rail { height: 16vh; }
+  .altimeter { bottom: calc(12px + var(--safe-b)); }
+  .altimeter b { font-size: clamp(2.5rem, 1rem + 5vw, 4.5rem); }
+}
+
 /* touch: the 3D markers grow a 44 px target around the dot (the dot stays on its point) */
 @media (pointer: coarse) {
   .mk { padding: 19px; transform: translate(-22.5px, -50%); }

@@ -6,6 +6,9 @@ import { heightCalibration, modelAltitude, realAltitude } from '../lib/calibrate
 import { loupe, attachLoupe } from '../lib/loupe'
 import { fmt } from '../lib/format'
 import { NIGHT, SNOW, SIGNAL } from '../lib/palette'
+import { onTerrainEvicted } from '../lib/terrain'
+import { loadPixels } from '../lib/pixels'
+import { markBusy } from '../lib/busy'
 
 // the site's two colours and its signal, as display values for the contour map
 const srgb = (hex) => { const c = parseInt(hex.slice(1), 16); return new THREE.Vector3(((c >> 16) & 255) / 255, ((c >> 8) & 255) / 255, (c & 255) / 255) }
@@ -258,29 +261,158 @@ const SUN_DIR = new THREE.Vector3(-0.62, 0.26, 0.6).normalize()
 // texture sets per tier (WebP). First paint always uses the 1K albedo, then the rest streams in.
 const TIERS = {
   high: { base: 1024, patch: 1024, albedo: 'albedo.webp', detail: 'detail16.webp', detail2: 'detail17.webp' },
-  medium: { base: 512, patch: 768, albedo: 'albedo-2k.webp', detail: 'detail16-2k.webp', detail2: 'detail17.webp' },
+  // integrated GPUs: uploading a 4K texture stalled the page for ~0.7 s, so the summit layer is 2K here
+  medium: { base: 512, patch: 768, albedo: 'albedo-2k.webp', detail: 'detail16-2k.webp', detail2: 'detail17-2k.webp' },
   low: { base: 320, patch: 384, albedo: 'albedo-2k.webp', detail: null, detail2: null },
 }
+
+// how much of a big texture goes to the GPU per frame (makeUploader)
+const BAND_BYTES = { high: 4 << 20, medium: 2 << 20, low: 1 << 20 }
 
 function prepTexture(t) {
   t.colorSpace = THREE.NoColorSpace
   t.anisotropy = 8
+  t.magFilter = THREE.LinearFilter // a DataTexture's default is nearest
   t.minFilter = THREE.LinearMipmapLinearFilter
+  t.generateMipmaps = true
   t.needsUpdate = true
   return t
 }
 
-function rectGeometry(geo, rect, seg) {
-  // plane covering a base-uv rect, uvs remapped to base uv so the same heightmap/albedo work
-  const a = geo.uvToScene(rect.u0, rect.v0), b = geo.uvToScene(rect.u1, rect.v1)
-  const w = Math.abs(b.x - a.x), h = Math.abs(b.z - a.z)
-  const g = new THREE.PlaneGeometry(w, h, seg, seg)
-  g.rotateX(-Math.PI / 2)
-  g.translate((a.x + b.x) / 2, 0, (a.z + b.z) / 2)
-  const uv = g.attributes.uv
-  for (let i = 0; i < uv.count; i++) uv.setXY(i, rect.u0 + uv.getX(i) * (rect.u1 - rect.u0), rect.v0 + uv.getY(i) * (rect.v1 - rect.v0))
-  g.boundingSphere = new THREE.Sphere(new THREE.Vector3((a.x + b.x) / 2, 7, (a.z + b.z) / 2), Math.hypot(w, h))
+/**
+ * A flat grid over a base-uv rect (the whole tile by default), written straight into typed arrays:
+ * PlaneGeometry pushes every value through JS arrays and adds normals this shader never reads,
+ * which cost about a quarter of a second for the 768² summit patch. Vertices, uvs and winding are
+ * those of a PlaneGeometry laid flat (rotateX(-π/2)); the vertex shader lifts them to the heights.
+ */
+function gridGeometry(geo, rect, seg, centreY) {
+  const n = seg + 1
+  const pos = new Float32Array(n * n * 3), uv = new Float32Array(n * n * 2)
+  const du = (rect.u1 - rect.u0) / seg, dv = (rect.v1 - rect.v0) / seg
+  for (let iy = 0, k = 0; iy < n; iy++) {
+    const v = rect.v1 - iy * dv, z = (0.5 - v) * geo.sizeZ // north row first
+    for (let ix = 0; ix < n; ix++, k++) {
+      const u = rect.u0 + ix * du
+      pos[k * 3] = (u - 0.5) * geo.sizeX
+      pos[k * 3 + 2] = z
+      uv[k * 2] = u
+      uv[k * 2 + 1] = v
+    }
+  }
+  const index = new Uint32Array(seg * seg * 6)
+  for (let iy = 0, k = 0; iy < seg; iy++)
+    for (let ix = 0; ix < seg; ix++) {
+      const a = iy * n + ix, b = a + n
+      index[k++] = a; index[k++] = b; index[k++] = a + 1
+      index[k++] = b; index[k++] = b + 1; index[k++] = a + 1
+    }
+  const g = new THREE.BufferGeometry()
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3))
+  g.setAttribute('uv', new THREE.BufferAttribute(uv, 2))
+  g.setIndex(new THREE.BufferAttribute(index, 1))
+  const c = geo.uvToScene((rect.u0 + rect.u1) / 2, (rect.v0 + rect.v1) / 2)
+  g.boundingSphere = new THREE.Sphere(new THREE.Vector3(c.x, centreY, c.z), Math.hypot((rect.u1 - rect.u0) * geo.sizeX, (rect.v1 - rect.v0) * geo.sizeZ))
   return g
+}
+const WHOLE = { u0: 0, v0: 0, u1: 1, v1: 1 }
+
+/**
+ * A terrain texture. Decoded in a worker into raw rows (lib/pixels.js), it comes back as a
+ * DataTexture that can go to the GPU a band per frame; where workers can't decode, an ImageBitmap
+ * (decoded off the main thread, already flipped) or the TextureLoader. Null for a missing file.
+ */
+async function loadTexture(url) {
+  const px = await loadPixels(url)
+  if (px?.missing) return null
+  if (px) return new THREE.DataTexture(px.data, px.w, px.h, THREE.RGBAFormat, THREE.UnsignedByteType)
+  if (typeof createImageBitmap === 'function') {
+    try {
+      const res = await fetch(url)
+      if (!res.ok) return null
+      const bitmap = await createImageBitmap(await res.blob(), { imageOrientation: 'flipY', premultiplyAlpha: 'none', colorSpaceConversion: 'none' })
+      const t = new THREE.Texture(bitmap)
+      t.flipY = false // flipped by the decode
+      return t
+    } catch { /* fall back below */ }
+  }
+  return new THREE.TextureLoader().loadAsync(url).catch(() => null)
+}
+function freeTexture(t) {
+  t.dispose()
+  if (t.image && typeof t.image.close === 'function') t.image.close() // an ImageBitmap's memory
+}
+
+/** The first-paint albedo through useLoader (suspense), decoded the same way. */
+class FirstPaintLoader {
+  load(url, onLoad, _onProgress, onError) {
+    loadTexture(url).then((t) => (t ? onLoad(prepTexture(t)) : onError(new Error('missing'))), onError)
+  }
+}
+
+// first-paint albedos stay in useLoader's cache: free them when lib/terrain.js lets that mountain go
+const firstTextures = new Map()
+onTerrainEvicted((id) => {
+  const url = `/terrain/${id}/albedo-1k.webp`
+  firstTextures.get(url)?.dispose()
+  firstTextures.delete(url)
+  useLoader.clear(FirstPaintLoader, url)
+})
+
+/**
+ * Big textures go to the GPU a band of rows per frame (copyTextureToTexture from the CPU rows)
+ * instead of in one call: on an integrated GPU one call froze the page for 50–290 ms per 2K
+ * texture and about 100 ms for the 16 MB heightmap, longer on a phone. Storage and mip levels are
+ * allocated up front, the mipmaps are built once after the last band, and one band goes per frame
+ * across the whole queue, oldest texture first.
+ */
+function makeUploader(gl, bandBytes) {
+  const queue = []
+  const box = new THREE.Box2(), at = new THREE.Vector2()
+  return {
+    /** { done, cancel }: done resolves with the texture once it is all on the GPU (null if
+     *  cancelled); a texture cut short uploads whole the next time it's drawn. */
+    add(tex) {
+      const { width, height, data } = tex.image
+      const job = { tex, src: new THREE.DataTexture(data, width, height, tex.format, tex.type), row: 0, mips: tex.generateMipmaps }
+      job.rows = Math.max(1, Math.floor(bandBytes / (data.byteLength / height)))
+      const done = new Promise((resolve) => { job.resolve = resolve })
+      tex.source.dataReady = false
+      gl.initTexture(tex) // storage and mip levels now, pixels by the band
+      queue.push(job)
+      const cancel = () => {
+        const i = queue.indexOf(job)
+        if (i < 0) return
+        queue.splice(i, 1)
+        job.src = null
+        tex.generateMipmaps = job.mips
+        tex.source.dataReady = true
+        tex.needsUpdate = true
+        job.resolve(null)
+      }
+      return { done, cancel }
+    },
+    /** Sends one band; call once per frame. */
+    step() {
+      const job = queue[0]
+      if (!job) return
+      markBusy()
+      const { tex, src } = job
+      const { width, height } = src.image
+      const n = Math.min(job.rows, height - job.row)
+      const last = job.row + n >= height
+      tex.generateMipmaps = last && job.mips // built once, after the last band
+      box.min.set(0, job.row)
+      box.max.set(width, job.row + n)
+      gl.copyTextureToTexture(src, tex, box, at.set(0, job.row))
+      job.row += n
+      if (!last) return
+      queue.shift()
+      job.src = null // cancel() keeps the job: let go of the rows, the texture may drop them too
+      tex.generateMipmaps = job.mips
+      tex.source.dataReady = true
+      job.resolve(tex)
+    },
+  }
 }
 
 /** Nearest sampling for a float heightmap on GPUs that cannot filter it; the shader blends instead. */
@@ -292,6 +424,45 @@ function nearestHeights(tex) {
 
 const HIDDEN_LAYER = 31
 
+// heightmaps queued for a whole upload or already on the GPU: the full one (16 MB) streams in by
+// the band while the 512² one stays on screen, and is swapped in once it is all there
+const heightsOnGpu = new WeakSet()
+
+/**
+ * renderer.compileAsync for a scene whose materials can be disposed while it waits (drei's lines
+ * rebuild theirs when the full terrain arrives, and three's version then throws and never
+ * resolves): resolves once every program still in use has linked, polling without blocking where
+ * KHR_parallel_shader_compile allows.
+ */
+function compileScene(gl, scene, camera) {
+  markBusy(1500)
+  let pending
+  try { pending = gl.compile(scene, camera) } catch { return Promise.resolve() }
+  const all = [...pending]
+  const giveUp = performance.now() + 10000 // a lost context never reports ready: draw anyway
+  return new Promise((resolve) => {
+    const check = () => {
+      for (const m of pending) {
+        const program = gl.properties.get(m).currentProgram
+        if (!program || program.isReady()) pending.delete(m)
+      }
+      if (pending.size && performance.now() < giveUp) {
+        setTimeout(check, 10)
+        return
+      }
+      // read each program's uniforms and attributes now (synchronous GL queries) rather than in
+      // the first frame that draws it, the frame that reveals the mountain
+      for (const m of all) {
+        const program = gl.properties.get(m).currentProgram
+        try { program?.getUniforms(); program?.getAttributes() } catch { /* drawn and reported by three */ }
+      }
+      resolve()
+    }
+    if (gl.extensions.has('KHR_parallel_shader_compile')) check()
+    else setTimeout(check, 10)
+  })
+}
+
 /** ms since navigation for each loading stage of a mountain (read with ?debug=1 or window.__k2perf) */
 function perfSummary(id) {
   const out = {}
@@ -302,7 +473,7 @@ if (typeof window !== 'undefined') window.__k2perf = perfSummary
 
 export default function Terrain({ terrain, quality = 'high' }) {
   const tier = TIERS[quality] || TIERS.high
-  const { gl, camera } = useThree()
+  const { gl, camera, scene } = useThree()
   const { peak } = useMountain()
   const hasDetail = !!terrain.detail && !!tier.detail
   const hasDetail2 = !!terrain.detail2 && !!tier.detail2
@@ -312,20 +483,17 @@ export default function Terrain({ terrain, quality = 'high' }) {
   const cal = useMemo(() => heightCalibration(terrain, peak), [terrain, peak])
   const bandAlt = modelAltitude(8000, cal)
   // first paint: the 1K albedo (≈ 300 KB), loaded through suspense
-  const first = useLoader(THREE.TextureLoader, terrain.base + 'albedo-1k.webp')
+  const first = useLoader(FirstPaintLoader, terrain.base + 'albedo-1k.webp')
+  useEffect(() => { firstTextures.set(terrain.base + 'albedo-1k.webp', first) }, [first, terrain.base])
   const { geo, heightTexture } = terrain
   const patchRect = terrain.detail?.uv || { u0: 0.25, v0: 0.45, u1: 0.55, v1: 0.75 }
   const group = useRef()
+  const uploader = useMemo(() => makeUploader(gl, BAND_BYTES[quality] || BAND_BYTES.high), [gl, quality])
 
-  const baseGeometry = useMemo(() => {
-    const g = new THREE.PlaneGeometry(geo.sizeX, geo.sizeZ, tier.base, tier.base)
-    g.rotateX(-Math.PI / 2)
-    g.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 6, 0), Math.hypot(geo.sizeX, geo.sizeZ))
-    return g
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [terrain.id, tier])
+  const baseGeometry = useMemo(() => gridGeometry(geo, WHOLE, tier.base, 6), [terrain.id, tier])
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const patchGeometry = useMemo(() => rectGeometry(geo, patchRect, tier.patch), [terrain.id, tier])
+  const patchGeometry = useMemo(() => gridGeometry(geo, patchRect, tier.patch, 7), [terrain.id, tier])
 
   const uniforms = useMemo(() => {
     prepTexture(first)
@@ -370,15 +538,35 @@ export default function Terrain({ terrain, quality = 'high' }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [first, terrain.id])
 
-  // before the first frame with this heightmap (the 512² one, then the full one)
+  // Before the first frame with this heightmap. A heightmap not yet on the GPU goes up by the band:
+  // on the first mount while the terrain is hidden for its compile (the reveal waits for both),
+  // and when the full one replaces the 512² one, which stays on screen until it's all there.
+  const heightReady = useRef(null)
   useLayoutEffect(() => {
     if (!floatLinear) nearestHeights(heightTexture)
-    uniforms.uHeight.value = heightTexture
-    uniforms.uTexel.value.set(1 / geo.W, 1 / geo.H)
-    uniforms.uSpacing.value.set(geo.sizeX / geo.W, geo.sizeZ / geo.H)
-    uniforms.uBandAlt.value = bandAlt / 1000
-    uniforms.uCal.value.set(cal.gapM / 1000, cal.baseM / 1000, 1000 / cal.rampM)
-  }, [uniforms, heightTexture, geo, floatLinear, bandAlt, cal])
+    const show = () => {
+      uniforms.uHeight.value = heightTexture
+      uniforms.uTexel.value.set(1 / geo.W, 1 / geo.H)
+      uniforms.uSpacing.value.set(geo.sizeX / geo.W, geo.sizeZ / geo.H)
+      uniforms.uBandAlt.value = bandAlt / 1000
+      uniforms.uCal.value.set(cal.gapM / 1000, cal.baseM / 1000, 1000 / cal.rampM)
+      heightsOnGpu.add(heightTexture)
+    }
+    if (heightsOnGpu.has(heightTexture)) {
+      show()
+      return
+    }
+    let live = true
+    const up = uploader.add(heightTexture)
+    const current = uniforms.uHeight.value
+    if (current !== heightTexture && heightsOnGpu.has(current)) up.done.then((t) => { if (live && t) show() })
+    else {
+      show()
+      heightReady.current = up.done
+    }
+    // another mountain or a newer terrain first: this one uploads whole when it's next drawn
+    return () => { live = false; up.cancel() }
+  }, [uniforms, heightTexture, geo, floatLinear, bandAlt, cal, uploader])
 
   // the contour loupe follows the pointer over the canvas (lib/loupe.js)
   useEffect(() => attachLoupe(gl.domElement), [gl])
@@ -395,9 +583,12 @@ export default function Terrain({ terrain, quality = 'high' }) {
     return { base: mk({}), patch: mk({ PATCH: 1 }) }
   }, [uniforms, hasDetail, hasDetail2, floatLinear])
 
-  // Compile off the main thread where the driver allows (KHR_parallel_shader_compile), with the
-  // meshes parked on a layer the camera does not draw, so the page stays responsive meanwhile.
-  useEffect(() => {
+  // Compile off the main thread where the driver allows (KHR_parallel_shader_compile). This runs in
+  // the commit, before any frame: the terrain waits on a layer the camera does not draw and the
+  // routes and markers wait for terrainReady, so no frame draws a program that is still compiling
+  // (on an integrated GPU the terrain's took 0.65 s, all of it a frozen page). The whole scene is
+  // compiled, so the route lines and markers are ready when they appear too.
+  useLayoutEffect(() => {
     let alive = true
     const g = group.current
     if (!g) return
@@ -405,40 +596,61 @@ export default function Terrain({ terrain, quality = 'high' }) {
     performance.mark(`terrain:compile-start:${terrain.id}`)
     const done = () => { if (!alive) return; g.traverse((o) => o.layers.set(0)); performance.mark(`terrain:ready:${terrain.id}`); useStore.setState({ terrainReady: true }); if (location.search.includes('debug')) console.table(perfSummary(terrain.id)) }
     useStore.setState({ terrainReady: false })
-    if (gl.compileAsync) gl.compileAsync(g, camera).then(done, done)
-    else done()
+    Promise.all([compileScene(gl, scene, camera), heightReady.current]).then(done, done)
     return () => { alive = false }
-  }, [materials, gl, camera, terrain.id])
+  }, [materials, gl, camera, scene, terrain.id])
 
-  // stream the full-resolution textures in after first paint: albedo → detail → summit detail
+  // stream the full-resolution textures in after first paint: light → albedo → detail → summit
+  // detail. Each is decoded while the one before it goes up to the GPU by the band.
   useEffect(() => {
     let alive = true
-    const loader = new THREE.TextureLoader()
-    const owned = []
-    const load = async (file) => {
-      let t
-      try { t = await loader.loadAsync(terrain.base + file) } catch { return null } // missing layer: keep going
-      if (!alive) { t.dispose(); return null }
-      owned.push(t)
-      return prepTexture(t)
-    }
+    const owned = [], uploads = []
+    const layers = [
+      { file: 'light.webp', key: 'uLight', mark: 'light' },
+      { file: tier.albedo, key: 'uAlbedo', mark: 'albedo' },
+      hasDetail && { file: tier.detail, key: 'uDetail', on: 'uDetailOn', mark: 'detail' },
+      hasDetail2 && { file: tier.detail2, key: 'uDetail2', on: 'uDetail2On', mark: 'detail2' },
+    ].filter(Boolean)
+    const fetchLayer = (i) => (i < layers.length ? loadTexture(terrain.base + layers[i].file) : Promise.resolve(null))
+    const drop = (p) => p.then((t) => t && freeTexture(t))
     ;(async () => {
-      const l = await load('light.webp')
-      if (l) { uniforms.uLight.value = l; performance.mark(`tex:light:${terrain.id}`) }
-      const a = await load(tier.albedo)
-      if (a) { uniforms.uAlbedo.value = a; performance.mark(`tex:albedo:${terrain.id}`) }
-      if (hasDetail) { const d = await load(tier.detail); if (d) { uniforms.uDetail.value = d; uniforms.uDetailOn.value = 1 } }
-      if (hasDetail2) { const d = await load(tier.detail2); if (d) { uniforms.uDetail2.value = d; uniforms.uDetail2On.value = 1 } }
+      let next = fetchLayer(0)
+      for (let i = 0; i < layers.length; i++) {
+        const t = await next // missing layer: null, keep going
+        next = fetchLayer(i + 1)
+        if (!alive) { if (t) freeTexture(t); drop(next); return }
+        if (!t) continue
+        owned.push(prepTexture(t))
+        if (t.isDataTexture) {
+          const up = uploader.add(t)
+          uploads.push(up)
+          if (!(await up.done) || !alive) { drop(next); return }
+          t.image.data = null // on the GPU now (a restored context remounts the terrain: Scene.jsx)
+        }
+        const { key, on, mark } = layers[i]
+        uniforms[key].value = t
+        if (on) uniforms[on].value = 1
+        performance.mark(`tex:${mark}:${terrain.id}`)
+      }
     })()
-    return () => { alive = false; owned.forEach((t) => t.dispose()) }
+    return () => { alive = false; uploads.forEach((u) => u.cancel()); owned.forEach(freeTexture) }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [terrain.id, tier, uniforms, hasDetail, hasDetail2])
+  }, [terrain.id, tier, uniforms, hasDetail, hasDetail2, uploader])
 
-  useEffect(() => () => { materials.base.dispose(); materials.patch.dispose(); baseGeometry.dispose(); patchGeometry.dispose() }, [materials, baseGeometry, patchGeometry])
+  useEffect(() => () => { materials.base.dispose(); materials.patch.dispose() }, [materials])
+  // the grids leave with the mountain: their GPU buffers, and their CPU copies too (up to 37 MB),
+  // since React can hold on to an unmounted tree until the next switch
+  useEffect(() => () => {
+    for (const g of [baseGeometry, patchGeometry]) {
+      g.dispose()
+      for (const a of [g.index, ...Object.values(g.attributes)]) if (a) a.array = null
+    }
+  }, [baseGeometry, patchGeometry])
 
   const ndc = useMemo(() => new THREE.Vector2(), [])
   const ray = useMemo(() => new THREE.Raycaster(), [])
   useFrame(({ camera, clock, size }, dt) => {
+    uploader.step() // the next band of whichever texture is on its way to the GPU
     const s = useStore.getState()
     const still = s.motion === 'off'
     uniforms.uCamPos.value.copy(camera.position)

@@ -52,16 +52,35 @@ That runs three scripts:
 ## Loading and performance
 
 - Heightmaps ship as `height.q16`: quarter-metre uint16, row-delta and zig-zag coded, deflated
-  (16 MB → ~3.7 MB per mountain), decoded in the browser with fflate. A 512² `height-lo.q16`
-  (~350 KB) paints first; the full one is swapped in when it arrives and the routes are re-draped.
+  (16 MB → ~3.7 MB per mountain), decoded with fflate in a worker (`src/lib/heightWorker.js`,
+  main-thread fallback). A 512² `height-lo.q16` (~350 KB) paints first; the full one is swapped in
+  when it is on the GPU and the routes are re-draped.
 - Lighting is baked per mountain (`light.webp`: sun shadow in R, ambient occlusion in G) by
   `scripts/bake-light.mjs`, so the fragment shader has no ray-march loop; this is what cut the
   shader compile on integrated GPUs from tens of seconds to a few.
 - Textures ship as WebP. First paint uses a 1K albedo (~300 KB); the tier's full albedo, the 8 km
   detail layer and the 4 km summit layer stream in afterwards and are switched on through uniforms,
   so there is one shader program and no recompile.
-- The terrain program is compiled with `renderer.compileAsync` (KHR_parallel_shader_compile) while
-  the meshes sit on a camera-invisible layer, so the page stays responsive during the compile.
+- Nothing the GPU does freezes a frame:
+  - Textures are decoded in a worker into raw rows (`src/lib/pixelWorker.js`, OffscreenCanvas)
+    and sent to the GPU a band per frame (1 / 2 / 4 MB for the low / medium / high tier, mipmaps
+    built once after the last band), then their CPU copy is dropped. One `texImage2D` of a 2K
+    image froze the page for 50–290 ms on an integrated GPU. Where workers can't decode (Safari
+    before 16.4), an `ImageBitmap` or the `TextureLoader` takes over. A restored WebGL context
+    remounts the terrain so everything is sent again.
+  - The full heightmap goes up the same way while the 512² one stays on screen.
+  - The whole scene (terrain, route lines, markers) is compiled in the render commit with
+    KHR_parallel_shader_compile, before any frame can draw it. The mountain is revealed once every
+    program has linked and its heightmap is on the GPU. An invisible pair of lines
+    (`LinePrograms` in `Scene.jsx`) keeps the line shaders alive when drei rebuilds the route lines.
+  - The terrain grids are written straight into typed arrays (PlaneGeometry took a quarter of a
+    second for the 768² summit patch).
+- Memory: the current mountain and the last two visited stay loaded (the last one on phones and
+  tablets). Older ones free their heightmaps, GPU textures and first-paint albedo. The render loop
+  pauses while the 3D is scrolled away or the overview is open.
+- Resolution adapts per screen and frame time (`src/scene/Resolution.jsx`, see `DESIGN.md`).
+- Phones: the stage is `100lvh` (no resize as the browser bars slide), safe-area insets, a compact
+  landscape layout, a web manifest with a maskable icon.
 - Once a mountain is up, the next and previous mountains' first-paint files (512² heightmap, 1K
   albedo, the small JSON) are prefetched in idle time, about 0.7 MB each, so the arrows switch at
   once. Nothing else is fetched until a mountain is opened; Save-Data and 2G/3G skip it.
@@ -103,8 +122,8 @@ That runs three scripts:
   `Terrain.jsx` casts a ray onto the heightfield (`terrain.hitTest`), draws the map inside the ring
   in the fragment shader (`contourMap`: 100 m and 500 m contours from the calibrated height, the
   8,000 m line in signal) and moves the HTML ring and read-out (`src/ui/Loupe.jsx`) in the same frame.
-- Quality tiers (`high` / `medium` / `low`) pick mesh density, shadow steps and DPR from the GPU
-  string and viewport width.
+- Quality tiers (`high` / `medium` / `low`) pick mesh density, texture sizes, the upload band and
+  the resolution budget from the GPU string and viewport width.
 
 ## Data and attribution
 

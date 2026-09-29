@@ -111,8 +111,27 @@ Breakpoint 760px. Below it: side notes hidden, the poster sits higher, the explo
 become bottom sheets (≤ 46vh), the altimeter moves to the top right, the list view keeps rank,
 peak and height, the camera pulls back ×1.7, quality tier `low`.
 
+Phones and tablets: the 3D stage is `100lvh`, so the canvas never resizes as the browser bars slide
+(iOS Safari, Android Chrome); every edge control sits inside `env(safe-area-inset-*)` (notch, home
+indicator, landscape cut-outs); a landscape phone (height ≤ 500px) gets a compact nav and sheets;
+touch targets are ≥ 44 px; the loupe is press-and-hold, which pauses the drag and the page scroll;
+the stage blocks text selection and the iOS callout. Installable: web manifest, maskable icon,
+`theme-color` night.
+
 ## Performance tiers
 
-`high` 1024² mesh, 4K textures, DPR ≤ 1.75 · `medium` 512² + 768² summit patch, 2K base and
-4K summit layer, DPR 1 (integrated Intel, Mali, Adreno) · `low` 320², 2K base only (narrow
-viewports, ≤ 2 cores or ≤ 2 GB). Lighting is baked, so no tier pays for a shadow march.
+`high` 1024² mesh, 4K textures · `medium` 512² + 768² summit patch, 2K textures (integrated Intel,
+Mali, Adreno, Apple) · `low` 320² + 384², 2K albedo only (narrow viewports, ≤ 2 cores or ≤ 2 GB).
+Lighting is baked, so no tier pays for a shadow march.
+
+Resolution is steered, not fixed (`src/scene/Resolution.jsx`): a pixel budget per tier (8.5 / 2.4 /
+1.6 MP) caps the pixel ratio, then frame time moves it in 0.25 steps between 0.75 and the cap
+(stepping up only while it holds 60 fps, locking after a step up that cost frames); frames taken
+while a mountain loads don't count. Measured: Intel HD 4600 at 1440×900 settles at 0.75 (27 → 35
+fps), a phone profile renders at 1.75× instead of 1× at 60 fps.
+
+Nothing the GPU does may freeze a frame: shaders compile in the background before the mountain is
+revealed, and textures and the full heightmap go up a band of rows per frame (1 / 2 / 4 MB for
+low / medium / high). Measured on the HD 4600, first visit: main-thread long tasks during load
+2,770 → ~450 ms, and a repeat visit has one (the resolution step). Memory after visiting all
+fourteen: 340 → 162 MB of JS heap.

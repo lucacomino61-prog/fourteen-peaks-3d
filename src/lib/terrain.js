@@ -1,33 +1,56 @@
 import * as THREE from 'three'
-import { inflateSync } from 'fflate'
 import { makeGeo, sampleHeight } from './geo'
+import { decodeQ16 } from './q16'
 
-/** height.q16: deflated, zig-zag row-delta uint16 quarter-metres → Float32 metres */
-function decodeQ16(bytes, meta, W = meta.width, H = meta.height) {
-  const scale = meta.q16?.scale || 0.25
-  const z = inflateSync(bytes)
-  const out = new Float32Array(W * H)
-  for (let y = 0; y < H; y++) {
-    let prev = 0
-    for (let x = 0; x < W; x++) {
-      const i = y * W + x
-      const u = z[i * 2] | (z[i * 2 + 1] << 8)
-      const d = (u >>> 1) ^ -(u & 1) // un-zig-zag
-      prev = (prev + d) & 0xffff
-      out[i] = prev * scale
-    }
+// ---- decoding in a worker (main-thread fallback where workers are unavailable) ----
+let worker = null, seq = 0
+const waiting = new Map()
+function decode(bytes, W, H, scale) {
+  if (worker === false || typeof Worker === 'undefined') return Promise.resolve(decodeQ16(new Uint8Array(bytes), W, H, scale))
+  if (!worker) {
+    try {
+      worker = new Worker(new URL('./heightWorker.js', import.meta.url), { type: 'module' })
+      worker.onmessage = ({ data }) => {
+        const w = waiting.get(data.id)
+        waiting.delete(data.id)
+        if (!w) return
+        if (data.error) w.reject(new Error(data.error))
+        else w.resolve(new Float32Array(data.buf))
+      }
+      worker.onerror = () => { worker = false; for (const w of waiting.values()) w.retry(); waiting.clear() }
+    } catch { worker = false; return decode(bytes, W, H, scale) }
   }
-  return out.buffer
+  const id = ++seq
+  const copy = bytes.slice(0) // kept for the fallback if the worker dies before answering
+  return new Promise((resolve, reject) => {
+    waiting.set(id, { resolve, reject, retry: () => resolve(decodeQ16(new Uint8Array(copy), W, H, scale)) })
+    worker.postMessage({ id, bytes, W, H, scale }, [bytes])
+  })
 }
 
+// ---- the loaded terrains: the most recent few stay, older ones free their memory ----
+// A full terrain holds a 16 MB Float32 heightmap plus its 16 MB GPU texture: all fourteen
+// would crash a phone's tab, so only the current mountain and the last two visited are kept (the
+// last one on phones and tablets, where memory is tighter; a revisit decodes from the HTTP cache).
+const MAX_TERRAINS = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches ? 2 : 3
 const cache = new Map()
+const evictListeners = new Set()
+/** Called with a mountain id when its terrain leaves the cache (the scene frees its textures). */
+export function onTerrainEvicted(fn) { evictListeners.add(fn); return () => evictListeners.delete(fn) }
+function remember(id, entry) {
+  cache.delete(id)
+  cache.set(id, entry) // most recent last
+  while (cache.size > MAX_TERRAINS) {
+    const [oldId, old] = cache.entries().next().value
+    cache.delete(oldId)
+    old.lo?.heightTexture.dispose()
+    old.full?.heightTexture.dispose()
+    evictListeners.forEach((fn) => fn(oldId))
+  }
+}
 
-function buildTerrain(id, base, meta, detail, detail2, buf, W, H, lo) {
-  const src = new Float32Array(buf)
-  // flip rows so row 0 = south (v=0), matching texture v
-  const height = new Float32Array(W * H)
-  for (let y = 0; y < H; y++) height.set(src.subarray((H - 1 - y) * W, (H - y) * W), y * W)
-
+function buildTerrain(id, base, meta, detail, detail2, height, W, H, lo) {
+  // `height` is already Float32 metres with row 0 = south (v = 0), matching texture v
   const heightTexture = new THREE.DataTexture(height, W, H, THREE.RedFormat, THREE.FloatType)
   heightTexture.magFilter = THREE.LinearFilter
   heightTexture.minFilter = THREE.LinearFilter
@@ -99,6 +122,7 @@ export async function loadTerrain(id = 'k2', onUpgrade) {
   const base = `/terrain/${id}/`
   if (cache.has(id)) {
     const c = cache.get(id)
+    remember(id, c)
     if (c.full) return c.full
     if (onUpgrade) c.waiters.push(onUpgrade)
     return c.lo
@@ -106,14 +130,17 @@ export async function loadTerrain(id = 'k2', onUpgrade) {
   const optional = (url) => fetch(url).then((r) => (r.ok ? r.json() : null)).catch(() => null)
   const meta = await fetch(`${base}height.json`).then((r) => r.json())
   const [detail, detail2] = await Promise.all([optional(`${base}detail16.json`), optional(`${base}detail17.json`)])
-  const fetchQ = (file, W, H) => fetch(`${base}${file}`).then((r) => r.arrayBuffer()).then((b) => decodeQ16(new Uint8Array(b), meta, W, H))
+  const scale = meta.q16?.scale || 0.25
+  const fetchQ = (file, W, H) => fetch(`${base}${file}`).then((r) => r.arrayBuffer()).then((b) => decode(b, W, H, scale))
+  // the old uncompressed format is stored north row first
+  const flipRows = (src, W, H) => { const out = new Float32Array(W * H); for (let y = 0; y < H; y++) out.set(src.subarray((H - 1 - y) * W, (H - y) * W), y * W); return out }
 
   const entry = { lo: null, full: null, waiters: onUpgrade ? [onUpgrade] : [] }
-  cache.set(id, entry)
+  remember(id, entry)
 
-  const fullPromise = (meta.q16 ? fetchQ('height.q16', meta.width, meta.height) : fetch(`${base}height.bin`).then((r) => r.arrayBuffer()))
-    .then((buf) => {
-      const full = buildTerrain(id, base, meta, detail, detail2, buf, meta.width, meta.height, false)
+  const fullPromise = (meta.q16 ? fetchQ('height.q16', meta.width, meta.height) : fetch(`${base}height.bin`).then((r) => r.arrayBuffer()).then((b) => flipRows(new Float32Array(b), meta.width, meta.height)))
+    .then((heights) => {
+      const full = buildTerrain(id, base, meta, detail, detail2, heights, meta.width, meta.height, false)
       performance.mark(`terrain:full:${id}`)
       entry.full = full
       entry.waiters.splice(0).forEach((fn) => { try { fn(full) } catch {} })
@@ -121,8 +148,8 @@ export async function loadTerrain(id = 'k2', onUpgrade) {
     })
 
   if (meta.lo && meta.q16) {
-    const loBuf = await fetchQ('height-lo.q16', meta.lo.width, meta.lo.height)
-    entry.lo = buildTerrain(id, base, meta, detail, detail2, loBuf, meta.lo.width, meta.lo.height, true)
+    const loHeights = await fetchQ('height-lo.q16', meta.lo.width, meta.lo.height)
+    entry.lo = buildTerrain(id, base, meta, detail, detail2, loHeights, meta.lo.width, meta.lo.height, true)
     performance.mark(`terrain:lo:${id}`)
     return entry.lo
   }

@@ -1,12 +1,13 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import { Line, OrbitControls } from '@react-three/drei'
 import Terrain from './Terrain'
 import Routes from './Routes'
 import Camps from './Camps'
 import Hazards from './Hazards'
 import CameraRig from './CameraRig'
 import Declutter from './Declutter'
+import Resolution from './Resolution'
 import { buildPaths } from '../lib/paths'
 import { useStore, MountainCtx } from '../store'
 import { byId } from '../data'
@@ -28,6 +29,22 @@ function probeQuality() {
   return 'high'
 }
 
+/**
+ * Keeps the route and hazard lines' two shader programs alive. drei's <Line> disposes its material
+ * whenever its points change, which every line does when the full terrain replaces the first-paint
+ * one; three deletes a program no material uses, so the next frame compiled both line shaders
+ * again on the main thread. These two lines never change and are never drawn, so the programs stay.
+ */
+function LinePrograms() {
+  const points = useMemo(() => [[0, -50, 0], [0, -50, 0.01]], [])
+  return (
+    <group visible={false}>
+      <Line points={points} transparent depthWrite={false} />
+      <Line points={points} transparent depthWrite={false} dashed />
+    </group>
+  )
+}
+
 export default function Scene({ terrain }) {
   const controls = useRef()
   const [touched, setTouched] = useState(false)
@@ -44,25 +61,30 @@ export default function Scene({ terrain }) {
   useEffect(() => { set({ paths }) }, [paths, set])
   // tier is decided synchronously on first render so the terrain compiles exactly once
   const [tier] = useState(() => { const q = probeQuality(); useStore.setState({ quality: q }); return q })
+  // bumped when a lost WebGL context comes back: the terrain remounts and sends its textures again
+  // (it frees their CPU copies once they are on the GPU)
+  const [glEpoch, setGlEpoch] = useState(0)
 
   return (
     <Canvas
       // rendered from GSAP's ticker (lib/clock.js), the one animation clock
       frameloop="never"
-      dpr={[1, tier === 'high' ? 1.75 : 1]}
+      dpr={1} // then steered per screen and per frame time by <Resolution>
       gl={{ antialias: true, powerPreference: 'high-performance', stencil: false, alpha: true }}
       camera={{ position: [summit.x + 4, summit.y + 1, summit.z + 6], fov: 40, near: 0.05, far: 120 }}
       onCreated={({ gl }) => {
         gl.setClearColor('#000000', 0)
         // allow the browser to restore a lost context instead of leaving a dead canvas
         gl.domElement.addEventListener('webglcontextlost', (e) => e.preventDefault(), false)
+        gl.domElement.addEventListener('webglcontextrestored', () => setGlEpoch((n) => n + 1), false)
       }}
       style={{ pointerEvents: mode === 'explorer' || mode === 'hero' ? 'auto' : 'none' }}
       onPointerMissed={() => set({ selected: null })}
     >
       <MountainCtx.Provider value={mountain}>
+        <LinePrograms />
         <Suspense fallback={null}>
-          <Terrain key={terrain.id} terrain={terrain} quality={tier} />
+          <Terrain key={`${terrain.id}:${glEpoch}`} terrain={terrain} quality={tier} />
           <group visible={terrainReady}>
             <Routes paths={paths} />
             <Camps terrain={terrain} />
@@ -71,6 +93,7 @@ export default function Scene({ terrain }) {
         </Suspense>
         <CameraRig terrain={terrain} paths={paths} controls={controls} />
         <Declutter />
+        <Resolution tier={tier} />
       </MountainCtx.Provider>
       <OrbitControls
         ref={controls}

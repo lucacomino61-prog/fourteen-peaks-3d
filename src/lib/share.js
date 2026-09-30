@@ -5,7 +5,7 @@ import { track } from './analytics.js'
 import { useStore } from '../store'
 
 // a confirmation (hidden from view when the visitor turned confirmations off) or an error (always shown)
-const toast = (text, kind) => useStore.setState({ toast: { text, kind, at: Date.now() } })
+export const toast = (text, kind) => useStore.setState({ toast: { text, kind, at: Date.now() } })
 
 export async function copyText(text) {
   try {

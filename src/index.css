@@ -447,7 +447,7 @@ section { position: relative; }
 .footer h2 { font-size: 0.875rem; color: var(--snow-2); font-family: var(--font-ui); font-weight: 600; letter-spacing: 0; margin-bottom: 8px; }
 .footer ul { padding-left: 16px; list-style: disc; display: grid; gap: 6px; max-width: 62ch; }
 .footer p { max-width: 62ch; }
-.footer p + p { margin-top: 0.8em; }
+.footer p + p, .footer ul + p { margin-top: 0.8em; }
 
 /* ---------- all fourteen: grid or list ---------- */
 .overview { position: fixed; inset: 0; z-index: 60; background: var(--night); overflow: auto; overscroll-behavior: contain; padding: var(--space-xl) var(--gutter) var(--space-2xl); }

@@ -1,11 +1,12 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useStore, useMountain } from '../store'
 import { mountains } from '../data'
 import { jumpTo } from '../lib/clock'
-import { pad2, longDate } from '../lib/format'
+import { pad2, longDate, fmt } from '../lib/format'
 import { alt, metresText, useUnits } from '../lib/units'
 import { mountainPath, mountainTitle } from '../lib/meta'
 import { share, copyLink } from '../lib/share'
+import { downloadStl, PRINT, printScale } from '../lib/stl'
 import { analyticsConfigured } from '../lib/analytics'
 import { Compass, ArrowLeft, ArrowRight, X, Search as SearchIcon, Share as ShareIcon, Sliders } from './Icons'
 
@@ -214,6 +215,13 @@ export function History() {
 export function Footer({ tile }) {
   const mountain = useMountain()
   const { sources, peak, id } = mountain
+  const [making, setMaking] = useState(false) // the 3D-print file is being made (lib/stl.js)
+  const makeStl = async () => {
+    if (making) return
+    setMaking(true)
+    await downloadStl(mountain)
+    setMaking(false)
+  }
   const size = tile ? `a ${Math.round(tile.km)} km square around ${peak.name} at about ${Math.round(tile.metresPerPx)} m per pixel` : `a square of about 32 km around ${peak.name}`
   return (
     <footer className="footer">
@@ -226,6 +234,7 @@ export function Footer({ tile }) {
         <div>
           <h2>Data</h2>
           <ul>{sources.map((s) => <li key={s}>{s}</li>)}</ul>
+          <p id="stl-note">The 3D-print file (STL) is {fmt(PRINT.sizeKm)} km of ground around the summit at true scale, {fmt(PRINT.widthMm)} mm across (1:{fmt(printScale())}), on a {fmt(PRINT.baseMm)} mm base. It is made in your browser from the elevation data alone, no imagery: keep the Copernicus credit above with it.</p>
         </div>
       </div>
       <div className="wrap foot-actions">
@@ -233,6 +242,9 @@ export function Footer({ tile }) {
         {/* the address as it is now: the mountain, or the route being climbed (lib/address.js) */}
         <button type="button" className="pill" onClick={() => copyLink(location.pathname || mountainPath(id))}>Copy link</button>
         <button type="button" className="pill" onClick={() => window.print()}>Print fact sheet</button>
+        <button type="button" className="pill" onClick={makeStl} aria-busy={making} aria-describedby="stl-note">
+          {making ? 'Making the 3D-print file…' : 'Download for 3D printing'}
+        </button>
         <button type="button" className="pill" onClick={() => useStore.setState({ correctionOpen: true })}>Suggest a correction</button>
       </div>
       <div className="wrap foot-bar">

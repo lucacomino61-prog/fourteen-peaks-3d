@@ -6,6 +6,7 @@ import '@fontsource-variable/jetbrains-mono'
 import './index.css'
 import App from './App.jsx'
 import { startClock } from './lib/clock'
+import { initSound } from './lib/sound'
 import { parsePath } from './lib/address'
 import { LANG } from './i18n'
 
@@ -16,6 +17,7 @@ if (!parsePath(location.pathname).valid) location.replace('/404.html')
 document.documentElement.lang = LANG
 
 startClock()
+initSound()
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

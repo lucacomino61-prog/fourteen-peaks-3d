@@ -159,14 +159,14 @@ export default function Ascent({ terrain }) {
         const f = seg - i
         const t = stops[i].t + (stops[i + 1].t - stops[i].t) * f
         const at = Math.round(seg)
-        // the stop on screen goes in the address (lib/address.js)
-        if (at !== shown) { shown = at; useStore.setState({ progress: t, stop: stops[at].slug }) }
-        else useStore.setState({ progress: t })
+        // resting on a stop (a scroll lands on whole pixels, a hair either side), the altimeter
+        // reads the stop's documented height exactly
+        const alt = Math.abs(seg - at) < 0.01 ? stops[at].alt : Math.round(modelAlt(path, t) + stops[i].gap + (stops[i + 1].gap - stops[i].gap) * f)
+        // the stop on screen goes in the address (lib/address.js); the height to the wind (lib/sound.js)
+        if (at !== shown) { shown = at; useStore.setState({ progress: t, altitude: alt, stop: stops[at].slug }) }
+        else useStore.setState({ progress: t, altitude: alt })
         setActive(at)
         if (altRef.current) {
-          // resting on a stop (a scroll lands on whole pixels, a hair either side), the altimeter
-          // reads the stop's documented height exactly
-          const alt = Math.abs(seg - at) < 0.01 ? stops[at].alt : Math.round(modelAlt(path, t) + stops[i].gap + (stops[i + 1].gap - stops[i].gap) * f)
           shownAlt.current = alt
           altRef.current.textContent = fmt(inUnits(alt))
           profileApi.current?.(t, alt)

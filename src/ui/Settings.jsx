@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef } from 'react'
 import { useStore } from '../store'
 import { lockScroll } from '../lib/clock'
+import { t } from '../i18n'
 import { X } from './Icons'
 
 const THEMES = [['night', 'Night'], ['day', 'Day'], ['system', 'System']]
@@ -89,6 +90,11 @@ export default function Settings() {
             note="The turning mountain, the eased camera and the pulsing markers. Off, everything cuts." />
           <Switch label="Battery saver" checked={settings.saver} onChange={(on) => setSetting('saver', on)}
             note="Lighter terrain and at most 30 frames a second." />
+        </section>
+        <section aria-labelledby="set-sound">
+          <h3 id="set-sound" className="set-group mono">{t('Sound')}</h3>
+          <Switch label={t('Wind')} checked={settings.sound} onChange={(on) => setSetting('sound', on)}
+            note={t('Wind that grows stronger as you climb, and follows the summit forecast when it is shown. Made in your browser from noise: nothing is downloaded.')} />
         </section>
         <section aria-labelledby="set-notify">
           <h3 id="set-notify" className="set-group mono">Notifications</h3>

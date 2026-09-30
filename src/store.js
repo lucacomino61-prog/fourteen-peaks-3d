@@ -76,6 +76,8 @@ export const useStore = create((set, get) => ({
   loupeHold: false, // a finger is holding the loupe: the drag moves the loupe, not the camera
   overviewView: 'grid', // 'grid' | 'list' in the All-fourteen overlay
   progress: 0, // 0..1 along the ascent
+  altitude: null, // metres, the altimeter's reading on the climb (ui/Ascent.jsx; the wind follows it)
+  weather: null, // the summit forecast once loaded (lib/weather.js)
   mountainId: INITIAL.id,
   home: PLACE.home, // the visit started on the home page and hasn't switched mountains (lib/address.js)
   stop: null, // the slug of the climb's stop on screen (ui/Ascent.jsx), for the address

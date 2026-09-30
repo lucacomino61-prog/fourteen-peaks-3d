@@ -54,7 +54,15 @@ That runs three scripts:
 - Heightmaps ship as `height.q16`: quarter-metre uint16, row-delta and zig-zag coded, deflated
   (16 MB → ~3.7 MB per mountain), decoded with fflate in a worker (`src/lib/heightWorker.js`,
   main-thread fallback). A 512² `height-lo.q16` (~350 KB) paints first; the full one is swapped in
-  when it is on the GPU and the routes are re-draped.
+  when it is on the GPU and the routes are re-draped. Phones and weak devices (the low tier) take
+  the 1024² `height-mid.q16` instead (~1.2 MB): one value per 31 m, the 30 m DEM's own resolution,
+  so a first visit on a phone is 3.5 MB instead of 6. `node scripts/encode-height.mjs --from-q16`
+  derives it from the published `height.q16`.
+- Drawing: at most 60 frames a second, 30 when the page is at rest (15 with animations stopped),
+  none while the reading sections cover the stage (`src/lib/clock.js`); 4× multisampling only on
+  phones, tablets and desktop graphics cards (`src/lib/quality.js`). Measured on an Intel HD 4600
+  at 1440×900: hero 31 → 60 fps, ascent 41 → 60, explorer 35 → 60, at a higher resolution (1.0×
+  instead of 0.75×), and a GPU frame 22–27 → 10–11.5 ms.
 - Lighting is baked per mountain (`light.webp`: sun shadow in R, ambient occlusion in G) by
   `scripts/bake-light.mjs`, so the fragment shader has no ray-march loop; this is what cut the
   shader compile on integrated GPUs from tens of seconds to a few.

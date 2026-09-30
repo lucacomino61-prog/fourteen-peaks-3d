@@ -41,20 +41,19 @@ float vnoise(vec2 p) {
   f = f * f * (3.0 - 2.0 * f);
   return mix(mix(hash21(i), hash21(i + vec2(1, 0)), f.x), mix(hash21(i + vec2(0, 1)), hash21(i + vec2(1, 1)), f.x), f.y);
 }
+// the gradient of vnoise at p, worked out rather than sampled: one noise evaluation instead of four
+vec2 vnoiseGrad(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f), du = 6.0 * f * (1.0 - f);
+  float a = hash21(i), b = hash21(i + vec2(1, 0)), c = hash21(i + vec2(0, 1)), d = hash21(i + vec2(1, 1));
+  float k = a - b - c + d;
+  return du * vec2(b - a + k * u.y, c - a + k * u.x);
+}
 // inside-patch weight with a soft rim
 float patchWeight(vec2 uv) {
   vec2 d = (uv - uPatchRect.xy) / (uPatchRect.zw - uPatchRect.xy);
   vec2 m = smoothstep(0.0, 0.04, d) * smoothstep(0.0, 0.04, 1.0 - d);
   return clamp(m.x * m.y, 0.0, 1.0);
-}
-// micro-relief on steep ground: the DEM is 30 m, rock is not smooth at 8 m
-float microRelief(vec2 uv) {
-  float hl = H(uv - vec2(uTexel.x, 0.0)), hr = H(uv + vec2(uTexel.x, 0.0));
-  float hs = H(uv - vec2(0.0, uTexel.y)), hn = H(uv + vec2(0.0, uTexel.y));
-  float slope = length(vec2(hr - hl, hn - hs)) / (2.0 * uSpacing.x);
-  float rock = smoothstep(0.5, 1.2, slope);
-  float n = vnoise(uv * 2600.0) * 0.6 + vnoise(uv * 7000.0) * 0.4 - 0.5;
-  return n * 0.005 * rock;
 }
 `
 
@@ -168,10 +167,12 @@ vec3 sampleAlbedo(vec2 uv, float dist, out float bump) {
     }
   }
 #endif
-  float near = 1.0 - smoothstep(0.8, 5.0, dist);
-  if (near > 0.001) {
-    float g = vnoise(uv * 5000.0) * 0.6 + vnoise(uv * 21000.0) * 0.4;
-    col *= 1.0 + (g - 0.5) * 0.2 * near;
+  // grain in the imagery close up (6 m and 1.5 m), each octave gone before it is under a pixel
+  float near1 = 1.0 - smoothstep(1.5, 4.0, dist), near2 = 1.0 - smoothstep(0.3, 1.2, dist);
+  if (near1 > 0.001) {
+    float g = (vnoise(uv * 5000.0) - 0.5) * 0.6 * near1;
+    if (near2 > 0.001) g += (vnoise(uv * 21000.0) - 0.5) * 0.4 * near2;
+    col *= 1.0 + g * 0.2;
   }
   return col;
 }
@@ -181,19 +182,20 @@ vec3 getNormal(float bump, float dist) {
   float hs = H(vUv - vec2(0.0, uTexel.y)), hn = H(vUv + vec2(0.0, uTexel.y));
   float dhdx = (hr - hl) / (2.0 * uSpacing.x);
   float dhdn = (hn - hs) / (2.0 * uSpacing.y);
-  // micro-relief gradient from the same noise the vertex shader displaces with (ALU only, no fetches)
-  float near = 1.0 - smoothstep(2.0, 9.0, dist);
-  if (near > 0.001) {
-    float slope = length(vec2(dhdx, dhdn));
-    float rock = smoothstep(0.5, 1.2, slope) * near;
-    vec2 e = vec2(0.00012, 0.0);
-    float nl = vnoise((vUv - e.xy) * 2600.0) * 0.6 + vnoise((vUv - e.xy) * 7000.0) * 0.4;
-    float nr = vnoise((vUv + e.xy) * 2600.0) * 0.6 + vnoise((vUv + e.xy) * 7000.0) * 0.4;
-    float ns = vnoise((vUv - e.yx) * 2600.0) * 0.6 + vnoise((vUv - e.yx) * 7000.0) * 0.4;
-    float nn = vnoise((vUv + e.yx) * 2600.0) * 0.6 + vnoise((vUv + e.yx) * 7000.0) * 0.4;
-    float amp = 0.005 * rock / (2.0 * e.x * uSize.x);
-    dhdx += (nr - nl) * amp;
-    dhdn += (nn - ns) * amp;
+  // Micro-relief on steep rock (the DEM is 30 m; rock is not smooth at 5 m): 5 m of noise, as a
+  // slope. Each octave fades out before its bumps get smaller than a pixel, where they would only
+  // shimmer, and flat snow skips it. (It used to be eight noise evaluations for a finite difference
+  // out to 9 km, a quarter of the hero's frame on an integrated GPU.)
+  float near1 = 1.0 - smoothstep(3.0, 7.0, dist), near2 = 1.0 - smoothstep(1.0, 3.0, dist);
+  if (near1 > 0.001) {
+    float rock = smoothstep(0.5, 1.2, length(vec2(dhdx, dhdn)));
+    if (rock > 0.001) {
+      vec2 g = vnoiseGrad(vUv * 2600.0) * (2600.0 * 0.28 * near1);
+      if (near2 > 0.001) g += vnoiseGrad(vUv * 7000.0) * (7000.0 * 0.065 * near2);
+      g *= 0.005 * rock / uSize;
+      dhdx += g.x;
+      dhdn += g.y;
+    }
   }
   dhdx -= bump * 6.0;
   dhdn += bump * 6.0;
@@ -259,10 +261,15 @@ void main() {
 const SUN_DIR = new THREE.Vector3(-0.62, 0.26, 0.6).normalize()
 
 // texture sets per tier (WebP). First paint always uses the 1K albedo, then the rest streams in.
+// The summit patch has one vertex per texel of the 2048² heightmap (512 across its 7.9 km, 15.5 m
+// apart; the DEM itself is 30 m): its old 768 and 1024 only interpolated between texels, and in the
+// wide views those triangles were one or two pixels big, which is what a GPU draws slowest (on an
+// integrated GPU a coarser mesh alone halved the hero's frame). The shading is per pixel from the
+// heightmap either way, so it looks the same.
 const TIERS = {
-  high: { base: 1024, patch: 1024, albedo: 'albedo.webp', detail: 'detail16.webp', detail2: 'detail17.webp' },
+  high: { base: 1024, patch: 512, albedo: 'albedo.webp', detail: 'detail16.webp', detail2: 'detail17.webp' },
   // integrated GPUs: uploading a 4K texture stalled the page for ~0.7 s, so the summit layer is 2K here
-  medium: { base: 512, patch: 768, albedo: 'albedo-2k.webp', detail: 'detail16-2k.webp', detail2: 'detail17-2k.webp' },
+  medium: { base: 512, patch: 512, albedo: 'albedo-2k.webp', detail: 'detail16-2k.webp', detail2: 'detail17-2k.webp' },
   low: { base: 320, patch: 384, albedo: 'albedo-2k.webp', detail: null, detail2: null },
 }
 
@@ -694,8 +701,10 @@ export default function Terrain({ terrain, quality = 'high' }) {
 
   return (
     <group ref={group} visible>
-      <mesh geometry={baseGeometry} material={materials.base} frustumCulled={false} />
-      <mesh geometry={patchGeometry} material={materials.patch} frustumCulled={false} />
+      {/* the patch first, then the coarse grid sunk under it: what the patch covers fails the depth
+          test instead of being shaded twice, and the route lines and rings always come after */}
+      <mesh geometry={baseGeometry} material={materials.base} frustumCulled={false} renderOrder={-1} />
+      <mesh geometry={patchGeometry} material={materials.patch} frustumCulled={false} renderOrder={-2} />
     </group>
   )
 }

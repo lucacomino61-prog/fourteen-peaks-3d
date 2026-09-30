@@ -155,15 +155,27 @@ the stage blocks text selection and the iOS callout. Installable: web manifest, 
 
 ## Performance tiers
 
-`high` 1024² mesh, 4K textures · `medium` 512² + 768² summit patch, 2K textures (integrated Intel,
-Mali, Adreno, Apple) · `low` 320² + 384², 2K albedo only (narrow viewports, ≤ 2 cores or ≤ 2 GB).
-Lighting is baked, so no tier pays for a shadow march.
+`high` 1024² mesh + 512² summit patch, 4K textures · `medium` 512² + 512², 2K textures (integrated
+Intel, Mali, Adreno, Apple) · `low` 320² + 384², 2K albedo only and the 1024² heightmap (narrow
+viewports, ≤ 2 cores or ≤ 2 GB). Lighting is baked, so no tier pays for a shadow march. The summit
+patch stops at one vertex per heightmap texel: finer only interpolated, and made triangles a pixel
+or two wide in the wide views, the slowest thing a GPU draws.
+
+Multisampling (4×) only where it is cheap: phones and tablets (tile-based GPUs) and desktop cards
+with their own memory. Integrated desktop GPUs draw without it: on the HD 4600 it doubled every
+frame (explorer 11.5 → 27 ms), and the resolution steering turns the saved time into pixels.
+
+Frames are paced by `src/lib/clock.js`: at most 60 a second (a 90–144 Hz screen would otherwise
+draw up to 2.4× as many), 30 once nobody has touched the page for 1.5 s and the camera has nowhere
+to go (15 with animations stopped), none while the reading sections or a dialog cover the stage.
+Any input restores the full rate at once; `<Resolution>` ignores the spaced-out frames.
 
 Resolution is steered, not fixed (`src/scene/Resolution.jsx`): a pixel budget per tier (8.5 / 2.4 /
 1.6 MP) caps the pixel ratio, then frame time moves it in 0.25 steps between 0.75 and the cap
 (stepping up only while it holds 60 fps, locking after a step up that cost frames); frames taken
-while a mountain loads don't count. Measured: Intel HD 4600 at 1440×900 settles at 0.75 (27 → 35
-fps), a phone profile renders at 1.75× instead of 1× at 60 fps. A GPU that can't keep up at all
+while a mountain loads don't count. Measured: Intel HD 4600 at 1440×900 settles at 1.0 and holds
+60 fps (it sat at 0.75 and 31–42 fps before the 2026-09-30 pass: MSAA off there, the lighter
+summit patch, cheaper micro-relief); a phone profile renders at 1.75–2× at 60 fps. A GPU that can't keep up at all
 (6 of the last 8 frames over 120 ms) is rescued at once, loading or not: the ratio drops to 0.5,
 then the scene switches to the light tier (checked with frames slowed to ~6 fps: 0.5× within 4 s,
 light meshes by 8 s). The ratio lives in the store and reaches `<Canvas dpr>` from there: R3F

@@ -248,16 +248,20 @@ section { position: relative; }
 .tab[aria-selected='true'] { color: var(--snow); border-color: var(--signal); }
 .tab[aria-selected='true'] i { color: var(--signal); }
 @media (hover: hover) and (pointer: fine) { .tab:hover { color: var(--snow); border-color: var(--line-strong); } }
+/* A route has up to 13 cards stacked in one place, one showing. The others are hidden once faded
+   (visibility after the transition): with only opacity 0 each kept its own blurred layer over the
+   moving 3D for the compositor to redraw, and the invisible ones above the card on show took its
+   clicks and wheel scrolling. Only the card on show blurs what is behind it. */
 .ascent-card {
   position: absolute; left: var(--gutter); bottom: clamp(2.5rem, 7vh, 5rem);
   width: min(30rem, calc(100vw - 2 * var(--gutter))); max-height: calc(100dvh - 7rem); overflow: auto;
   display: grid; gap: 14px; pointer-events: auto; padding: 22px 24px 24px;
-  background: var(--glass); backdrop-filter: blur(14px);
+  background: var(--glass);
   border: 1px solid var(--line); border-left: 2px solid var(--signal); border-radius: var(--radius);
-  opacity: 0; transform: translateY(14px);
-  transition: opacity 280ms var(--ease-out), transform 360ms var(--ease-out);
+  opacity: 0; transform: translateY(14px); visibility: hidden;
+  transition: opacity 280ms var(--ease-out), transform 360ms var(--ease-out), visibility 0s linear 360ms;
 }
-.ascent-card.is-active { opacity: 1; transform: none; }
+.ascent-card.is-active { opacity: 1; transform: none; visibility: visible; transition-delay: 0s; backdrop-filter: blur(14px); }
 .ascent-card .stop-foot { font-size: 11px; color: var(--snow-3); letter-spacing: 0.02em; padding-top: 10px; border-top: 1px solid var(--line); }
 .ascent-card h3 { font-size: var(--step-3); font-weight: 600; }
 .ascent-card h3 span { display: block; font-family: var(--font-ui); font-size: 14px; color: var(--snow-3); font-weight: 400; letter-spacing: 0; margin-top: 6px; }
@@ -488,7 +492,7 @@ section { position: relative; }
 .stage { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 /* Safari before 18 only knows the prefixed backdrop filter */
 .hero > .switch { -webkit-backdrop-filter: blur(8px); }
-.ascent-card { -webkit-backdrop-filter: blur(14px); }
+.ascent-card.is-active { -webkit-backdrop-filter: blur(14px); }
 
 /* Safe areas (viewport-fit=cover): the notch, the rounded corners and the home indicator */
 :root {
@@ -747,6 +751,8 @@ html { overflow-anchor: none; }
 .ascent[data-leaving='1'] .ascent-card,
 .ascent[data-leaving='1'] .altimeter,
 .explorer[data-leaving='1'] > * { opacity: 0; pointer-events: none; transition: opacity 180ms ease; }
+/* and the card on show lets go of its blurred layer once it has faded */
+.ascent[data-leaving='1'] .ascent-card { visibility: hidden; transition: opacity 180ms ease, visibility 0s linear 180ms; }
 
 /* a 3D marker that would sit under the nav hides (scene/Declutter.jsx) */
 .mk[data-under='1'], .hz[data-under='1'] { opacity: 0; pointer-events: none; }

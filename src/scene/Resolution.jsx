@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { isBusy } from '../lib/busy'
+import { isCalm } from '../lib/clock'
 import { useStore } from '../store'
 
 // Rendering resolution for every screen: a pixel budget per quality tier keeps a 4K monitor or a
@@ -45,7 +46,9 @@ export default function Resolution({ tier, onStruggle }) {
 
   useFrame((_, dt) => {
     const s = st.current
-    if (document.hidden) { recent.current.length = 0; return }
+    // a hidden tab, or frames spaced out on purpose while the page is at rest (lib/clock.js):
+    // their timing says nothing about the GPU
+    if (document.hidden || isCalm()) { recent.current.length = 0; s.t = 0; s.n = 0; return }
 
     // the rescue: 6 of the last 8 frames too slow
     const r = recent.current

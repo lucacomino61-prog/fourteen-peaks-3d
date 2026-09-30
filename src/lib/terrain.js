@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import { makeGeo, sampleHeight } from './geo'
 import { decodeQ16 } from './q16'
+import { quality } from './quality'
+import { useStore } from '../store'
 
 // ---- decoding in a worker (main-thread fallback where workers are unavailable) ----
 let worker = null, seq = 0
@@ -29,9 +31,10 @@ function decode(bytes, W, H, scale) {
 }
 
 // ---- the loaded terrains: the most recent few stay, older ones free their memory ----
-// A full terrain holds a 16 MB Float32 heightmap plus its 16 MB GPU texture: all fourteen
-// would crash a phone's tab, so only the current mountain and the last two visited are kept (the
-// last one on phones and tablets, where memory is tighter; a revisit decodes from the HTTP cache).
+// A full terrain holds a 16 MB Float32 heightmap plus its 16 MB GPU texture (4 + 4 MB on phones):
+// all fourteen would crash a phone's tab, so only the current mountain and the last two visited are
+// kept (the last one on phones and tablets, where memory is tighter; a revisit decodes from the
+// HTTP cache).
 const MAX_TERRAINS = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches ? 2 : 3
 const cache = new Map()
 const evictListeners = new Set()
@@ -115,7 +118,8 @@ function buildTerrain(id, base, meta, detail, detail2, height, W, H, lo) {
 
 /**
  * Loads a mountain in two stages: a 512² heightmap for the first paint (≈350 KB), then the full
- * 2048² one. Resolves with the first stage; `onUpgrade(fullTerrain)` fires when the full one is ready.
+ * one (2048², or 1024² on the low tier). Resolves with the first stage; `onUpgrade(fullTerrain)`
+ * fires when the full one is ready.
  * Once fully loaded, later calls resolve with the full terrain immediately.
  */
 export async function loadTerrain(id = 'k2', onUpgrade) {
@@ -138,9 +142,16 @@ export async function loadTerrain(id = 'k2', onUpgrade) {
   const entry = { lo: null, full: null, waiters: onUpgrade ? [onUpgrade] : [] }
   remember(id, entry)
 
-  const fullPromise = (meta.q16 ? fetchQ('height.q16', meta.width, meta.height) : fetch(`${base}height.bin`).then((r) => r.arrayBuffer()).then((b) => flipRows(new Float32Array(b), meta.width, meta.height)))
+  // Phones and weak devices (the low tier) take the 1024² heightmap: one value per 31 m, which is
+  // what the 30 m DEM holds; the 2048² one interpolates between those values. 1.2 MB instead of
+  // 3.7, and a quarter of the memory and of the decoding. (The store says 'low' too once a GPU that
+  // could not keep up was moved to the light tier: the next mountains come lighter as well.)
+  const low = quality() === 'low' || useStore.getState().quality === 'low'
+  const mid = meta.q16 && meta.mid && low ? meta.mid : null
+  const [fullW, fullH] = mid ? [mid.width, mid.height] : [meta.width, meta.height]
+  const fullPromise = (meta.q16 ? fetchQ(mid ? 'height-mid.q16' : 'height.q16', fullW, fullH) : fetch(`${base}height.bin`).then((r) => r.arrayBuffer()).then((b) => flipRows(new Float32Array(b), meta.width, meta.height)))
     .then((heights) => {
-      const full = buildTerrain(id, base, meta, detail, detail2, heights, meta.width, meta.height, false)
+      const full = buildTerrain(id, base, meta, detail, detail2, heights, fullW, fullH, false)
       performance.mark(`terrain:full:${id}`)
       entry.full = full
       entry.waiters.splice(0).forEach((fn) => { try { fn(full) } catch {} })

@@ -9,28 +9,9 @@ import CameraRig from './CameraRig'
 import Declutter from './Declutter'
 import Resolution from './Resolution'
 import { buildPaths } from '../lib/paths'
+import { quality, multisample } from '../lib/quality'
 import { useStore, MountainCtx } from '../store'
 import { byId } from '../data'
-
-/** Decide the quality tier once, before the canvas exists, with a throwaway context. */
-function probeQuality() {
-  // ?quality=low|medium|high forces a tier (to tell a GPU that is too slow from anything else)
-  const forced = new URLSearchParams(location.search).get('quality')
-  if (forced === 'low' || forced === 'medium' || forced === 'high') return forced
-  const narrow = window.innerWidth < 800
-  const weak = (navigator.hardwareConcurrency || 8) <= 2 || (navigator.deviceMemory || 8) <= 2
-  if (narrow || weak) return 'low'
-  try {
-    const c = document.createElement('canvas')
-    const gl = c.getContext('webgl2') || c.getContext('webgl')
-    const dbg = gl?.getExtension('WEBGL_debug_renderer_info')
-    const r = dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : ''
-    gl?.getExtension('WEBGL_lose_context')?.loseContext()
-    if (/SwiftShader|Software|llvmpipe|Basic Render/i.test(r)) return 'low'
-    if (/Intel.*(HD|UHD|Iris)|Mali|Adreno|Apple GPU/i.test(r) && !/Iris Xe|Arc/i.test(r)) return 'medium'
-  } catch {}
-  return 'high'
-}
 
 /**
  * Keeps the route and hazard lines' two shader programs alive. drei's <Line> disposes its material
@@ -65,7 +46,7 @@ export default function Scene({ terrain }) {
   useEffect(() => { set({ paths }) }, [paths, set])
   // tier is decided synchronously on first render so the terrain compiles once; only a GPU that
   // can't keep up even at half resolution gets it changed, to the lightest (<Resolution>)
-  const [tier, setTier] = useState(() => { const q = probeQuality(); useStore.setState({ quality: q }); return q })
+  const [tier, setTier] = useState(() => { const q = quality(); useStore.setState({ quality: q }); return q })
   const struggle = () => {
     if (tier === 'low') return
     useStore.setState({ quality: 'low' })
@@ -80,7 +61,9 @@ export default function Scene({ terrain }) {
       // rendered from GSAP's ticker (lib/clock.js), the one animation clock
       frameloop="never"
       dpr={dpr} // steered per screen and per frame time by <Resolution>, through the store
-      gl={{ antialias: true, powerPreference: 'high-performance', stencil: false, alpha: true }}
+      // multisampling only where the GPU makes it cheap (lib/quality.js); elsewhere the resolution
+      // steering (<Resolution>) spends those milliseconds on more pixels
+      gl={{ antialias: multisample(), powerPreference: 'high-performance', stencil: false, alpha: true }}
       camera={{ position: [summit.x + 4, summit.y + 1, summit.z + 6], fov: 40, near: 0.05, far: 120 }}
       onCreated={({ gl }) => {
         gl.setClearColor('#000000', 0)

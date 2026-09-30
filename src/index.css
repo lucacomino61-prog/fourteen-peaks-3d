@@ -458,6 +458,14 @@ section { position: relative; }
 .stats b .unit { font-size: 0.5em; font-weight: 500; color: var(--snow-2); margin-left: 0.18em; letter-spacing: 0; }
 .stats small { font-size: 0.8125rem; color: var(--snow-2); }
 .routes-other { margin-top: var(--space-l); font-size: 0.875rem; color: var(--snow-3); max-width: 70ch; }
+/* the climbing season: twelve months, the season's filled (ui/Season.jsx) */
+.season { margin-top: var(--space-l); display: grid; gap: 10px; max-width: 42rem; }
+.season-title { font-size: 0.75rem; font-weight: 400; color: var(--snow-3); letter-spacing: 0.04em; text-transform: uppercase; }
+.season-strip { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 3px; }
+.season-strip li { display: grid; place-items: center; height: 34px; border-radius: 3px; background: rgb(var(--snow-rgb) / 0.06); font-family: var(--font-mono); font-size: 0.6875rem; color: var(--snow-3); }
+.season-strip li.is-on { background: var(--snow); color: var(--night); font-weight: 600; }
+.season-note { font-size: 0.9375rem; color: var(--snow-2); max-width: 62ch; }
+.season-sources { font-size: 0.75rem; color: var(--snow-3); max-width: 70ch; }
 
 /* ---------- the glossary where the words are (ui/Glossed.jsx) ---------- */
 /* a term reads as the text around it, with a dotted underline; it is a button all the same */
@@ -1000,6 +1008,7 @@ html[data-motion='off'] .toast span.is-long { animation-duration: 6500ms !import
   .print-sheet .ps-hazards, .print-sheet .ps-timeline { list-style: none; padding: 0; display: grid; gap: 1.5mm; }
   .print-sheet .ps-timeline li, .print-sheet .ps-hazards li { break-inside: avoid; }
   .print-sheet .ps-foot { margin-top: 8mm; padding-top: 2mm; border-top: 0.5pt solid #000; font-size: 8pt; }
+  .print-sheet .ps-season { margin-top: 2mm; font-size: 9.5pt; }
 }
 
 /* ---------- hand-offs between sections, and the ascent and explorer on phones ---------- */

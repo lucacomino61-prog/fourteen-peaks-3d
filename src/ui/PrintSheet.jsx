@@ -1,6 +1,7 @@
 import { useMountain } from '../store'
 import { alt, metresText, useUnits } from '../lib/units'
 import { SITE_NAME, mountainPath } from '../lib/meta'
+import { seasonText } from '../data/seasons'
 
 const UPDATED = import.meta.env.VITE_LAST_UPDATED
 
@@ -10,7 +11,7 @@ const UPDATED = import.meta.env.VITE_LAST_UPDATED
  * everything else (index.css, "print").
  */
 export default function PrintSheet() {
-  const { id, peak, routes, hazards, stats, timeline, sources } = useMountain()
+  const { id, peak, routes, hazards, stats, timeline, sources, season } = useMountain()
   const units = useUnits()
   const url = typeof location !== 'undefined' ? `${location.origin}${mountainPath(id)}` : mountainPath(id)
   return (
@@ -41,6 +42,7 @@ export default function PrintSheet() {
 
       <h2>The numbers</h2>
       <dl className="ps-stats">{stats.map((s) => <div key={s.label}><dt>{s.label}</dt><dd>{metresText(s.value, units)}{s.note ? ` (${s.note})` : ''}</dd></div>)}</dl>
+      {season && <p className="ps-season"><b>Climbing season, {seasonText(season.months, 'long')}.</b> {season.note}</p>}
 
       <h2>{peak.historyTitle}</h2>
       <ol className="ps-timeline">{timeline.map((t) => <li key={t.year}><b>{t.year}</b> {t.title}. {t.text}</li>)}</ol>

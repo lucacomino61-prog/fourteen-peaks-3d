@@ -10,6 +10,7 @@ import { downloadStl, PRINT, printScale } from '../lib/stl'
 import { withLang } from '../i18n'
 import { WeatherLine, WeatherPanel } from './Weather'
 import Glossed from './Glossed'
+import Season from './Season'
 import { analyticsConfigured } from '../lib/analytics'
 import { Compass, ArrowLeft, ArrowRight, X, Search as SearchIcon, Share as ShareIcon, Sliders } from './Icons'
 
@@ -177,7 +178,7 @@ function StatValue({ v, units }) {
 }
 
 export function Figures() {
-  const { stats, peak } = useMountain()
+  const { stats, peak, season } = useMountain()
   const units = useUnits()
   return (
     <section id="figures" className="section">
@@ -191,6 +192,7 @@ export function Figures() {
             <div key={s.label}><dt className="mono">{s.label}</dt><dd><b><StatValue v={s.value} units={units} /></b><small>{s.note}</small></dd></div>
           ))}
         </dl>
+        <Season season={season} />
         <p className="routes-other"><Glossed text={peak.otherLines} /></p>
         <WeatherPanel />
       </div>

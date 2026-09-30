@@ -13,6 +13,7 @@ import gasherbrum2 from './gasherbrum2.js'
 import broadpeak from './broadpeak.js'
 import shishapangma from './shishapangma.js'
 import { slugify } from '../lib/meta.js'
+import { seasons, seasonDate } from './seasons.js'
 
 // ordered highest to lowest, so the arrows walk down the fourteen
 export const mountains = [k2, everest, annapurna, kangchenjunga, lhotse, makalu, chooyu, dhaulagiri, manaslu, nangaparbat, gasherbrum1, gasherbrum2, broadpeak, shishapangma]
@@ -25,6 +26,9 @@ export const byId = Object.fromEntries(mountains.map((m) => [m.id, m]))
 for (const m of mountains) {
   for (const r of m.routes) for (const c of r.camps) c.slug = slugify(c.name)
   for (const s of m.stats) s.key = s.label
+  // its climbing season (src/data/seasons.js) and the season's middle, for a summit night's day
+  m.season = seasons[m.id] || null
+  m.seasonDate = () => seasonDate(m.id)
 }
 
 // rank among the fourteen by height

@@ -6,6 +6,7 @@ import { fmt, pad2 } from '../lib/format'
 import { alt, useUnits } from '../lib/units'
 import { mountainPath } from '../lib/meta'
 import { figures } from '../lib/compare'
+import { seasonText } from '../data/seasons'
 import { t } from '../i18n'
 import Lineup from './Lineup'
 import { X } from './Icons'
@@ -22,6 +23,7 @@ const COLUMNS = [
   { key: 'height', label: 'Height', sort: (m) => m.peak.elevation, first: -1, cell: (m, f, units) => alt(m.peak.elevation, units), mono: true },
   { key: 'range', label: 'Range', sort: (m) => m.peak.range, text: true, first: 1, cell: (m) => m.peak.range },
   { key: 'countries', label: 'Countries', sort: (m) => m.peak.countries, text: true, first: 1, cell: (m) => m.peak.countries },
+  { key: 'season', label: 'Season', sort: (m) => m.season?.months[0] ?? null, first: 1, cell: (m) => (m.season ? seasonText(m.season.months) : '–') },
   { key: 'first', label: 'First ascent', sort: (m, f) => f.first, first: 1, cell: (m, f) => f.first ?? '–', mono: true },
   { key: 'winter', label: 'First in winter', sort: (m, f) => f.winter, first: 1, cell: (m, f) => f.winter ?? '–', mono: true },
   { key: 'summits', label: 'Summits', sort: (m, f) => f.summits, first: -1, cell: (m, f) => (f.summitsText ? <>{f.summitsText}{f.trueSummits && <sup aria-label={t('see the note')}>†</sup>}</> : '–'), mono: true },

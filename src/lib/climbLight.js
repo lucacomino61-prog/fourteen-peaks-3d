@@ -5,8 +5,8 @@
 // runs on through the night, with the real sun of that place and day (lib/sun.js): to the
 // documented arrival where the text gives one, else through the dawn and back into the usual
 // light at the summit, so no arrival hour is made up. The day: the documented push's date where
-// the text gives it (the winter ascents, Buhl in 1953), else the middle of the mountain's main
-// climbing season (its data), else today.
+// the text gives it (the winter ascents, Buhl in 1953), else a day in the mountain's climbing
+// season (the 15th of its last month: src/data/seasons.js), else today.
 import { dayOf, nowAt } from './sun'
 
 const minutes = (hhmm) => { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m }

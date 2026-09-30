@@ -7,6 +7,7 @@ import { alt, metresText, useUnits } from '../lib/units'
 import { mountainPath, mountainTitle } from '../lib/meta'
 import { share, copyLink } from '../lib/share'
 import { downloadStl, PRINT, printScale } from '../lib/stl'
+import { withLang } from '../i18n'
 import { analyticsConfigured } from '../lib/analytics'
 import { Compass, ArrowLeft, ArrowRight, X, Search as SearchIcon, Share as ShareIcon, Sliders } from './Icons'
 
@@ -151,6 +152,7 @@ export function RoutesMenu() {
         <li><button onClick={() => useStore.setState({ routesOpen: false, overviewOpen: true, overviewView: 'grid' })}>All fourteen peaks <small>pick one to open it</small></button></li>
         <li><button onClick={() => useStore.setState({ routesOpen: false, overviewOpen: true, overviewView: 'lineup' })}>Compare the fourteen <small>side by side at one scale, and a table</small></button></li>
         <li><button onClick={() => useStore.setState({ routesOpen: false, searchOpen: true })}><SearchIcon /> Search <small>peaks, routes, camps, hazards, years</small></button></li>
+        <li><a href={withLang('/guess/')}>Guess the mountain <small>a game with contour maps</small></a></li>
         <li><button onClick={() => { close(); shareMountain(mountain) }}><ShareIcon /> {canShare ? `Share ${peak.name}` : `Copy the link to ${peak.name}`} <small>send its page</small></button></li>
         <li><button onClick={() => useStore.setState({ routesOpen: false, correctionOpen: true })}>Suggest a correction <small>a wrong altitude, date or line</small></button></li>
         <li><button onClick={openSettings} aria-haspopup="dialog"><Sliders /> Settings <small>theme, text size, units, notifications</small></button></li>
@@ -249,6 +251,7 @@ export function Footer({ tile }) {
       </div>
       <div className="wrap foot-bar">
         <nav aria-label="About this site">
+          <a href={withLang('/guess/')}>Guess the mountain</a>
           <a href="/privacy/">Privacy</a>
           <a href="/terms/">Terms of use</a>
           {analyticsConfigured && <button type="button" onClick={() => useStore.setState({ consentOpen: 'asked' })}>Privacy choices</button>}

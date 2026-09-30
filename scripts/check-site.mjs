@@ -19,7 +19,7 @@ const EXTERNAL = process.argv.includes('--external')
 const PORT = 4213
 const BASE = `http://127.0.0.1:${PORT}`
 const DIST = path.resolve('dist')
-const PAGES = ['/', ...mountains.map((m) => `/${m.id}/`), '/privacy/', '/terms/', '/404.html']
+const PAGES = ['/', ...mountains.map((m) => `/${m.id}/`), '/k2/abruzzi/', '/k2/abruzzi/camp-4/', '/guess/', '/privacy/', '/terms/', '/404.html']
 const problems = []
 const note = (msg) => { problems.push(msg); console.log(`  ✗ ${msg}`) }
 

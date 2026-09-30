@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b0d12" />
+    <meta name="color-scheme" content="dark" />
+    <!-- head:page -->
+    <title>Guess the mountain · The fourteen 8,000 m peaks in 3D</title>
+    <!-- /head:page -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to the content</a>
+    <header class="page-bar">
+      <a class="page-brand" href="/">The fourteen</a>
+      <a class="page-back" href="/">Back to the mountains</a>
+    </header>
+    <main id="main" class="doc game" tabindex="-1">
+      <p class="game-kicker mono">A game</p>
+      <h1>Guess the mountain</h1>
+      <p class="lead">Ten of the fourteen, drawn as contour lines from their elevation models: north up, 10&nbsp;km across, a line every 200&nbsp;m and the 8,000&nbsp;m line in orange. Which one is it?</p>
+      <section class="game-board" data-board aria-labelledby="game-round">
+        <div class="game-top mono">
+          <span id="game-round" data-round>Round 1 of 10</span>
+          <span data-score>0 right</span>
+        </div>
+        <figure class="game-map">
+          <div class="game-canvas">
+            <canvas data-map role="img" aria-label="Contour map of the mountain to guess"></canvas>
+            <span class="game-north mono" aria-hidden="true">N ↑</span>
+          </div>
+          <figcaption class="mono"><span class="game-scale" aria-hidden="true"><i></i>2 km</span><span data-caption>Contours every 200 m, index lines every 1,000 m</span></figcaption>
+        </figure>
+        <div class="game-options" data-options role="group" aria-label="Your answer"></div>
+        <p class="game-status" data-status role="status" aria-live="polite"></p>
+        <div class="game-actions">
+          <button type="button" class="pill" data-hint>Show a hint</button>
+          <button type="button" class="btn-solid" data-next hidden>Next mountain</button>
+        </div>
+      </section>
+      <section class="game-end" data-end hidden aria-labelledby="game-end-title">
+        <h2 id="game-end-title" data-end-title>Ten mountains, 0 right</h2>
+        <p data-end-note></p>
+        <div class="game-actions">
+          <button type="button" class="btn-solid" data-again>Play again</button>
+          <button type="button" class="pill" data-share>Share your score</button>
+        </div>
+      </section>
+      <noscript><p>The game draws its maps with JavaScript, which is switched off in this browser.</p></noscript>
+      <h2>The fourteen</h2>
+      <ol class="lost-peaks">
+          <!-- list:peaks -->
+      </ol>
+    </main>
+    <footer class="page-foot">
+      <nav aria-label="Site"><a href="/">The fourteen</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms of use</a></nav>
+    </footer>
+    <script type="module" src="/src/pages/guess.js"></script>
+  </body>
+</html>

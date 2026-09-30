@@ -88,6 +88,8 @@ body {
   overflow-x: clip;
 }
 #root { isolation: isolate; }
+/* the hidden attribute always hides, whatever display a component's class gives it */
+[hidden] { display: none !important; }
 h1, h2, h3, h4, p, ol, ul, dl, dd { margin: 0; }
 ol, ul { padding: 0; list-style: none; }
 h1, h2, h3 { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.02em; line-height: 1.05; text-wrap: balance; }

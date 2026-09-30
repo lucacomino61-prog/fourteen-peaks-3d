@@ -126,6 +126,7 @@ function sitePages(env) {
   const PAGES = {
     privacy: { slug: 'privacy', title: 'Privacy', description: 'What this site keeps and sends: no cookies, no accounts; your settings in your browser, and visit counting only with your agreement.' },
     terms: { slug: 'terms', title: 'Terms of use', description: 'How to use the fourteen 8,000 m peaks in 3D: an educational model, not for navigation, with its data sources and their terms.' },
+    guess: { slug: 'guess', title: 'Guess the mountain', description: 'Ten of the fourteen 8,000 m peaks drawn as contour maps from their elevation models. Can you name them?' },
   }
 
   // the parts of the policy pages that follow the build's settings
@@ -177,6 +178,7 @@ function sitePages(env) {
         if (file.endsWith('/404.html')) head = ''
         else if (/\/privacy\/index\.html$/.test(file)) head = pageHead(PAGES.privacy, lang)
         else if (/\/terms\/index\.html$/.test(file)) head = pageHead(PAGES.terms, lang)
+        else if (/\/guess\/index\.html$/.test(file)) head = pageHead(PAGES.guess, lang)
         else head = homeHead(lang)
         return html
           // the visitor's theme and text size (lib/settings.js) before anything is drawn
@@ -205,7 +207,7 @@ function sitePages(env) {
           fs.mkdirSync(dir, { recursive: true })
           fs.writeFileSync(path.join(dir, 'index.html'), withHead(html, head(lang)))
         }
-        urls.push(withLang('/', lang), ...pages.map(([p]) => withLang(p, lang)), withLang('/privacy/', lang), withLang('/terms/', lang))
+        urls.push(withLang('/', lang), ...pages.map(([p]) => withLang(p, lang)), withLang('/guess/', lang), withLang('/privacy/', lang), withLang('/terms/', lang))
       }
       const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${site}${u}</loc><lastmod>${updated}</lastmod></url>`).join('\n')}\n</urlset>\n`
       fs.writeFileSync(path.join(out, 'sitemap.xml'), sitemap)
@@ -235,6 +237,7 @@ export default defineConfig(({ mode }) => {
           main: path.resolve('index.html'),
           privacy: path.resolve('privacy/index.html'),
           terms: path.resolve('terms/index.html'),
+          guess: path.resolve('guess/index.html'),
           notFound: path.resolve('404.html'),
         },
         output: {

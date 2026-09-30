@@ -11,6 +11,7 @@
     "check": "node scripts/check-site.mjs",
     "og": "node scripts/og.mjs",
     "skylines": "node scripts/make-skylines.mjs",
+    "guess": "node scripts/make-guess.mjs",
     "terrain": "node scripts/fetch-terrain.mjs && node scripts/fetch-copernicus.mjs && node scripts/build-albedo.mjs",
     "probe": "node scripts/probe.mjs",
     "assets": "node scripts/encode-height.mjs && node scripts/bake-light.mjs && node scripts/make-webp.mjs && node scripts/make-thumbs.mjs"

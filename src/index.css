@@ -291,11 +291,46 @@ section { position: relative; }
   opacity: 0; transition: opacity 400ms ease; text-shadow: var(--halo);
 }
 .ascent[data-active='1'] .altimeter { opacity: 1; }
-.altimeter b { font-size: clamp(3rem, 1rem + 8vw, 9.5rem); font-weight: 500; color: var(--snow); letter-spacing: -0.06em; line-height: 0.85; font-variant-numeric: tabular-nums; }
-.altimeter .rail { width: 2px; height: 30vh; background: var(--line-strong); position: relative; margin-top: 10px; border-radius: 1px; }
-.altimeter .rail i { position: absolute; left: -3px; right: -3px; height: 2px; background: var(--snow-3); }
-.altimeter .rail i.dz { background: var(--signal); left: -6px; right: -6px; }
-.altimeter .rail b { position: absolute; left: -5px; width: 12px; height: 12px; border-radius: 99px; background: var(--signal); box-shadow: 0 0 0 4px rgb(255 91 46 / 0.25); transform: translateY(50%); }
+.altimeter > b { font-size: clamp(3rem, 1rem + 8vw, 9.5rem); font-weight: 500; color: var(--snow); letter-spacing: -0.06em; line-height: 0.85; font-variant-numeric: tabular-nums; }
+/* the route in profile (ui/Profile.jsx), a small map inset under the altimeter and the climb's
+   scrubber: the part climbed in the signal (its ink in the day theme: 4.6:1 on snow, where the
+   bright signal is 2.6:1), the rest in snow, 2 px lines, a 10% wash, hairline grid. Its first
+   row is the air at that height, estimated (lib/air.js). */
+.profile {
+  position: relative; width: min(19rem, 32vw); margin-top: 14px; padding: 10px 12px 8px; pointer-events: auto;
+  background: var(--glass); border: 1px solid var(--line); border-radius: var(--radius); text-shadow: none;
+}
+.profile .air { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 14px; margin: 0 0 10px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.profile .air div { display: flex; align-items: baseline; gap: 7px; }
+.profile .air dt { font-size: 0.6875rem; color: var(--snow-3); }
+.profile .air dd { margin: 0; font-size: 0.8125rem; color: var(--snow); font-variant-numeric: tabular-nums; }
+.air-short { display: none; }
+.profile-plot { position: relative; height: 7rem; margin-right: 3.2rem; cursor: ew-resize; touch-action: none; }
+.profile-plot svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.pf-grid { stroke: var(--line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.pf-area { fill: rgb(var(--snow-rgb) / 0.1); }
+.pf-line { fill: none; stroke: var(--snow-2); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.pf-climbed { stroke: var(--signal-ink); }
+.pf-dz { stroke: var(--signal-ink); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.pf-mark { position: absolute; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 99px; background: var(--snow); box-shadow: 0 0 0 2px var(--night); pointer-events: none; }
+.pf-mark.is-hazard { width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 1px; transform: rotate(45deg); background: var(--snow-3); }
+.pf-mark.is-grave { background: var(--signal-ink); }
+.pf-mark.is-end { width: 10px; height: 10px; margin: -5px 0 0 -5px; }
+.pf-me { position: absolute; left: 0; top: 100%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 99px; background: var(--signal-ink); box-shadow: 0 0 0 2px var(--night), 0 0 0 6px rgb(255 91 46 / 0.22); pointer-events: none; }
+.pf-x { position: absolute; top: 0; bottom: 0; width: 1px; margin-left: -0.5px; background: var(--line-strong); pointer-events: none; }
+.pf-read {
+  position: absolute; bottom: calc(100% + 8px); transform: translateX(-50%); display: grid; gap: 1px; justify-items: center;
+  padding: 5px 9px; border-radius: 6px; background: var(--night); box-shadow: 0 0 0 1px var(--line-strong); white-space: nowrap;
+  font-size: 0.6875rem; color: var(--snow-3); pointer-events: none;
+}
+.pf-read.is-left { transform: translateX(calc(-100% + 12px)); }
+.pf-read b { font-size: 0.8125rem; font-weight: 500; color: var(--snow); }
+.pf-y { position: absolute; top: 0; bottom: 0; left: calc(100% + 8px); width: 2.8rem; pointer-events: none; }
+.pf-y span { position: absolute; right: 0; transform: translateY(-50%); font-size: 0.625rem; color: var(--snow-3); }
+.pf-x-axis { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 5px 3.2rem 0 0; font-size: 0.625rem; color: var(--snow-3); }
+.pf-key { display: inline-flex; align-items: center; gap: 6px; }
+.pf-key i { width: 14px; height: 1px; background: var(--signal-ink); }
+.profile-plot:focus-visible { outline-offset: 6px; }
 
 /* ---------- explorer ---------- */
 .explorer { min-height: 100dvh; pointer-events: none; }
@@ -412,6 +447,7 @@ section { position: relative; }
 .footer h2 { font-size: 0.875rem; color: var(--snow-2); font-family: var(--font-ui); font-weight: 600; letter-spacing: 0; margin-bottom: 8px; }
 .footer ul { padding-left: 16px; list-style: disc; display: grid; gap: 6px; max-width: 62ch; }
 .footer p { max-width: 62ch; }
+.footer p + p { margin-top: 0.8em; }
 
 /* ---------- all fourteen: grid or list ---------- */
 .overview { position: fixed; inset: 0; z-index: 60; background: var(--night); overflow: auto; overscroll-behavior: contain; padding: var(--space-xl) var(--gutter) var(--space-2xl); }
@@ -472,8 +508,8 @@ section { position: relative; }
   .ascent-card { bottom: 1.25rem; padding: 16px 18px 18px; }
   .ascent-card p { font-size: 0.875rem; }
   .altimeter { top: 112px; bottom: auto; }
-  .altimeter b { font-size: 3rem; }
-  .altimeter .rail, .altimeter small { display: none; }
+  .altimeter > b { font-size: 3rem; }
+  .altimeter small { display: none; }
   .panel { top: auto; bottom: 0; left: 0; right: 0; width: auto; max-height: 46vh; border-radius: 12px 12px 0 0; }
   .detail { right: 0; left: 0; bottom: 0; width: auto; border-radius: 12px 12px 0 0; z-index: 2; }
   .explorer-continue { top: 72px; }
@@ -547,9 +583,9 @@ section { position: relative; }
   .explorer-continue { top: calc(64px + var(--safe-t)); }
   .ascent-tabs { top: calc(62px + var(--safe-t)); }
   .ascent-card { bottom: calc(12px + var(--safe-b)); max-height: calc(100dvh - 7.5rem - var(--safe-b)); }
-  .altimeter .rail { height: 16vh; }
+  .profile-plot, .pf-y { height: 4.5rem; }
   .altimeter { bottom: calc(12px + var(--safe-b)); }
-  .altimeter b { font-size: clamp(2.5rem, 1rem + 5vw, 4.5rem); }
+  .altimeter > b { font-size: clamp(2.5rem, 1rem + 5vw, 4.5rem); }
 }
 
 /* touch: the 3D markers grow a 44 px target around the dot (the dot stays on its point) */
@@ -817,6 +853,8 @@ html { overflow-anchor: none; }
 .ascent[data-leaving='1'] .ascent-card,
 .ascent[data-leaving='1'] .altimeter,
 .explorer[data-leaving='1'] > * { opacity: 0; pointer-events: none; transition: opacity 180ms ease; }
+/* the profile takes the pointer itself (the altimeter lets it through): not once it has faded */
+.ascent[data-leaving='1'] .profile { pointer-events: none; }
 /* and the card on show lets go of its blurred layer once it has faded */
 .ascent[data-leaving='1'] .ascent-card { visibility: hidden; transition: opacity 180ms ease, visibility 0s linear 180ms; }
 
@@ -841,8 +879,19 @@ html { overflow-anchor: none; }
   .ascent-tabs::-webkit-scrollbar { display: none; }
   .tab { flex: none; min-height: 44px; padding: 0 14px 0 10px; }
   .tab span { max-width: none; overflow: visible; }
-  /* the altimeter under the tab row, not beside its second line */
-  .altimeter { top: calc(64px + 44px + 16px + var(--safe-t)); }
+  /* the altimeter under the tab row, not beside its second line, and across the top: the profile
+     at the left, the height and the air at the right */
+  .altimeter {
+    top: calc(64px + 44px + 16px + var(--safe-t)); left: var(--pad-l);
+    grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'pf num'; column-gap: 14px; align-items: start;
+  }
+  .altimeter > b { grid-area: num; }
+  .altimeter .profile { grid-area: pf; justify-self: stretch; width: auto; margin: 0; padding: 8px 10px 8px; }
+  .profile .air { flex-wrap: nowrap; margin-bottom: 6px; padding-bottom: 6px; }
+  .air-long { display: none; }
+  .air-short { display: inline; }
+  .profile-plot { height: 3.4rem; margin-right: 6px; }
+  .pf-y, .pf-x-axis { display: none; }
   /* the card leaves the upper half to the route */
   .ascent-card { max-height: 50dvh; }
   .ascent-card .facts[data-open='0'] { display: none; }

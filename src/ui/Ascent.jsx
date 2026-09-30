@@ -7,6 +7,8 @@ import { jumpTo } from '../lib/clock'
 import { fmt, pad2 } from '../lib/format'
 import { alt as altitude, inUnits, metresText, unitName, useUnits } from '../lib/units'
 import { campSlug, routeEnd, routePath, stopTitle, routeTitle } from '../lib/meta'
+import { airShare, boilingC, toF } from '../lib/air'
+import Profile from './Profile'
 import { share } from '../lib/share'
 import { t } from '../i18n'
 import { Warning, ArrowRight, Link } from './Icons'
@@ -63,6 +65,10 @@ function buildStops(terrain, route, path, H, peak) {
   for (const s of stops) s.gap = s.alt - modelAlt(path, s.t)
   return stops
 }
+
+/** "34%" and "72 °C" (or "161 °F") for a height, as the altimeter shows them */
+const airText = (m) => `${fmt(Math.round(airShare(m) * 100))}%`
+const boilText = (m, units) => (units === 'ft' ? `${fmt(Math.round(toF(boilingC(m))))} °F` : `${fmt(Math.round(boilingC(m)))} °C`)
 
 /** The stop's own address, shared from its card (the system sheet on a phone, else copied). */
 function shareStop(mountain, route, s) {
@@ -129,10 +135,13 @@ export default function Ascent({ terrain }) {
   const [active, setActive] = useState(0)
   const root = useRef()
   const altRef = useRef()
-  const dotRef = useRef()
+  const profileApi = useRef(null) // moves the profile's position dot (ui/Profile.jsx)
+  const registerProfile = (fn) => { profileApi.current = fn }
+  const airRef = useRef()
+  const boilRef = useRef()
   const shownAlt = useRef(0) // the altimeter's height in metres, for a change of unit
   const trigger = useRef(null)
-  const minAlt = stops[0]?.alt || 5000, maxAlt = peak.elevation
+  const minAlt = stops[0]?.alt || 5000
 
   useEffect(() => {
     if (!stops.length || !root.current || !path) return
@@ -155,17 +164,44 @@ export default function Ascent({ terrain }) {
         else useStore.setState({ progress: t })
         setActive(at)
         if (altRef.current) {
-          const alt = Math.round(modelAlt(path, t) + stops[i].gap + (stops[i + 1].gap - stops[i].gap) * f)
+          // resting on a stop (a scroll lands on whole pixels, a hair either side), the altimeter
+          // reads the stop's documented height exactly
+          const alt = Math.abs(seg - at) < 0.01 ? stops[at].alt : Math.round(modelAlt(path, t) + stops[i].gap + (stops[i + 1].gap - stops[i].gap) * f)
           shownAlt.current = alt
           altRef.current.textContent = fmt(inUnits(alt))
-          if (dotRef.current) dotRef.current.style.bottom = `${Math.min(100, Math.max(0, ((alt - minAlt) / (maxAlt - minAlt)) * 100))}%`
+          profileApi.current?.(t, alt)
+          // the air up here, estimated (lib/air.js); written only when a figure changes
+          const air = airText(alt), boil = boilText(alt, useStore.getState().settings.units)
+          if (airRef.current && airRef.current.textContent !== air) airRef.current.textContent = air
+          if (boilRef.current && boilRef.current.textContent !== boil) boilRef.current.textContent = boil
         }
       },
     })
     trigger.current = st
     ScrollTrigger.refresh()
     return () => { st.kill(); if (trigger.current === st) trigger.current = null }
-  }, [stops, path, minAlt, maxAlt, motion])
+  }, [stops, path, motion])
+
+  /**
+   * The profile asks for a place in the climb: a stop (by index or key) or a point between stops
+   * (t along the line). The scroll maps evenly onto the stops, so a point between two stops is
+   * that far between their scroll positions.
+   */
+  const seek = (to) => {
+    const st = trigger.current
+    if (!st || stops.length < 2) return
+    const n = stops.length
+    let p
+    if (to.index != null) p = to.index / (n - 1)
+    else if (to.key != null) p = Math.max(0, stops.findIndex((s) => s.key === to.key)) / (n - 1)
+    else {
+      let i = 0
+      while (i < n - 2 && stops[i + 1].t < to.t) i++
+      const a = stops[i], b = stops[i + 1]
+      p = (i + (b.t > a.t ? Math.min(1, Math.max(0, (to.t - a.t) / (b.t - a.t))) : 0)) / (n - 1)
+    }
+    jumpTo(st.start + (st.end - st.start) * p + 1)
+  }
 
   // A place named by the address (/k2/abruzzi/camp-4/, or Back to one): once this climb is laid
   // out, the page goes to that stop, the route's first card for a route alone. Only for the
@@ -181,8 +217,11 @@ export default function Ascent({ terrain }) {
     useStore.setState({ pendingStop: null })
   }, [pendingStop, stops, terrain.id, mountainId])
 
-  // metres ↔ feet in the settings: the altimeter redraws where it is
-  useEffect(() => { if (altRef.current && shownAlt.current) altRef.current.textContent = fmt(inUnits(shownAlt.current, units)) }, [units])
+  // metres ↔ feet in the settings: the altimeter redraws where it is (and °C ↔ °F with it)
+  useEffect(() => {
+    if (altRef.current && shownAlt.current) altRef.current.textContent = fmt(inUnits(shownAlt.current, units))
+    if (boilRef.current && shownAlt.current) boilRef.current.textContent = boilText(shownAlt.current, units)
+  }, [units])
 
   const pick = (id) => {
     if (id === activeRoute) return
@@ -264,13 +303,15 @@ export default function Ascent({ terrain }) {
         <div className="altimeter" aria-live="off">
           <small className="mono">{t('altitude, {unit}', { unit: unitName(units) })}</small>
           <b className="mono"><span ref={altRef}>{fmt(inUnits(minAlt, units))}</span></b>
-          <div className="rail">
-            <i style={{ bottom: '0%' }} />
-            <i className="dz" style={{ bottom: `${((8000 - minAlt) / (maxAlt - minAlt)) * 100}%` }} title={altitude(8000, units)} />
-            <i style={{ bottom: '100%' }} />
-            <b ref={dotRef} style={{ bottom: '0%' }} />
-          </div>
-          <small className="mono">{t('the orange tick is {height}', { height: altitude(8000, units) })}</small>
+          {path && (
+            <Profile path={path} stops={stops} units={units} active={active} register={registerProfile} onSeek={seek}>
+              {/* estimates for the height on the altimeter (lib/air.js; the footer names the models) */}
+              <dl className="air mono">
+                <div><dt>{t('air')}</dt><dd ref={airRef}>{airText(minAlt)}</dd></div>
+                <div><dt><span className="air-long">{t('water boils at')}</span><span className="air-short">{t('boils at')}</span></dt><dd ref={boilRef}>{boilText(minAlt, units)}</dd></div>
+              </dl>
+            </Profile>
+          )}
         </div>
       </div>
       <div className="ascent-track" style={{ marginTop: '-100dvh' }}>

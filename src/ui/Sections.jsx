@@ -220,6 +220,7 @@ export function Footer({ tile }) {
         <div>
           <h2>About the model</h2>
           <p>The terrain is {size}, displaced from a real digital elevation model and draped with satellite imagery. The elevation model rounds off sharp summits, so near the top the 3D mountain stands up to about 250 m lower than its surveyed height; the altitudes quoted on the page, and in the loupe, are corrected to the documented ones. Route lines and camp positions are approximate: they were reconstructed from published expedition accounts and fitted to the elevation data so that camp altitudes match documented values. Use it to understand the mountain, not to navigate it.</p>
+          <p>Next to the altimeter, the air at that height is estimated: its pressure as a share of sea level’s, from J. B. West’s model atmosphere for high mountains (Journal of Applied Physiology, 1996), and the temperature water boils at, from the Antoine equation for water.</p>
         </div>
         <div>
           <h2>Data</h2>

@@ -5,6 +5,7 @@ import Terrain from './Terrain'
 import Routes from './Routes'
 import Camps from './Camps'
 import Hazards from './Hazards'
+import Plume from './Plume'
 import CameraRig from './CameraRig'
 import Declutter from './Declutter'
 import Resolution from './Resolution'
@@ -95,6 +96,7 @@ export default function Scene({ terrain }) {
             <Routes paths={paths} />
             <Camps terrain={terrain} />
             <Hazards terrain={terrain} />
+            <Plume terrain={terrain} />
           </group>
         </Suspense>
         <CameraRig terrain={terrain} paths={paths} controls={controls} />

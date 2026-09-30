@@ -27,7 +27,7 @@
       <p>A few settings are kept in your browser’s local storage so that they survive a reload. They never leave your device, and clearing the site’s data removes them.</p>
       <ul>
         <li><code>fp-motion</code>: whether you stopped the animations.</li>
-        <li><code>fp-settings</code>: what you changed in the settings (theme, text size, metres or feet, the wind’s sound, the two notifications, the battery saver), and only that.</li>
+        <li><code>fp-settings</code>: what you changed in the settings (theme, text size, metres or feet, the wind’s sound, whether the summit forecast loads by itself, the two notifications, the battery saver), and only that.</li>
         <li><code>fp-seen</code>: the date of the version of the site you last saw, so that “What’s new” can tell you when it has changed.</li>
         <li><code>fp-guess</code>: your best score in “Guess the mountain”, if you have played it.</li>
         <li><code>fp-stats</code>: your answer about visit counting, when the site asks.</li>
@@ -40,8 +40,11 @@
       <h2>Corrections you send</h2>
       <!-- policy:corrections -->
 
+      <h2>The summit weather, only if you ask for it</h2>
+      <p>The forecast for a summit comes from <a href="https://open-meteo.com/">Open-Meteo</a>. Nothing is asked of it until you press “Show the weather on the summit” (or switch on “Load the forecast by itself” in the settings). Then your browser sends Open-Meteo the mountain’s coordinates and, as with any request on the internet, your address and browser type; its <a href="https://open-meteo.com/en/terms">terms</a> say it may keep addresses for technical reasons and deletes its logs after 90 days. Once you have asked, the other mountains you open during the same visit load their forecast too. The forecast is kept in your browser for the visit, an hour at most (<code>fp-weather</code>, <code>fp-weather-asked</code>, in session storage).</p>
+
       <h2>Everything else comes from this site</h2>
-      <p>The 3D terrain, the satellite imagery, the fonts and the code are all served by this site itself. Looking at a mountain sends no request to Google, Esri or any other third party.</p>
+      <p>The 3D terrain, the satellite imagery, the fonts and the code are all served by this site itself. Looking at a mountain sends no request to Google, Esri or any other third party; only the summit weather, if you ask for it, comes from elsewhere (above).</p>
 
       <h2>Server logs</h2>
       <p>Like nearly every website, the server that delivers these pages can record standard access logs (address, time, page requested, browser) to keep the service secure and running. They are kept by the hosting provider under its own policy and are not used to follow anyone.</p>

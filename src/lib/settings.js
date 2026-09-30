@@ -1,13 +1,14 @@
 // The visitor's settings, kept on this device (localStorage 'fp-settings', only what differs from
-// the defaults): theme, text size, units, notifications, the battery saver and the wind's sound. Theme and text size
+// the defaults): theme, text size, units, notifications, the battery saver, the wind's sound and
+// whether the summit forecast loads by itself. Theme and text size
 // are applied before the first paint too, by PREPAINT in every page's head (vite.config.js), so a
 // day-theme visitor never sees a night flash. The Stop-animations switch keeps its own key
 // (fp-motion, store.js).
 const KEY = 'fp-settings'
 
-export const DEFAULTS = { theme: 'night', text: 'default', units: 'm', confirmations: true, whatsNew: true, saver: false, sound: false }
+export const DEFAULTS = { theme: 'night', text: 'default', units: 'm', confirmations: true, whatsNew: true, saver: false, sound: false, weather: false }
 export const TEXT_SCALE = { small: 0.9, default: 1, large: 1.15, larger: 1.3 }
-const ALLOWED = { theme: ['night', 'day', 'system'], text: Object.keys(TEXT_SCALE), units: ['m', 'ft'], confirmations: [true, false], whatsNew: [true, false], saver: [true, false], sound: [true, false] }
+const ALLOWED = { theme: ['night', 'day', 'system'], text: Object.keys(TEXT_SCALE), units: ['m', 'ft'], confirmations: [true, false], whatsNew: [true, false], saver: [true, false], sound: [true, false], weather: [true, false] }
 
 /** Settings as stored, each one checked (an old or edited value falls back to the default). */
 export function loadSettings() {

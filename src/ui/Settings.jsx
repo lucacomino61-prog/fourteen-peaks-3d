@@ -96,6 +96,11 @@ export default function Settings() {
           <Switch label={t('Wind')} checked={settings.sound} onChange={(on) => setSetting('sound', on)}
             note={t('Wind that grows stronger as you climb, and follows the summit forecast when it is shown. Made in your browser from noise: nothing is downloaded.')} />
         </section>
+        <section aria-labelledby="set-weather">
+          <h3 id="set-weather" className="set-group mono">{t('Summit weather')}</h3>
+          <Switch label={t('Load the forecast by itself')} checked={settings.weather} onChange={(on) => setSetting('weather', on)}
+            note={t('For each mountain you open, without asking each time. Your browser asks Open-Meteo for it, which sees your internet address.')} />
+        </section>
         <section aria-labelledby="set-notify">
           <h3 id="set-notify" className="set-group mono">Notifications</h3>
           <Switch label="Confirmations" checked={settings.confirmations} onChange={(on) => setSetting('confirmations', on)}

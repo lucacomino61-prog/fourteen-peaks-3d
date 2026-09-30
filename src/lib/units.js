@@ -2,6 +2,7 @@
 // converted here. Prose (descriptions, history) keeps its metres: the setting says so.
 import { useStore } from '../store'
 import { fmt } from './format'
+import { toF } from './air'
 
 const FEET = 3.28084
 
@@ -31,3 +32,11 @@ export const metresText = (text, units = currentUnits()) =>
 
 /** The unit in use, as a React subscription (components re-render when it changes). */
 export const useUnits = () => useStore((s) => s.settings.units)
+
+// The weather's units follow the same setting: metres go with °C and km/h, feet with °F and mph.
+const MPH = 1.609344
+/** "-31 °C" or "-24 °F" */
+export const tempText = (c, units = currentUnits()) => (units === 'ft' ? `${fmt(Math.round(toF(c)))} °F` : `${fmt(Math.round(c))} °C`)
+/** "73 km/h" or "45 mph" */
+export const windText = (kmh, units = currentUnits()) => (units === 'ft' ? `${fmt(Math.round(kmh / MPH))} mph` : `${fmt(Math.round(kmh))} km/h`)
+export const windScale = (units = currentUnits()) => (units === 'ft' ? 1 / MPH : 1)

@@ -124,7 +124,7 @@ function sitePages(env) {
     jsonLd: { '@context': 'https://schema.org', '@type': 'WebPage', name: title, url: `${site}${withLang(`/${slug}/`, lang)}`, inLanguage: lang, dateModified: updated, isPartOf: website(lang) },
   })
   const PAGES = {
-    privacy: { slug: 'privacy', title: 'Privacy', description: 'What this site keeps and sends: no cookies, no accounts; your settings in your browser, and visit counting only with your agreement.' },
+    privacy: { slug: 'privacy', title: 'Privacy', description: 'What this site keeps and sends: no cookies, no accounts; your settings in your browser, the summit weather only when you ask for it, and visit counting only with your agreement.' },
     terms: { slug: 'terms', title: 'Terms of use', description: 'How to use the fourteen 8,000 m peaks in 3D: an educational model, not for navigation, with its data sources and their terms.' },
     guess: { slug: 'guess', title: 'Guess the mountain', description: 'Ten of the fourteen 8,000 m peaks drawn as contour maps from their elevation models. Can you name them?' },
   }

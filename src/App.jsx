@@ -5,6 +5,7 @@ import Scene from './scene/Scene'
 import { useStore, MountainCtx, placeFromUrl } from './store'
 import { byId } from './data'
 import { addressFor, describeAddress } from './lib/address'
+import { loadWeather, weatherWanted } from './lib/weather'
 import Ascent from './ui/Ascent'
 import Explorer from './ui/Explorer'
 import { Nav, Hero, Figures, History, Footer, RoutesMenu } from './ui/Sections'
@@ -124,6 +125,17 @@ function useWhatsNew(ready) {
   }, [ready])
 }
 
+/**
+ * The summit forecast (lib/weather.js) for each mountain that comes on screen, once the visitor has
+ * asked for it in this visit or has the setting on; nothing is fetched otherwise.
+ */
+function useWeather(mountainId, ready) {
+  const auto = useStore((s) => s.settings.weather)
+  useEffect(() => {
+    if (ready && weatherWanted()) loadWeather(byId[mountainId])
+  }, [mountainId, ready, auto])
+}
+
 /** The site's own counted events (only with the visitor's agreement: lib/analytics.js). */
 function useEvents() {
   useEffect(() => useStore.subscribe((s, prev) => {
@@ -177,6 +189,7 @@ export default function App() {
   useProgressFallback()
   useEvents()
   useWhatsNew(terrainReady)
+  useWeather(mountainId, terrainReady)
   // once the current mountain is up, fetch its neighbours' first-paint files so the arrows are instant
   useEffect(() => {
     if (!terrainReady) return

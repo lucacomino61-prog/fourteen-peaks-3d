@@ -116,7 +116,7 @@ export const useStore = create((set, get) => ({
         if (location.pathname !== url) history[how === 'replace' ? 'replaceState' : 'pushState'](null, '', url)
       } catch { /* the page still switches */ }
     }
-    set({ mountainId: id, home: false, stop: null, pendingStop: null, overviewOpen: false, activeRoute: null, visibleRoutes: [], routesOpen: false, selected: null, hovered: null, progress: 0, mode: 'hero', fly: null, flying: false, paths: null })
+    set({ mountainId: id, home: false, stop: null, pendingStop: null, weather: null, overviewOpen: false, activeRoute: null, visibleRoutes: [], routesOpen: false, selected: null, hovered: null, progress: 0, mode: 'hero', fly: null, flying: false, paths: null })
   },
   stepMountain: (dir) => {
     const i = mountains.findIndex((m) => m.id === get().mountainId)

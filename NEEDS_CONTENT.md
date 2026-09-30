@@ -11,6 +11,7 @@ What only the owner can decide or supply. The site builds and works without any 
 | A contact address | The privacy page points to the public repository for questions. A direct address may be wanted; none is invented here. | `privacy/index.html` |
 | A legal read of the privacy and terms pages | Written plainly from what the site actually does; not checked by a lawyer, and no governing law is named. | `privacy/index.html`, `terms/index.html` |
 | The Esri imagery | The satellite textures derive from Esri World Imagery and are published with the site; whether that use is covered is the owner's call (noted in LICENSE). | `public/terrain/*/albedo*.webp`, `detail*.webp` |
+| The summit weather's terms | Open-Meteo's free API is for non-commercial use only (under 10,000 calls a day, counted per caller); its data is CC BY 4.0 and credited wherever it shows. If the site ever earns money (ads, sales, a paid tier), it needs Open-Meteo's paid plan, or the weather taken out. | `src/lib/weather.js` |
 
 After changing the site's look, render the link previews again: `npm run build && npm run og`.
 Before publishing: `npm run build && npm run check -- --external` (every link on every page, and

@@ -8,6 +8,7 @@ import { mountainPath, mountainTitle } from '../lib/meta'
 import { share, copyLink } from '../lib/share'
 import { downloadStl, PRINT, printScale } from '../lib/stl'
 import { withLang } from '../i18n'
+import { WeatherLine, WeatherPanel } from './Weather'
 import { analyticsConfigured } from '../lib/analytics'
 import { Compass, ArrowLeft, ArrowRight, X, Search as SearchIcon, Share as ShareIcon, Sliders } from './Icons'
 
@@ -91,6 +92,7 @@ export function Hero({ loading }) {
       <div className="hero-side">
         <p>Drag the mountain to turn it. Point at the ground to read it through the loupe.</p>
         <p className="mono">{peak.countries} · Copernicus GLO-30 · Esri imagery</p>
+        <WeatherLine />
       </div>
     </section>
   )
@@ -187,6 +189,7 @@ export function Figures() {
           ))}
         </dl>
         <p className="routes-other">{peak.otherLines}</p>
+        <WeatherPanel />
       </div>
     </section>
   )

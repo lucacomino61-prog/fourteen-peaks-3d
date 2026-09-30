@@ -9,6 +9,24 @@ import { useStore, useMountain } from '../store'
 const still = () => useStore.getState().motion === 'off'
 const _pos = new THREE.Vector3(), _look = new THREE.Vector3(), _r = new THREE.Vector3(), _a = new THREE.Vector3(), _v = new THREE.Vector3()
 
+/**
+ * Whether the climb at `to` is in plain view from `from`. Plain line of sight let the crest of a hill
+ * in front of the camera graze the point (a route's start sat on the skyline of a blurred slope on
+ * phones), so most of the sight line must clear the ground by an angle: about 5° on screen next to
+ * the camera, easing to 1.5°. The last eighth, next to the point, is the slope it lies on, which only
+ * has to stay under the line.
+ */
+function inView(terrain, from, to) {
+  const d = from.distanceTo(to)
+  for (let i = 1; i <= 28; i++) {
+    const t = i / 32
+    const x = from.x + (to.x - from.x) * t, y = from.y + (to.y - from.y) * t, z = from.z + (to.z - from.z) * t
+    const tan = 0.087 - 0.07 * t // tan 5° → tan 1.5° at t = 0.875
+    if (y - terrain.heightAtScene(x, z) / 1000 < d * t * tan) return false
+  }
+  return terrain.lineOfSight(from, to, 32, 0.03)
+}
+
 /** A good camera pose for viewing a whole route */
 function routePose(terrain, paths, summit, id, far = 1, portrait = false) {
   // on phones the bottom sheet covers ~45% of the frame: aim lower so the mountain sits in the top half
@@ -152,7 +170,9 @@ export default function CameraRig({ terrain, paths, controls }) {
       if (!path) return
       const p = THREE.MathUtils.clamp(progress, 0, 1)
       pointAt(path, p, _r)
-      pointAt(path, Math.min(p + 0.05, 1), _a)
+      // look a little ahead up the climb, at most 300 m: 5% of a long route (Everest's South Col
+      // route is 10 km) swung the camp itself to the edge of the frame, under the altimeter
+      pointAt(path, Math.min(p + Math.min(0.05, 0.3 / path.length), 1), _a)
       // view from the side of the mountain this route climbs: direction summit → base, swinging as we rise
       const b = path.points[0]
       const baseAng = Math.atan2(b.x - summit.x, b.z - summit.z)
@@ -165,8 +185,13 @@ export default function CameraRig({ terrain, paths, controls }) {
       _pos.set(_r.x + Math.sin(ang) * dist, _r.y + lift, _r.z + Math.cos(ang) * dist)
       const ground = terrain.heightAtScene(_pos.x, _pos.z) / 1000 + 0.12
       if (_pos.y < ground) _pos.y = ground
-      // aim slightly below the point ahead so the slope fills the frame
-      _look.copy(_a).y -= 0.06
+      // a ridge between the camera and the climb (likelier on a phone, which stands further back:
+      // K2's base camp showed as a blurred slope with no route): rise until the point is in view,
+      // in 50 m steps so the camera's target does not jump as the scroll moves it
+      for (let i = 0; i < 40 && !inView(terrain, _pos, _r); i++) _pos.y += 0.05
+      // aim slightly below the point ahead so the slope fills the frame; on a phone the stop card
+      // covers the lower part of the screen, so aim lower still (about 6°): the climb sits above it
+      _look.copy(_a).y -= 0.06 + (portrait ? dist * 0.1 : 0)
       if (end > 0) _look.lerp(summit, end).y -= 0.25 * end
     }
 

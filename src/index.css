@@ -367,7 +367,8 @@ section { position: relative; }
 
 /* ---------- content sections ---------- */
 .content { background: var(--night); }
-.section { padding-block: var(--space-3xl); border-top: 1px solid var(--line); }
+/* one rhythm between the reading sections: --space-2xl each side (3xl each side put 216–240 px between two of them) */
+.section { padding-block: var(--space-2xl); border-top: 1px solid var(--line); }
 .section-head { display: grid; gap: var(--space-s); margin-bottom: var(--space-xl); }
 .section-head p { color: var(--snow-2); font-size: var(--step-1); max-width: 40ch; line-height: 1.4; }
 
@@ -731,4 +732,50 @@ html[data-motion='off'] .toast span { animation: toast-still 2600ms steps(1, end
   .print-sheet .ps-hazards, .print-sheet .ps-timeline { list-style: none; padding: 0; display: grid; gap: 1.5mm; }
   .print-sheet .ps-timeline li, .print-sheet .ps-hazards li { break-inside: avoid; }
   .print-sheet .ps-foot { margin-top: 8mm; padding-top: 2mm; border-top: 0.5pt solid #000; font-size: 8pt; }
+}
+
+/* ---------- hand-offs between sections, and the ascent and explorer on phones ---------- */
+/* When a route is picked below the ascent, the ascent keeps the view still itself (Ascent.jsx);
+   the browser's own scroll anchoring (Chrome only) would add a second jump. */
+html { overflow-anchor: none; }
+
+/* what floats over the 3D fades as its section scrolls away, rather than sliding under the
+   see-through nav (App.jsx sets data-leaving). The list of routes (no route chosen yet) is page
+   content that can be taller than the screen: it scrolls away like the history does. */
+.hero[data-leaving='1'] > *,
+.ascent[data-leaving='1'] .ascent-tabs,
+.ascent[data-leaving='1'] .ascent-card,
+.ascent[data-leaving='1'] .altimeter,
+.explorer[data-leaving='1'] > * { opacity: 0; pointer-events: none; transition: opacity 180ms ease; }
+
+/* a 3D marker that would sit under the nav hides (scene/Declutter.jsx) */
+.mk[data-under='1'], .hz[data-under='1'] { opacity: 0; pointer-events: none; }
+
+/* the route card's facts fold behind a button on phones */
+.facts-toggle {
+  display: none; align-items: center; justify-self: start; min-height: 44px; padding: 0 16px;
+  border: 1px solid var(--line-strong); border-radius: 99px; font-size: 12px; color: var(--snow-2);
+  transition: color 140ms ease, border-color 140ms ease;
+}
+.facts-toggle[aria-expanded='true'] { color: var(--snow); }
+
+@media (max-width: 760px) {
+  .section { padding-block: var(--space-xl); }
+  /* the route tabs: one full-width row that scrolls sideways, 44 px targets, whole names */
+  .ascent-tabs {
+    left: 0; right: 0; flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+    padding: 0 var(--pad-r) 2px var(--pad-l); scroll-padding-inline: var(--pad-l); gap: 6px;
+  }
+  .ascent-tabs::-webkit-scrollbar { display: none; }
+  .tab { flex: none; min-height: 44px; padding: 0 14px 0 10px; }
+  .tab span { max-width: none; overflow: visible; }
+  /* the altimeter under the tab row, not beside its second line */
+  .altimeter { top: calc(64px + 44px + 16px + var(--safe-t)); }
+  /* the card leaves the upper half to the route */
+  .ascent-card { max-height: 50dvh; }
+  .ascent-card .facts[data-open='0'] { display: none; }
+  .facts-toggle { display: inline-flex; }
+  /* the explorer: a detail sheet takes the panel's place instead of covering it */
+  .explorer[data-detail='1'] .panel { visibility: hidden; opacity: 0; }
+  .detail { background: var(--night); }
 }

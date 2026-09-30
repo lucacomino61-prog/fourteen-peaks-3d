@@ -102,7 +102,22 @@ function useModes(ready) {
     ].map(([sel, mode]) =>
       ScrollTrigger.create({ trigger: sel, start: 'top 50%', end: 'bottom 50%', onToggle: (self) => self.isActive && useStore.setState({ mode }) }),
     )
-    return () => triggers.forEach((t) => t.kill())
+    // What floats over the 3D in a section (the hero's controls, the stop card, tabs and altimeter,
+    // the explorer's panel) fades out as the section scrolls away, instead of sliding up under the
+    // see-through nav: data-leaving while the section's end is on its way out (index.css). The
+    // ascent's last stop rests with the section's end on the bottom edge, so its fade starts just
+    // past it: any earlier and the summit card was never shown.
+    const leaving = [
+      ['#top', 'bottom 45%'],
+      ['#ascent', 'bottom 98%'],
+      ['#explorer', 'bottom 92%'],
+    ].map(([sel, start]) =>
+      ScrollTrigger.create({
+        trigger: sel, start, end: 'bottom top',
+        onToggle: (self) => { const el = document.querySelector(sel); if (el) el.dataset.leaving = self.isActive ? '1' : '0' },
+      }),
+    )
+    return () => [...triggers, ...leaving].forEach((t) => t.kill())
   }, [ready])
 }
 

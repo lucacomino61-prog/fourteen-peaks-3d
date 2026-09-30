@@ -14,9 +14,14 @@ function whenReady(id, fn) {
   })
 }
 
-export function scrollToId(id) {
-  const el = document.getElementById(id)
-  if (el) jumpTo(el.getBoundingClientRect().top + window.scrollY)
+/** Put an element at the top of the view; `below: true` keeps it clear of the nav (reading content). */
+export function scrollToId(id, { below = false } = {}) {
+  let el = document.getElementById(id)
+  if (!el) return
+  // a timeline row is display: contents and has no box of its own: measure its first cell
+  if (!el.getClientRects().length && el.firstElementChild) el = el.firstElementChild
+  const nav = below ? (document.querySelector('.nav')?.getBoundingClientRect().bottom || 0) + 16 : 0
+  jumpTo(el.getBoundingClientRect().top + window.scrollY - nav)
 }
 
 export function goTo({ mountain, route, camp, hazard, year }) {
@@ -40,6 +45,6 @@ export function goTo({ mountain, route, camp, hazard, year }) {
     } else if (route) {
       st.chooseRoute(route)
       requestAnimationFrame(() => scrollToId('ascent'))
-    } else if (year) scrollToId(`y${year}`)
+    } else if (year) scrollToId(`y${year}`, { below: true })
   })
 }

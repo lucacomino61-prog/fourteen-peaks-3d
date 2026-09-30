@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ROUTE_LIFT_M, fractionNear, pointAt } from '../lib/paths'
@@ -55,18 +55,25 @@ function buildStops(terrain, route, path, H, peak) {
 
 function StopCard({ s, i, n, route, num, active }) {
   const hz = s.hazard
+  // on a phone the route's facts fold away behind a button, so the card leaves the route in view
+  const [facts, setFacts] = useState(false)
   return (
     // the altitude is the altimeter's to show; the card names the stop (and tells screen readers the height)
     <article className={`ascent-card ${active ? 'is-active' : ''} ${s.overview ? 'is-overview' : ''}`} aria-hidden={!active} data-alt={s.alt}>
       <h3>{s.title}<span className="visually-hidden">, {fmt(s.alt)}&nbsp;m</span>{s.overview && <span>{route.aka}</span>}</h3>
       <p>{s.body}</p>
       {s.overview && (
-        <dl className="facts">
-          <div><dt>first ascent</dt><dd>{route.firstAscent}</dd></div>
-          <div><dt>traffic</dt><dd>{route.share}</dd></div>
-          <div><dt>difficulty</dt><dd>{route.difficulty}</dd></div>
-          <div><dt>vertical</dt><dd>{route.verticalGain}</dd></div>
-        </dl>
+        <>
+          <button type="button" className="facts-toggle mono" aria-expanded={facts} aria-controls={`facts-${route.id}`} onClick={() => setFacts(!facts)} tabIndex={active ? 0 : -1}>
+            {facts ? 'Fewer details' : 'Route facts'}
+          </button>
+          <dl className="facts" id={`facts-${route.id}`} data-open={facts ? '1' : '0'}>
+            <div><dt>first ascent</dt><dd>{route.firstAscent}</dd></div>
+            <div><dt>traffic</dt><dd>{route.share}</dd></div>
+            <div><dt>difficulty</dt><dd>{route.difficulty}</dd></div>
+            <div><dt>vertical</dt><dd>{route.verticalGain}</dd></div>
+          </dl>
+        </>
       )}
       {hz && (
         <div className={`haz sev-${hz.severity}`}>
@@ -133,6 +140,31 @@ export default function Ascent({ terrain }) {
   // the section changes height when a route is chosen: the mode triggers need new positions
   useEffect(() => { ScrollTrigger.refresh() }, [activeRoute])
 
+  // A route picked further down (in the explorer, or by search) changes this section's height,
+  // which would move everything below it on screen. Keep the view where it is: the page is shifted
+  // by the difference before it paints. (Browser scroll anchoring would do this in Chrome only;
+  // it is switched off for the page, so every browser gets the same.)
+  const lastHeight = useRef(0)
+  useLayoutEffect(() => {
+    const el = root.current
+    if (!el) return
+    const h = el.offsetHeight
+    const prev = lastHeight.current
+    lastHeight.current = h
+    if (!prev || prev === h) return
+    const top = el.getBoundingClientRect().top + window.scrollY
+    if (window.scrollY >= top + prev - 1) jumpTo(window.scrollY + (h - prev))
+  }, [activeRoute, stops.length])
+
+  // phones: the tabs are one row that scrolls sideways; bring the chosen one into it
+  const tabsRef = useRef()
+  useEffect(() => {
+    const strip = tabsRef.current
+    const tab = strip?.querySelector('[aria-selected="true"]')
+    if (!strip || !tab || strip.scrollWidth <= strip.clientWidth) return
+    strip.scrollLeft = Math.max(0, tab.offsetLeft - (strip.clientWidth - tab.offsetWidth) / 2)
+  }, [activeRoute])
+
   if (!route) {
     return (
       <section id="ascent" className="ascent is-choose" ref={root} aria-label="Choose a route">
@@ -167,7 +199,7 @@ export default function Ascent({ terrain }) {
   return (
     <section id="ascent" className="ascent" ref={root} data-active="1" aria-label="Climb each route camp by camp">
       <div className="ascent-sticky">
-        <div className="ascent-tabs" role="tablist" aria-label="Route">
+        <div className="ascent-tabs" role="tablist" aria-label="Route" ref={tabsRef}>
           {routes.map((r, i) => (
             <button key={r.id} role="tab" aria-selected={r.id === activeRoute} className="tab" onClick={() => pick(r.id)}>
               <i className="mono">{pad2(i + 1)}</i><span>{r.name}</span>

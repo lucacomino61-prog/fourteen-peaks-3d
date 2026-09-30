@@ -61,7 +61,9 @@ Self-hosted variable fonts (`@fontsource-variable`).
 
 Utopia fluid space tokens `--space-xs … --space-3xl`; gutter `--gutter`; wrapper 80rem. Controls are
 pills (99px radius); panels and cards 4px (bottom sheets on phones 12px top corners). Hairlines, not
-boxes, for content. Touch targets ≥ 44 px on phones (the 3D markers grow a padded target).
+boxes, for content. Touch targets ≥ 44 px on phones (the 3D markers grow a padded target). The
+reading sections (Numbers, History) are spaced `--space-2xl` above and below, `--space-xl` on
+phones: at `3xl` two neighbours stood 216–240 px apart, too loose for a page read by scrolling.
 
 ## Components
 
@@ -79,13 +81,18 @@ boxes, for content. Touch targets ≥ 44 px on phones (the 3D markers grow a pad
 - **Routes menu:** numbered routes, the active one marked by a signal edge; information links; the
   neighbours.
 - **Ascent:** numbered route tabs (the active one outlined in signal); one glass card at a time with
-  a signal left edge; the altimeter at poster size, pinned to each card's documented altitude.
+  a signal left edge; the altimeter at poster size, pinned to each card's documented altitude. On
+  phones the tabs are one row that scrolls sideways (the chosen one is brought into it), the
+  altimeter sits under that row, and the route's facts fold behind a "Route facts" button so the
+  first card leaves the route in view.
 - **Explorer:** opaque panel, numbered route rows (signal edge on the active one) with eye toggles;
   layers Camps · Hazard zones · Contour map · Death Zone (signal); detail sheet with a top edge in
   the item's colour.
 - **3D markers:** the dot sits on its point with the name to the right; hazard chips sit on their
   point with the name to the left; a name that would land on a more important one hides its text
-  (`src/scene/Declutter.jsx`: summit, active camps, hazards, dimmed camps). Names show to 11 km.
+  (`src/scene/Declutter.jsx`: summit, active camps, hazards, dimmed camps), and so does one that
+  would land on the UI over the 3D (tabs, card, altimeter, panels); a marker that would sit under
+  the see-through nav hides altogether. Names show to 11 km.
 - **Overview:** "The fourteen" as a grid of shaded-relief cards or a **list** (rank, peak, height,
   countries, first ascent, routes, deaths); a modal that traps and returns focus.
 - **Numbers, History, Footer:** display heads; stats as big display values over mono labels between
@@ -113,6 +120,12 @@ One authored moment: the camera. Hero orbit (slow, drag to turn), the scroll-scr
 chosen route, eased fly-to poses in the explorer (a pose aims at most 3.5 km short of the summit and
 keeps the camera within 10.5 km of it). UI transitions ≤ 300 ms ease-out, transforms and opacity
 only.
+
+Hand-offs: what floats over the 3D (the hero's controls, the stop card, tabs and altimeter, the
+explorer's panel) fades out in 180 ms as its section scrolls away (`data-leaving`, set in
+`App.jsx`), instead of sliding up under the see-through nav; the ascent's fade starts just past its
+last stop, so the summit card is shown. The list of routes (no route chosen yet) is page content and
+scrolls away like the history.
 
 **One clock** (`src/lib/clock.js`): GSAP's ticker owns requestAnimationFrame; Lenis (smooth wheel
 scrolling, `autoRaf: false`) and the 3D (`<Canvas frameloop="never">` + `advance`) are stepped from

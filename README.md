@@ -157,7 +157,13 @@ That runs three scripts:
   along the chosen route scrubbed by scroll (`src/ui/Ascent.jsx`), then hands over to
   OrbitControls in the explorer with fly-to poses per route. A pose aims at most 3.5 km short of
   the summit and keeps the camera within 10.5 km of it, so the summit stays in frame and clear of
-  the distance dissolve at every angle of the explorer's orbit.
+  the distance dissolve at every angle of the explorer's orbit. During the ascent the camera rises
+  until the point of the climb is in plain view (the ground has to stay a few degrees under the
+  line of sight, not just under it), and it looks at most 300 m further up the route, so the camp
+  on the card stays near the middle of the frame on long routes.
+- Choosing a route changes the ascent's height. When it is chosen further down the page (the
+  explorer, search), the page is shifted by the difference before it paints, so the view stays put.
+  Browser scroll anchoring is off (`overflow-anchor: none`), so every browser behaves the same.
 - Marker and hazard names are HTML (`@react-three/drei` `<Html>`); `src/scene/Declutter.jsx`
   hides the text of any name that would land on a more important one, keeping its dot.
 - The contour loupe: `src/lib/loupe.js` tracks the pointer (mouse hover; touch press-and-hold),

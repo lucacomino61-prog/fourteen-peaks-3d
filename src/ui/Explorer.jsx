@@ -85,11 +85,13 @@ export default function Explorer() {
   const showHazards = useStore((s) => s.showHazards)
   const showDeathZone = useStore((s) => s.showDeathZone)
   const showContours = useStore((s) => s.showContours)
+  const selected = useStore((s) => s.selected)
 
   const focus = (id) => set({ activeRoute: id, visibleRoutes: visible.includes(id) ? visible : [...visible, id], selected: { type: 'route', id }, fly: { route: id } })
 
   return (
-    <section id="explorer" className="explorer" aria-label="Explore all routes">
+    // data-detail: on a phone the detail sheet takes the panel's place instead of covering it
+    <section id="explorer" className="explorer" aria-label="Explore all routes" data-detail={selected ? '1' : '0'}>
       <div className="panel" data-lenis-prevent>
         <div className="panel-head">
           <h2>{routes.length} ways up</h2>

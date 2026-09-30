@@ -459,6 +459,26 @@ section { position: relative; }
 .stats small { font-size: 0.8125rem; color: var(--snow-2); }
 .routes-other { margin-top: var(--space-l); font-size: 0.875rem; color: var(--snow-3); max-width: 70ch; }
 
+/* ---------- the glossary where the words are (ui/Glossed.jsx) ---------- */
+/* a term reads as the text around it, with a dotted underline; it is a button all the same */
+.term {
+  display: inline; padding: 0; font: inherit; color: inherit; line-height: inherit; text-align: inherit; cursor: help;
+  text-decoration: underline dotted; text-decoration-color: rgb(var(--snow-rgb) / 0.55); text-underline-offset: 3px; text-decoration-thickness: 1px;
+  transition: text-decoration-color 140ms ease, color 140ms ease;
+}
+.term[aria-expanded='true'] { color: var(--snow); text-decoration-color: var(--signal); text-decoration-style: solid; }
+@media (hover: hover) and (pointer: fine) { .term:hover { color: var(--snow); text-decoration-color: var(--signal); } }
+.term-pop {
+  position: fixed; z-index: 110; width: min(21rem, calc(100vw - 24px)); padding: 14px 44px 14px 16px; display: grid; gap: 6px;
+  border: 1px solid var(--line-strong); border-radius: 10px; background: var(--night); color: var(--snow);
+  box-shadow: 0 18px 50px rgb(0 0 0 / 0.5); animation: dialog-in 160ms var(--ease-out);
+}
+.term-pop:focus { outline: none; }
+.term-pop-title { font-family: var(--font-display); font-weight: 600; font-size: 1rem; }
+.term-pop p:not(.term-pop-title) { font-size: 0.875rem; line-height: 1.5; color: var(--snow-2); }
+.term-pop a { justify-self: start; font-size: 0.8125rem; color: var(--snow); text-decoration: underline; text-decoration-color: var(--signal); text-underline-offset: 3px; }
+.term-pop .close { position: absolute; top: 6px; right: 6px; }
+
 /* ---------- the summit weather (ui/Weather.jsx): a forecast, credited to Open-Meteo wherever it shows ---------- */
 .wx-line, .hero-side .wx-line { display: grid; gap: 4px; justify-items: end; max-width: 46ch; margin-top: 4px; }
 .wx-now { font-size: 0.9375rem; color: var(--snow); }

@@ -82,6 +82,7 @@ export const useStore = create((set, get) => ({
   // clock, today) or 'now' (the real sun there, this minute); scene/Terrain.jsx lights it
   sun: { mode: 'usual', minutes: 720 },
   climbLight: null, // the light of a summit night on the climb ({ ymd, minutes, blend }: lib/climbLight.js)
+  term: null, // the glossary term open beside a word: { id, anchor } (ui/Glossed.jsx)
   mountainId: INITIAL.id,
   home: PLACE.home, // the visit started on the home page and hasn't switched mountains (lib/address.js)
   stop: null, // the slug of the climb's stop on screen (ui/Ascent.jsx), for the address

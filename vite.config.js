@@ -4,6 +4,7 @@ import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import { mountains } from './src/data/index.js'
+import { glossary, glossarySources } from './src/data/glossary.js'
 import { siteName, siteDescription, mountainPath, routePath, routeStops, mountainTitle, mountainDescription, routeTitle, routeDescription, stopTitle, stopDescription } from './src/lib/meta.js'
 import { PREPAINT } from './src/lib/settings.js'
 import { LOCALES, withLang } from './src/i18n/lang.js'
@@ -127,6 +128,7 @@ function sitePages(env) {
     privacy: { slug: 'privacy', title: 'Privacy', description: 'What this site keeps and sends: no cookies, no accounts; your settings in your browser, the summit weather only when you ask for it, and visit counting only with your agreement.' },
     terms: { slug: 'terms', title: 'Terms of use', description: 'How to use the fourteen 8,000 m peaks in 3D: an educational model, not for navigation, with its data sources and their terms.' },
     guess: { slug: 'guess', title: 'Guess the mountain', description: 'Ten of the fourteen 8,000 m peaks drawn as contour maps from their elevation models. Can you name them?' },
+    glossary: { slug: 'glossary', title: 'Glossary', description: 'The climbing words of the fourteen 8,000 m peaks in plain terms: serac, couloir, col, cornice, the Death Zone, alpine style and more.' },
   }
 
   // the parts of the policy pages that follow the build's settings
@@ -139,6 +141,9 @@ function sitePages(env) {
     : `<p>“Suggest a correction” opens a new issue in the site’s <a href="${REPO_URL}">public GitHub repository</a> with your text filled in. Nothing is sent until you submit it there, under your own GitHub account, where anyone can read it.</p>`
 
   const peakLinks = (lang) => mountains.map((m) => `<li><a href="${mountainPath(m.id, lang)}"><b translate="no">${esc(m.peak.name)}</b> <span class="mono">${m.peak.elevation.toLocaleString(LOCALES[lang])} m</span></a></li>`).join('\n          ')
+  // the glossary page, from the same data as the words marked in the app (src/data/glossary.js)
+  const glossaryList = (terms) => [...terms].sort((a, b) => a.term.localeCompare(b.term)).map((g) => `<div id="${g.id}"><dt>${esc(g.term)}</dt><dd>${esc(g.def)}</dd></div>`).join('\n        ')
+  const glossarySourceList = (sources) => sources.map((s) => `<li>${esc(s)}</li>`).join('\n        ')
 
   /**
    * Every page the app answers to, per language: [path without language, head(lang)].
@@ -179,6 +184,7 @@ function sitePages(env) {
         else if (/\/privacy\/index\.html$/.test(file)) head = pageHead(PAGES.privacy, lang)
         else if (/\/terms\/index\.html$/.test(file)) head = pageHead(PAGES.terms, lang)
         else if (/\/guess\/index\.html$/.test(file)) head = pageHead(PAGES.guess, lang)
+        else if (/\/glossary\/index\.html$/.test(file)) head = pageHead(PAGES.glossary, lang)
         else head = homeHead(lang)
         return html
           // the visitor's theme and text size (lib/settings.js) before anything is drawn
@@ -190,6 +196,8 @@ function sitePages(env) {
           .replace('<!-- policy:analytics -->', analyticsText)
           .replace('<!-- policy:corrections -->', correctionsText)
           .replace('<!-- list:peaks -->', peakLinks(lang))
+          .replace('<!-- list:glossary -->', glossaryList(glossary))
+          .replace('<!-- list:glossary-sources -->', glossarySourceList(glossarySources))
       },
     },
     // after the build: a copy of the app's page for every mountain, route and stop, then the
@@ -207,7 +215,7 @@ function sitePages(env) {
           fs.mkdirSync(dir, { recursive: true })
           fs.writeFileSync(path.join(dir, 'index.html'), withHead(html, head(lang)))
         }
-        urls.push(withLang('/', lang), ...pages.map(([p]) => withLang(p, lang)), withLang('/guess/', lang), withLang('/privacy/', lang), withLang('/terms/', lang))
+        urls.push(withLang('/', lang), ...pages.map(([p]) => withLang(p, lang)), withLang('/guess/', lang), withLang('/glossary/', lang), withLang('/privacy/', lang), withLang('/terms/', lang))
       }
       const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${site}${u}</loc><lastmod>${updated}</lastmod></url>`).join('\n')}\n</urlset>\n`
       fs.writeFileSync(path.join(out, 'sitemap.xml'), sitemap)
@@ -238,6 +246,7 @@ export default defineConfig(({ mode }) => {
           privacy: path.resolve('privacy/index.html'),
           terms: path.resolve('terms/index.html'),
           guess: path.resolve('guess/index.html'),
+          glossary: path.resolve('glossary/index.html'),
           notFound: path.resolve('404.html'),
         },
         output: {

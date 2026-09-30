@@ -9,6 +9,7 @@ import { share, copyLink } from '../lib/share'
 import { downloadStl, PRINT, printScale } from '../lib/stl'
 import { withLang } from '../i18n'
 import { WeatherLine, WeatherPanel } from './Weather'
+import Glossed from './Glossed'
 import { analyticsConfigured } from '../lib/analytics'
 import { Compass, ArrowLeft, ArrowRight, X, Search as SearchIcon, Share as ShareIcon, Sliders } from './Icons'
 
@@ -156,6 +157,7 @@ export function RoutesMenu() {
         <li><button onClick={() => useStore.setState({ routesOpen: false, overviewOpen: true, overviewView: 'lineup' })}>Compare the fourteen <small>side by side at one scale, and a table</small></button></li>
         <li><button onClick={() => useStore.setState({ routesOpen: false, searchOpen: true })}><SearchIcon /> Search <small>peaks, routes, camps, hazards, years</small></button></li>
         <li><a href={withLang('/guess/')}>Guess the mountain <small>a game with contour maps</small></a></li>
+        <li><a href={withLang('/glossary/')}>Glossary <small>the climbing words, in plain terms</small></a></li>
         <li><button onClick={() => { close(); shareMountain(mountain) }}><ShareIcon /> {canShare ? `Share ${peak.name}` : `Copy the link to ${peak.name}`} <small>send its page</small></button></li>
         <li><button onClick={() => useStore.setState({ routesOpen: false, correctionOpen: true })}>Suggest a correction <small>a wrong altitude, date or line</small></button></li>
         <li><button onClick={openSettings} aria-haspopup="dialog"><Sliders /> Settings <small>theme, text size, units, notifications</small></button></li>
@@ -189,7 +191,7 @@ export function Figures() {
             <div key={s.label}><dt className="mono">{s.label}</dt><dd><b><StatValue v={s.value} units={units} /></b><small>{s.note}</small></dd></div>
           ))}
         </dl>
-        <p className="routes-other">{peak.otherLines}</p>
+        <p className="routes-other"><Glossed text={peak.otherLines} /></p>
         <WeatherPanel />
       </div>
     </section>
@@ -209,7 +211,7 @@ export function History() {
           {timeline.map((t) => (
             <li key={t.year} id={`y${t.year}`} className={`tl-item ${t.highlight ? 'is-key' : ''}`}>
               <div className="year mono">{t.year}</div>
-              <div className="body"><h3>{t.title}</h3><p>{t.text}</p></div>
+              <div className="body"><h3>{t.title}</h3><p><Glossed text={t.text} /></p></div>
             </li>
           ))}
         </ol>
@@ -256,6 +258,7 @@ export function Footer({ tile }) {
       <div className="wrap foot-bar">
         <nav aria-label="About this site">
           <a href={withLang('/guess/')}>Guess the mountain</a>
+          <a href={withLang('/glossary/')}>Glossary</a>
           <a href="/privacy/">Privacy</a>
           <a href="/terms/">Terms of use</a>
           {analyticsConfigured && <button type="button" onClick={() => useStore.setState({ consentOpen: 'asked' })}>Privacy choices</button>}

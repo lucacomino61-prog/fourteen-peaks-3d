@@ -10,6 +10,7 @@ import { campSlug, routeEnd, routePath, stopTitle, routeTitle } from '../lib/met
 import { airShare, boilingC, toF } from '../lib/air'
 import Profile from './Profile'
 import { prepareClimbLight } from '../lib/climbLight'
+import Glossed from './Glossed'
 import { share } from '../lib/share'
 import { t } from '../i18n'
 import { Warning, ArrowRight, Link } from './Icons'
@@ -92,7 +93,7 @@ function StopCard({ s, i, n, route, num, active, units, mountain }) {
     // the altitude is the altimeter's to show; the card names the stop (and tells screen readers the height)
     <article className={`ascent-card ${active ? 'is-active' : ''} ${s.overview ? 'is-overview' : ''}`} aria-hidden={!active} data-alt={s.alt}>
       <h3>{s.title}<span className="visually-hidden">, {altitude(s.alt, units)}</span>{s.overview && <span>{route.aka}</span>}</h3>
-      <p>{s.body}</p>
+      <p><Glossed text={s.body} tabbable={active} /></p>
       {s.overview && (
         <>
           <button type="button" className="facts-toggle mono" aria-expanded={facts} aria-controls={`facts-${route.id}`} onClick={() => setFacts(!facts)} tabIndex={active ? 0 : -1}>
@@ -101,7 +102,7 @@ function StopCard({ s, i, n, route, num, active, units, mountain }) {
           <dl className="facts" id={`facts-${route.id}`} data-open={facts ? '1' : '0'}>
             <div><dt>{t('first ascent')}</dt><dd>{route.firstAscent}</dd></div>
             <div><dt>{t('traffic')}</dt><dd>{route.share}</dd></div>
-            <div><dt>{t('difficulty')}</dt><dd>{route.difficulty}</dd></div>
+            <div><dt>{t('difficulty')}</dt><dd><Glossed text={route.difficulty} tabbable={active} /></dd></div>
             <div><dt>{t('vertical')}</dt><dd>{metresText(route.verticalGain, units)}</dd></div>
           </dl>
         </>

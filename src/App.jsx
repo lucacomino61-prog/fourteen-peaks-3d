@@ -20,6 +20,7 @@ import Correction from './ui/Correction'
 import Consent from './ui/Consent'
 import Toast from './ui/Toast'
 import PrintSheet from './ui/PrintSheet'
+import { TermPopover } from './ui/Glossed'
 import { useTerrain } from './lib/useTerrain'
 import { warmNeighbours } from './lib/prefetch'
 import { jumpTo } from './lib/clock'
@@ -233,6 +234,7 @@ export default function App() {
       <Correction />
       <Consent />
       <Toast />
+      <TermPopover />
       <PrintSheet />
     </>
   )

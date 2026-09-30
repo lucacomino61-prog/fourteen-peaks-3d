@@ -4,6 +4,7 @@ import { alt, useUnits } from '../lib/units'
 import { SNOW, SIGNAL, hazardColor } from '../lib/palette'
 import { Eye, X, ArrowDown } from './Icons'
 import LightControl from './LightControl'
+import Glossed from './Glossed'
 
 function Detail() {
   const { routes, hazards, peak } = useMountain()
@@ -22,7 +23,7 @@ function Detail() {
         <>
           <div className="kicker"><span>{pad2(i + 1)} {r.name}</span><span>{alt(c.alt, units)}</span></div>
           <h3>{c.name}</h3>
-          <p>{c.blurb}</p>
+          <p><Glossed text={c.blurb} /></p>
           <div className="row">
             <div><span>position (approx.)</span>{c.lat.toFixed(4)} N, {c.lon.toFixed(4)} E</div>
             <div><span>route</span>{r.aka}</div>
@@ -38,7 +39,7 @@ function Detail() {
         <>
           <div className="kicker"><span>{h.kind}</span><span>≈ {alt(h.alt, units)}</span></div>
           <h3>{h.name}</h3>
-          <p>{h.blurb}</p>
+          <p><Glossed text={h.blurb} /></p>
           {h.incidents.length > 0 && <ul>{h.incidents.map((i) => <li key={i}>{i}</li>)}</ul>}
         </>
       )
@@ -49,7 +50,7 @@ function Detail() {
       <>
         <div className="kicker"><span>{peak.lat.toFixed(4)} N, {peak.lon.toFixed(4)} E</span><span>{alt(peak.elevation, units)}</span></div>
         <h3>{peak.name}</h3>
-        <p>{peak.summitBlurb}</p>
+        <p><Glossed text={peak.summitBlurb} /></p>
       </>
     )
   } else if (selected?.type === 'route') {
@@ -61,10 +62,10 @@ function Detail() {
         <>
           <div className="kicker"><span>{pad2(i + 1)} · {r.aka}</span><span>{r.share}</span></div>
           <h3>{r.name}</h3>
-          <p>{r.summary}</p>
+          <p><Glossed text={r.summary} /></p>
           <div className="row">
             <div><span>first ascent</span>{r.firstAscent}</div>
-            <div><span>difficulty</span>{r.difficulty}</div>
+            <div><span>difficulty</span><Glossed text={r.difficulty} /></div>
           </div>
         </>
       )

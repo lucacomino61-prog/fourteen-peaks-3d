@@ -35,6 +35,13 @@
 .choice button[aria-pressed='true'] { background: var(--snow); color: var(--night); border-color: var(--snow); }
 @media (hover: hover) and (pointer: fine) { .choice button:hover { border-color: rgb(var(--snow-rgb) / 0.6); } }
 
+/* the glossary (glossary/index.html): one term to a row, the one linked to lit up */
+.gloss { margin-top: var(--space-l); border-bottom: 1px solid var(--line); }
+.gloss > div { padding: 16px 0 18px; border-top: 1px solid var(--line); scroll-margin-top: calc(var(--header-h) + 16px); }
+.gloss dt { font-family: var(--font-display); font-weight: 600; font-size: var(--step-1); color: var(--snow); }
+.gloss dd { margin: 6px 0 0; max-width: 62ch; color: var(--snow-2); }
+.gloss > div:target { box-shadow: inset 2px 0 0 var(--signal); padding-left: 14px; }
+
 .page-foot {
   border-top: 1px solid var(--line); padding: var(--space-l) var(--gutter) calc(var(--space-l) + env(safe-area-inset-bottom, 0px));
   display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 0.8125rem; color: var(--snow-3);

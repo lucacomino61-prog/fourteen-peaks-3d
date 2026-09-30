@@ -363,17 +363,18 @@ onTerrainEvicted((id) => {
  * instead of in one call: on an integrated GPU one call froze the page for 50–290 ms per 2K
  * texture and about 100 ms for the 16 MB heightmap, longer on a phone. Storage and mip levels are
  * allocated up front, the mipmaps are built once after the last band, and one band goes per frame
- * across the whole queue, oldest texture first.
+ * across the whole queue, oldest texture first. Each band is handed over as its own slice of the
+ * rows, not as an offset into the whole image (UNPACK_SKIP_ROWS), which a browser may copy whole.
  */
 function makeUploader(gl, bandBytes) {
   const queue = []
-  const box = new THREE.Box2(), at = new THREE.Vector2()
+  const at = new THREE.Vector2()
   return {
     /** { done, cancel }: done resolves with the texture once it is all on the GPU (null if
      *  cancelled); a texture cut short uploads whole the next time it's drawn. */
     add(tex) {
       const { width, height, data } = tex.image
-      const job = { tex, src: new THREE.DataTexture(data, width, height, tex.format, tex.type), row: 0, mips: tex.generateMipmaps }
+      const job = { tex, data, width, height, src: new THREE.DataTexture(null, width, 1, tex.format, tex.type), row: 0, mips: tex.generateMipmaps }
       job.rows = Math.max(1, Math.floor(bandBytes / (data.byteLength / height)))
       const done = new Promise((resolve) => { job.resolve = resolve })
       tex.source.dataReady = false
@@ -384,6 +385,7 @@ function makeUploader(gl, bandBytes) {
         if (i < 0) return
         queue.splice(i, 1)
         job.src = null
+        job.data = null
         tex.generateMipmaps = job.mips
         tex.source.dataReady = true
         tex.needsUpdate = true
@@ -396,18 +398,19 @@ function makeUploader(gl, bandBytes) {
       const job = queue[0]
       if (!job) return
       markBusy()
-      const { tex, src } = job
-      const { width, height } = src.image
+      const { tex, src, data, width, height } = job
       const n = Math.min(job.rows, height - job.row)
       const last = job.row + n >= height
+      const perRow = data.length / height
       tex.generateMipmaps = last && job.mips // built once, after the last band
-      box.min.set(0, job.row)
-      box.max.set(width, job.row + n)
-      gl.copyTextureToTexture(src, tex, box, at.set(0, job.row))
+      src.image = { data: data.subarray(job.row * perRow, (job.row + n) * perRow), width, height: n }
+      gl.copyTextureToTexture(src, tex, null, at.set(0, job.row))
       job.row += n
       if (!last) return
       queue.shift()
-      job.src = null // cancel() keeps the job: let go of the rows, the texture may drop them too
+      // cancel() keeps the job: let go of the rows, the texture may drop them too
+      job.src = null
+      job.data = null
       tex.generateMipmaps = job.mips
       tex.source.dataReady = true
       job.resolve(tex)

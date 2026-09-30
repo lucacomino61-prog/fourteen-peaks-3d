@@ -150,7 +150,12 @@ Resolution is steered, not fixed (`src/scene/Resolution.jsx`): a pixel budget pe
 1.6 MP) caps the pixel ratio, then frame time moves it in 0.25 steps between 0.75 and the cap
 (stepping up only while it holds 60 fps, locking after a step up that cost frames); frames taken
 while a mountain loads don't count. Measured: Intel HD 4600 at 1440×900 settles at 0.75 (27 → 35
-fps), a phone profile renders at 1.75× instead of 1× at 60 fps.
+fps), a phone profile renders at 1.75× instead of 1× at 60 fps. A GPU that can't keep up at all
+(6 of the last 8 frames over 120 ms) is rescued at once, loading or not: the ratio drops to 0.5,
+then the scene switches to the light tier (checked with frames slowed to ~6 fps: 0.5× within 4 s,
+light meshes by 8 s). The ratio lives in the store and reaches `<Canvas dpr>` from there: R3F
+re-applies that prop whenever the scene re-renders, so a ratio set beside it was undone by every
+mode change. `?quality=low|medium|high` forces a tier.
 
 Nothing the GPU does may freeze a frame: shaders compile in the background before the mountain is
 revealed, and textures and the full heightmap go up a band of rows per frame (1 / 2 / 4 MB for

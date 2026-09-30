@@ -14,6 +14,9 @@ import { byId } from '../data'
 
 /** Decide the quality tier once, before the canvas exists, with a throwaway context. */
 function probeQuality() {
+  // ?quality=low|medium|high forces a tier (to tell a GPU that is too slow from anything else)
+  const forced = new URLSearchParams(location.search).get('quality')
+  if (forced === 'low' || forced === 'medium' || forced === 'high') return forced
   const narrow = window.innerWidth < 800
   const weak = (navigator.hardwareConcurrency || 8) <= 2 || (navigator.deviceMemory || 8) <= 2
   if (narrow || weak) return 'low'
@@ -53,14 +56,21 @@ export default function Scene({ terrain }) {
   const terrainReady = useStore((s) => s.terrainReady)
   const motion = useStore((s) => s.motion)
   const loupeHold = useStore((s) => s.loupeHold)
+  const dpr = useStore((s) => s.dpr)
   const set = useStore((s) => s.set)
   const mountain = byId[terrain.id]
   const { routes, peak } = mountain
   const paths = useMemo(() => buildPaths(terrain, routes), [terrain, routes])
   const summit = useMemo(() => terrain.snapToPeak(peak.lat, peak.lon), [terrain, peak])
   useEffect(() => { set({ paths }) }, [paths, set])
-  // tier is decided synchronously on first render so the terrain compiles exactly once
-  const [tier] = useState(() => { const q = probeQuality(); useStore.setState({ quality: q }); return q })
+  // tier is decided synchronously on first render so the terrain compiles once; only a GPU that
+  // can't keep up even at half resolution gets it changed, to the lightest (<Resolution>)
+  const [tier, setTier] = useState(() => { const q = probeQuality(); useStore.setState({ quality: q }); return q })
+  const struggle = () => {
+    if (tier === 'low') return
+    useStore.setState({ quality: 'low' })
+    setTier('low')
+  }
   // bumped when a lost WebGL context comes back: the terrain remounts and sends its textures again
   // (it frees their CPU copies once they are on the GPU)
   const [glEpoch, setGlEpoch] = useState(0)
@@ -69,7 +79,7 @@ export default function Scene({ terrain }) {
     <Canvas
       // rendered from GSAP's ticker (lib/clock.js), the one animation clock
       frameloop="never"
-      dpr={1} // then steered per screen and per frame time by <Resolution>
+      dpr={dpr} // steered per screen and per frame time by <Resolution>, through the store
       gl={{ antialias: true, powerPreference: 'high-performance', stencil: false, alpha: true }}
       camera={{ position: [summit.x + 4, summit.y + 1, summit.z + 6], fov: 40, near: 0.05, far: 120 }}
       onCreated={({ gl }) => {
@@ -93,7 +103,7 @@ export default function Scene({ terrain }) {
         </Suspense>
         <CameraRig terrain={terrain} paths={paths} controls={controls} />
         <Declutter />
-        <Resolution tier={tier} />
+        <Resolution tier={tier} onStruggle={struggle} />
       </MountainCtx.Provider>
       <OrbitControls
         ref={controls}

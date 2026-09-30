@@ -78,7 +78,9 @@ That runs three scripts:
 - Memory: the current mountain and the last two visited stay loaded (the last one on phones and
   tablets). Older ones free their heightmaps, GPU textures and first-paint albedo. The render loop
   pauses while the 3D is scrolled away or the overview is open.
-- Resolution adapts per screen and frame time (`src/scene/Resolution.jsx`, see `DESIGN.md`).
+- Resolution adapts per screen and frame time (`src/scene/Resolution.jsx`, see `DESIGN.md`); a GPU
+  that can't keep up gets half the resolution at once and then the light tier. Add
+  `?quality=low` (or `medium`, `high`) to any address to force a tier when testing a device.
 - Phones: the stage is `100lvh` (no resize as the browser bars slide), safe-area insets, a compact
   landscape layout, a web manifest with a maskable icon.
 - Once a mountain is up, the next and previous mountains' first-paint files (512² heightmap, 1K

@@ -61,6 +61,7 @@ export const useStore = create((set, get) => ({
   selected: null, // { type: 'camp' | 'hazard' | 'route', id, routeId }
   hovered: null,
   quality: 'high',
+  dpr: 1, // the drawing buffer's pixel ratio, steered by scene/Resolution.jsx
   paths: null,
   fly: null, // { route: id | 'overview' }
   flying: false,

@@ -262,7 +262,17 @@ section { position: relative; }
   transition: opacity 280ms var(--ease-out), transform 360ms var(--ease-out), visibility 0s linear 360ms;
 }
 .ascent-card.is-active { opacity: 1; transform: none; visibility: visible; transition-delay: 0s; backdrop-filter: blur(14px); }
-.ascent-card .stop-foot { font-size: 0.6875rem; color: var(--snow-3); letter-spacing: 0.02em; padding-top: 10px; border-top: 1px solid var(--line); }
+.ascent-card .stop-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 0.6875rem; color: var(--snow-3); letter-spacing: 0.02em; padding-top: 6px; border-top: 1px solid var(--line); }
+.ascent-card .stop-foot p { font-size: inherit; color: inherit; line-height: 1.4; }
+/* the stop's own address: copied, or the share sheet on a phone */
+.stop-share {
+  flex: none; display: grid; place-items: center; width: 32px; height: 32px; margin-right: -8px; border-radius: 99px; color: var(--snow-3);
+  transition: color 140ms ease, background-color 140ms ease, transform 120ms var(--ease-out);
+}
+.stop-share svg { width: 15px; height: 15px; }
+.stop-share:active { transform: scale(0.94); }
+@media (hover: hover) and (pointer: fine) { .stop-share:hover { color: var(--snow); background: rgb(var(--snow-rgb) / 0.08); } }
+@media (pointer: coarse) { .stop-share { width: 44px; height: 44px; margin: -6px -12px -6px 0; } }
 .ascent-card h3 { font-size: var(--step-3); font-weight: 600; }
 .ascent-card h3 span { display: block; font-family: var(--font-ui); font-size: 0.875rem; color: var(--snow-3); font-weight: 400; letter-spacing: 0; margin-top: 6px; }
 .ascent-card p { color: var(--snow-2); font-size: 0.9375rem; line-height: 1.5; }

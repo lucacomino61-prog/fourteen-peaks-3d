@@ -2,8 +2,9 @@ import { useEffect } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Scene from './scene/Scene'
-import { useStore, MountainCtx, mountainFromUrl } from './store'
-import { byId, mountains } from './data'
+import { useStore, MountainCtx, placeFromUrl } from './store'
+import { byId } from './data'
+import { addressFor, describeAddress } from './lib/address'
 import Ascent from './ui/Ascent'
 import Explorer from './ui/Explorer'
 import { Nav, Hero, Figures, History, Footer, RoutesMenu } from './ui/Sections'
@@ -34,19 +35,44 @@ captureCampaign()
 initAnalytics()
 if (mustAsk()) useStore.setState({ consentOpen: 'first' })
 
-/** Back and Forward move between mountains; the head follows the one on screen. */
-function useAddress(mountainId) {
+/**
+ * The address follows the page (lib/address.js): the mountain, the route being climbed and its stop.
+ * Back and Forward go to the place an address names. Nothing is rewritten until a place named by
+ * the address on arrival has been scrolled to, or it would be replaced by the hero's.
+ */
+function useAddress(ready) {
   useEffect(() => {
     const onPop = () => {
-      const m = mountainFromUrl() || mountains[0]
-      if (m.id === useStore.getState().mountainId) return
-      useStore.getState().setMountain(m.id, 'none')
-      jumpTo(0)
+      const p = placeFromUrl()
+      const s = useStore.getState()
+      if (p.mountain !== s.mountainId) {
+        s.setMountain(p.mountain, 'none')
+        useStore.setState({ home: p.home })
+        jumpTo(0)
+      }
+      if (p.route) {
+        const visible = useStore.getState().visibleRoutes
+        useStore.setState({ activeRoute: p.route, visibleRoutes: visible.includes(p.route) ? visible : [...visible, p.route], pendingStop: p.stop || '' })
+      } else if (p.mountain === s.mountainId) jumpTo(0)
     }
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
   }, [])
-  useEffect(() => { applyHead(byId[mountainId], !mountainFromUrl()) }, [mountainId])
+  useEffect(() => {
+    if (!ready) return
+    const sync = (s) => {
+      if (s.pendingStop !== null) return
+      const path = addressFor(s)
+      if (path !== location.pathname) {
+        try { history.replaceState(history.state, '', path + location.search + location.hash) } catch { /* too many rewrites: keep the old one */ }
+      }
+      applyHead(describeAddress(s), path)
+    }
+    sync(useStore.getState())
+    return useStore.subscribe((s, prev) => {
+      if (s.mountainId !== prev.mountainId || s.activeRoute !== prev.activeRoute || s.stop !== prev.stop || s.mode !== prev.mode || s.pendingStop !== prev.pendingStop) sync(s)
+    })
+  }, [ready])
 }
 
 /** "/" or Ctrl/⌘ K opens the search, unless the visitor is typing somewhere. */
@@ -146,7 +172,7 @@ export default function App() {
   const mode = useStore((s) => s.mode)
   const paths = useStore((s) => s.paths)
   useModes(!!terrain && !!paths)
-  useAddress(mountainId)
+  useAddress(!!terrain && !!paths)
   useSearchKey()
   useProgressFallback()
   useEvents()

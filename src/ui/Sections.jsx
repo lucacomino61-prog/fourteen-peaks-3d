@@ -228,7 +228,8 @@ export function Footer({ tile }) {
       </div>
       <div className="wrap foot-actions">
         {canShare && <button type="button" className="pill" onClick={() => shareMountain(mountain)}><ShareIcon /> Share {peak.name}</button>}
-        <button type="button" className="pill" onClick={() => copyLink(mountainPath(id))}>Copy link</button>
+        {/* the address as it is now: the mountain, or the route being climbed (lib/address.js) */}
+        <button type="button" className="pill" onClick={() => copyLink(location.pathname || mountainPath(id))}>Copy link</button>
         <button type="button" className="pill" onClick={() => window.print()}>Print fact sheet</button>
         <button type="button" className="pill" onClick={() => useStore.setState({ correctionOpen: true })}>Suggest a correction</button>
       </div>

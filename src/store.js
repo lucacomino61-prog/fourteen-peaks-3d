@@ -2,22 +2,29 @@ import { create } from 'zustand'
 import { createContext, useContext } from 'react'
 import { byId, mountains } from './data'
 import { mountainPath } from './lib/meta.js'
+import { parsePath } from './lib/address.js'
 import { DEFAULTS, loadSettings, saveSettings, applySettings, onSystemTheme } from './lib/settings'
 
 const loadDefaults = () => ({ ...DEFAULTS })
 
-/** The mountain in the address: its own page (/k2/), or an older ?peak=k2 link. Null on the home page. */
-export function mountainFromUrl() {
+/**
+ * What the address names (lib/address.js): a mountain's page (/k2/), a route on it (/k2/abruzzi/),
+ * a stop of that climb (/k2/abruzzi/camp-4/), or an older ?peak=k2 link. The home page shows the
+ * first mountain.
+ */
+export function placeFromUrl() {
   try {
-    const seg = location.pathname.split('/').filter(Boolean)[0]
-    if (seg && byId[seg]) return byId[seg]
+    const p = parsePath(location.pathname)
+    if (p.valid && p.mountain) return p
     const id = new URLSearchParams(location.search).get('peak')
-    if (id && byId[id]) return byId[id]
+    if (id && byId[id]) return { valid: true, home: false, mountain: id, route: null, stop: null }
+    return { valid: true, home: true, mountain: mountains[0].id, route: null, stop: null }
   } catch { /* no location: the first mountain */ }
-  return null
+  return { valid: true, home: true, mountain: mountains[0].id, route: null, stop: null }
 }
 
-const INITIAL = mountainFromUrl() || mountains[0]
+const PLACE = placeFromUrl()
+const INITIAL = byId[PLACE.mountain]
 
 // an older ?peak= link moves to the mountain's own address
 try {
@@ -70,6 +77,11 @@ export const useStore = create((set, get) => ({
   overviewView: 'grid', // 'grid' | 'list' in the All-fourteen overlay
   progress: 0, // 0..1 along the ascent
   mountainId: INITIAL.id,
+  home: PLACE.home, // the visit started on the home page and hasn't switched mountains (lib/address.js)
+  stop: null, // the slug of the climb's stop on screen (ui/Ascent.jsx), for the address
+  // a place in the climb named by the address, scrolled to once it is laid out (ui/Ascent.jsx):
+  // a stop's slug, '' for the route's first card, null for nothing
+  pendingStop: PLACE.route ? PLACE.stop || '' : null,
   overviewOpen: false,
   searchOpen: false,
   correctionOpen: false,
@@ -77,8 +89,8 @@ export const useStore = create((set, get) => ({
   consentOpen: false, // 'first' (asked on arrival) | 'asked' (from the footer) | false
   terrainReady: false,
   readyId: null, // the mountain whose terrain was last revealed
-  activeRoute: null, // nothing is drawn until the user picks a route
-  visibleRoutes: [],
+  activeRoute: PLACE.route, // nothing is drawn until the user picks a route (or the address names one)
+  visibleRoutes: PLACE.route ? [PLACE.route] : [],
   routesOpen: false, // the routes menu under the nav
   showCamps: true,
   showHazards: true,
@@ -102,7 +114,7 @@ export const useStore = create((set, get) => ({
         if (location.pathname !== url) history[how === 'replace' ? 'replaceState' : 'pushState'](null, '', url)
       } catch { /* the page still switches */ }
     }
-    set({ mountainId: id, overviewOpen: false, activeRoute: null, visibleRoutes: [], routesOpen: false, selected: null, hovered: null, progress: 0, mode: 'hero', fly: null, flying: false, paths: null })
+    set({ mountainId: id, home: false, stop: null, pendingStop: null, overviewOpen: false, activeRoute: null, visibleRoutes: [], routesOpen: false, selected: null, hovered: null, progress: 0, mode: 'hero', fly: null, flying: false, paths: null })
   },
   stepMountain: (dir) => {
     const i = mountains.findIndex((m) => m.id === get().mountainId)
@@ -110,7 +122,7 @@ export const useStore = create((set, get) => ({
   },
   /** Pick a route: it becomes the active one and is drawn on the mountain. */
   chooseRoute: (id) =>
-    set((s) => ({ activeRoute: id, visibleRoutes: s.visibleRoutes.includes(id) ? s.visibleRoutes : [...s.visibleRoutes, id], routesOpen: false, selected: null, progress: 0 })),
+    set((s) => ({ activeRoute: id, visibleRoutes: s.visibleRoutes.includes(id) ? s.visibleRoutes : [...s.visibleRoutes, id], routesOpen: false, selected: null, progress: 0, stop: null, pendingStop: null })),
   toggleRoute: (id) =>
     set((s) => ({
       visibleRoutes: s.visibleRoutes.includes(id) ? s.visibleRoutes.filter((r) => r !== id) : [...s.visibleRoutes, id],

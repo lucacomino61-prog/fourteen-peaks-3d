@@ -4,8 +4,9 @@ import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import { mountains } from './src/data/index.js'
-import { SITE_NAME, SITE_DESCRIPTION, mountainPath, mountainTitle, mountainDescription } from './src/lib/meta.js'
+import { siteName, siteDescription, mountainPath, routePath, routeStops, mountainTitle, mountainDescription, routeTitle, routeDescription, stopTitle, stopDescription } from './src/lib/meta.js'
 import { PREPAINT } from './src/lib/settings.js'
+import { LOCALES, withLang } from './src/i18n/lang.js'
 
 const PLACEHOLDER_URL = 'https://fourteen-peaks.example'
 const REPO_URL = 'https://github.com/lucacomino61-prog/fourteen-peaks-3d'
@@ -18,15 +19,20 @@ function lastUpdated() {
     return new Date().toISOString().slice(0, 10)
   }
 }
-const longDate = (iso) => new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
+const longDate = (iso, lang = 'en') => new Date(`${iso}T12:00:00Z`).toLocaleDateString(LOCALES[lang], { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
+// the languages the site is built in (each language's pages live under its prefix: /it/…)
+const LANGS = ['en']
+const OG_LOCALE = { en: 'en_GB', it: 'it_IT' }
+
 /**
- * The pages behind the app: one HTML file per mountain (/k2/ …) with its own title, description,
- * canonical address, link preview and structured data; the sitemap and robots.txt; the policy
- * texts that depend on how the build is set up (analytics, corrections); the last-updated date.
- * SITE_URL (the address the site is served from) makes every link absolute; without it the
- * build uses a placeholder domain and says so.
+ * The pages behind the app: one HTML file per mountain (/k2/), route (/k2/abruzzi/) and stop of a
+ * climb (/k2/abruzzi/camp-4/), each with its own title, description, canonical address, link
+ * preview and structured data; the sitemap and robots.txt; the policy texts that depend on how the
+ * build is set up (analytics, corrections); the last-updated date. SITE_URL (the address the site
+ * is served from) makes every link absolute; without it the build uses a placeholder domain and
+ * says so.
  */
 function sitePages(env) {
   const site = (env.SITE_URL || PLACEHOLDER_URL).replace(/\/+$/, '')
@@ -37,14 +43,17 @@ function sitePages(env) {
   const formHost = (() => { try { return new URL(env.VITE_FORM_ENDPOINT).host } catch { return '' } })()
 
   const image = (name) => `${site}/og/${name}.jpg`
-  const headBlock = ({ url, title, description, img, imgAlt, jsonLd }) => [
+  /** `path` is the page's address without its language; every language's version is named */
+  const headBlock = ({ lang, path: p, title, description, img, imgAlt, jsonLd }) => [
     `<title>${esc(title)}</title>`,
     `<meta name="description" content="${esc(description)}" />`,
-    `<link rel="canonical" href="${url}" />`,
-    `<meta property="og:site_name" content="${esc(SITE_NAME)}" />`,
+    `<link rel="canonical" href="${site}${withLang(p, lang)}" />`,
+    ...(LANGS.length > 1 ? [...LANGS.map((l) => `<link rel="alternate" hreflang="${l}" href="${site}${withLang(p, l)}" />`), `<link rel="alternate" hreflang="x-default" href="${site}${p}" />`] : []),
+    `<meta property="og:site_name" content="${esc(siteName(lang))}" />`,
     '<meta property="og:type" content="website" />',
-    '<meta property="og:locale" content="en_GB" />',
-    `<meta property="og:url" content="${url}" />`,
+    `<meta property="og:locale" content="${OG_LOCALE[lang]}" />`,
+    ...LANGS.filter((l) => l !== lang).map((l) => `<meta property="og:locale:alternate" content="${OG_LOCALE[l]}" />`),
+    `<meta property="og:url" content="${site}${withLang(p, lang)}" />`,
     `<meta property="og:title" content="${esc(title)}" />`,
     `<meta property="og:description" content="${esc(description)}" />`,
     `<meta property="og:image" content="${img}" />`,
@@ -58,31 +67,61 @@ function sitePages(env) {
     `<meta name="twitter:image:alt" content="${esc(imgAlt)}" />`,
     `<script type="application/ld+json">${JSON.stringify(jsonLd).replace(/</g, '\\u003c')}</script>`,
   ].join('\n    ')
-  const website = { '@type': 'WebSite', name: SITE_NAME, url: `${site}/`, inLanguage: 'en' }
-  const homeHead = () => headBlock({
-    url: `${site}/`, title: SITE_NAME, description: SITE_DESCRIPTION, img: image('home'),
-    imgAlt: 'Everest in 3D, its name set large behind the mountain',
+  const website = (lang) => ({ '@type': 'WebSite', name: siteName(lang), url: `${site}${withLang('/', lang)}`, inLanguage: lang })
+  const posterAlt = (name) => `${name} in 3D, its name set large behind the mountain`
+  const homeHead = (lang) => headBlock({
+    lang, path: '/', title: siteName(lang), description: siteDescription(lang), img: image('home'),
+    imgAlt: posterAlt('Everest'),
     jsonLd: {
-      '@context': 'https://schema.org', ...website, description: SITE_DESCRIPTION, dateModified: updated,
-      hasPart: mountains.map((m) => ({ '@type': 'WebPage', name: mountainTitle(m), url: `${site}${mountainPath(m.id)}` })),
+      '@context': 'https://schema.org', ...website(lang), description: siteDescription(lang), dateModified: updated,
+      hasPart: mountains.map((m) => ({ '@type': 'WebPage', name: mountainTitle(m, lang), url: `${site}${mountainPath(m.id, lang)}` })),
     },
   })
-  const mountainHead = (m) => headBlock({
-    url: `${site}${mountainPath(m.id)}`, title: mountainTitle(m), description: mountainDescription(m), img: image(m.id),
-    imgAlt: `${m.peak.name} in 3D, its name set large behind the mountain`,
+  const mountainAbout = (m) => ({
+    '@type': 'Mountain', name: m.peak.name, alternateName: m.peak.aka?.split(' · ').filter(Boolean),
+    geo: { '@type': 'GeoCoordinates', latitude: m.peak.lat, longitude: m.peak.lon, elevation: m.peak.elevation },
+  })
+  const crumbs = (lang, items) => ({
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map(([name, url], i) => ({ '@type': 'ListItem', position: i + 1, name, item: `${site}${url}` })),
+  })
+  const mountainHead = (m, lang) => headBlock({
+    lang, path: mountainPath(m.id, 'en'), title: mountainTitle(m, lang), description: mountainDescription(m, lang), img: image(m.id),
+    imgAlt: posterAlt(m.peak.name),
     jsonLd: {
-      '@context': 'https://schema.org', '@type': 'WebPage', name: mountainTitle(m), url: `${site}${mountainPath(m.id)}`,
-      description: mountainDescription(m), inLanguage: 'en', dateModified: updated, isPartOf: website,
-      about: {
-        '@type': 'Mountain', name: m.peak.name, alternateName: m.peak.aka?.split(' · ').filter(Boolean),
-        geo: { '@type': 'GeoCoordinates', latitude: m.peak.lat, longitude: m.peak.lon, elevation: m.peak.elevation },
+      '@context': 'https://schema.org', '@type': 'WebPage', name: mountainTitle(m, lang), url: `${site}${mountainPath(m.id, lang)}`,
+      description: mountainDescription(m, lang), inLanguage: lang, dateModified: updated, isPartOf: website(lang), about: mountainAbout(m),
+    },
+  })
+  const routeHead = (m, r, lang) => headBlock({
+    lang, path: routePath(m.id, r.id, null, 'en'), title: routeTitle(m, r, lang), description: routeDescription(m, r), img: image(m.id),
+    imgAlt: posterAlt(m.peak.name),
+    jsonLd: {
+      '@context': 'https://schema.org', '@graph': [
+        { '@type': 'WebPage', name: routeTitle(m, r, lang), url: `${site}${routePath(m.id, r.id, null, lang)}`, description: routeDescription(m, r), inLanguage: lang, dateModified: updated, isPartOf: website(lang), about: mountainAbout(m) },
+        crumbs(lang, [[m.peak.name, mountainPath(m.id, lang)], [r.name, routePath(m.id, r.id, null, lang)]]),
+      ],
+    },
+  })
+  const stopHead = (m, r, slug, stop, lang, canonicalRoute) => {
+    const place = stop.kind === 'summit'
+      ? mountainAbout(m)
+      : { '@type': 'Place', name: stop.name, ...(stop.lat != null ? { geo: { '@type': 'GeoCoordinates', latitude: stop.lat, longitude: stop.lon, elevation: stop.alt } } : {}), containedInPlace: mountainAbout(m) }
+    return headBlock({
+      lang, path: routePath(m.id, canonicalRoute.id, slug, 'en'), title: stopTitle(m, r, stop, lang), description: stopDescription(m, r, stop), img: image(m.id),
+      imgAlt: posterAlt(m.peak.name),
+      jsonLd: {
+        '@context': 'https://schema.org', '@graph': [
+          { '@type': 'WebPage', name: stopTitle(m, r, stop, lang), url: `${site}${routePath(m.id, r.id, slug, lang)}`, description: stopDescription(m, r, stop), inLanguage: lang, dateModified: updated, isPartOf: website(lang), about: place },
+          crumbs(lang, [[m.peak.name, mountainPath(m.id, lang)], [r.name, routePath(m.id, r.id, null, lang)], [stop.name, routePath(m.id, r.id, slug, lang)]]),
+        ],
       },
-    },
-  })
-  const pageHead = ({ slug, title, description }) => headBlock({
-    url: `${site}/${slug}/`, title: `${title} · ${SITE_NAME}`, description, img: image('home'),
-    imgAlt: 'Everest in 3D, its name set large behind the mountain',
-    jsonLd: { '@context': 'https://schema.org', '@type': 'WebPage', name: title, url: `${site}/${slug}/`, inLanguage: 'en', dateModified: updated, isPartOf: website },
+    })
+  }
+  const pageHead = ({ slug, title, description }, lang) => headBlock({
+    lang, path: `/${slug}/`, title: `${title} · ${siteName(lang)}`, description, img: image('home'),
+    imgAlt: posterAlt('Everest'),
+    jsonLd: { '@context': 'https://schema.org', '@type': 'WebPage', name: title, url: `${site}${withLang(`/${slug}/`, lang)}`, inLanguage: lang, dateModified: updated, isPartOf: website(lang) },
   })
   const PAGES = {
     privacy: { slug: 'privacy', title: 'Privacy', description: 'What this site keeps and sends: no cookies, no accounts; your settings in your browser, and visit counting only with your agreement.' },
@@ -98,10 +137,34 @@ function sitePages(env) {
     ? `<p>If you use “Suggest a correction”, what you write, the page you were on and, only if you give it, your email address are sent to the form service at <code>${esc(formHost)}</code> and on to the person who runs this site. They are used only to check and fix the site’s information, and to answer you if you asked for an answer.</p>`
     : `<p>“Suggest a correction” opens a new issue in the site’s <a href="${REPO_URL}">public GitHub repository</a> with your text filled in. Nothing is sent until you submit it there, under your own GitHub account, where anyone can read it.</p>`
 
-  const peakLinks = mountains.map((m) => `<li><a href="${mountainPath(m.id)}"><b translate="no">${esc(m.peak.name)}</b> <span class="mono">${m.peak.elevation.toLocaleString('en-GB')} m</span></a></li>`).join('\n          ')
+  const peakLinks = (lang) => mountains.map((m) => `<li><a href="${mountainPath(m.id, lang)}"><b translate="no">${esc(m.peak.name)}</b> <span class="mono">${m.peak.elevation.toLocaleString(LOCALES[lang])} m</span></a></li>`).join('\n          ')
+
+  /**
+   * Every page the app answers to, per language: [path without language, head(lang)].
+   * A hazard on several routes gets a page on each; the first route that lists it is canonical.
+   */
+  const appPages = () => {
+    const out = []
+    for (const m of mountains) {
+      out.push([mountainPath(m.id, 'en'), (lang) => mountainHead(m, lang)])
+      const firstRouteOf = {}
+      for (const r of m.routes) for (const id of r.hazards) firstRouteOf[id] ||= r
+      for (const r of m.routes) {
+        out.push([routePath(m.id, r.id, null, 'en'), (lang) => routeHead(m, r, lang)])
+        for (const [slug, stop] of routeStops(m, r)) {
+          const camp = stop.kind === 'camp' ? r.camps.find((c) => c.slug === slug) : null
+          const hz = stop.kind === 'hazard' ? m.hazards.find((h) => h.id === slug) : null
+          const where = camp || hz ? { lat: (camp || hz).lat, lon: (camp || hz).lon } : {}
+          out.push([routePath(m.id, r.id, slug, 'en'), (lang) => stopHead(m, r, slug, { ...stop, ...where }, lang, hz ? firstRouteOf[slug] : r)])
+        }
+      }
+    }
+    return out
+  }
 
   let warned = false
   let outDir = path.resolve('dist')
+  const withHead = (html, head) => html.replace(/<!-- head:page -->[\s\S]*?<!-- \/head:page -->/, `<!-- head:page -->\n    ${head}\n    <!-- /head:page -->`)
   return {
     name: 'site-pages',
     configResolved(config) { outDir = path.resolve(config.root, config.build.outDir) },
@@ -109,39 +172,45 @@ function sitePages(env) {
       order: 'pre',
       handler(html, ctx) {
         const file = ctx.filename.replace(/\\/g, '/')
+        const lang = 'en'
         let head = ''
         if (file.endsWith('/404.html')) head = ''
-        else if (/\/privacy\/index\.html$/.test(file)) head = pageHead(PAGES.privacy)
-        else if (/\/terms\/index\.html$/.test(file)) head = pageHead(PAGES.terms)
-        else head = homeHead()
+        else if (/\/privacy\/index\.html$/.test(file)) head = pageHead(PAGES.privacy, lang)
+        else if (/\/terms\/index\.html$/.test(file)) head = pageHead(PAGES.terms, lang)
+        else head = homeHead(lang)
         return html
           // the visitor's theme and text size (lib/settings.js) before anything is drawn
           .replace('<meta charset="UTF-8" />', `<meta charset="UTF-8" />\n    <script>${PREPAINT}</script>`)
           .replace(/<!-- head:page -->[\s\S]*?<!-- \/head:page -->/, head ? `<!-- head:page -->\n    ${head}\n    <!-- /head:page -->` : '$&')
-          .replaceAll('%LAST_UPDATED%', longDate(updated))
+          .replaceAll('%LAST_UPDATED%', longDate(updated, lang))
           .replaceAll('%LAST_UPDATED_ISO%', updated)
           .replaceAll('%REPO_URL%', REPO_URL)
           .replace('<!-- policy:analytics -->', analyticsText)
           .replace('<!-- policy:corrections -->', correctionsText)
-          .replace('<!-- list:peaks -->', peakLinks)
+          .replace('<!-- list:peaks -->', peakLinks(lang))
       },
     },
-    // after the build: a copy of the app's page for every mountain, then the sitemap and robots.txt
+    // after the build: a copy of the app's page for every mountain, route and stop, then the
+    // sitemap and robots.txt
     closeBundle() {
       const out = outDir
       const index = path.join(out, 'index.html')
       if (!fs.existsSync(index)) return
       const html = fs.readFileSync(index, 'utf8')
-      for (const m of mountains) {
-        const dir = path.join(out, m.id)
-        fs.mkdirSync(dir, { recursive: true })
-        const page = html.replace(/<!-- head:page -->[\s\S]*?<!-- \/head:page -->/, `<!-- head:page -->\n    ${mountainHead(m)}\n    <!-- /head:page -->`)
-        fs.writeFileSync(path.join(dir, 'index.html'), page)
+      const pages = appPages()
+      const urls = []
+      for (const lang of LANGS) {
+        for (const [p, head] of pages) {
+          const dir = path.join(out, withLang(p, lang))
+          fs.mkdirSync(dir, { recursive: true })
+          fs.writeFileSync(path.join(dir, 'index.html'), withHead(html, head(lang)))
+        }
+        urls.push(withLang('/', lang), ...pages.map(([p]) => withLang(p, lang)), withLang('/privacy/', lang), withLang('/terms/', lang))
       }
-      const urls = ['/', ...mountains.map((m) => mountainPath(m.id)), '/privacy/', '/terms/']
       const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${site}${u}</loc><lastmod>${updated}</lastmod></url>`).join('\n')}\n</urlset>\n`
       fs.writeFileSync(path.join(out, 'sitemap.xml'), sitemap)
       fs.writeFileSync(path.join(out, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${site}/sitemap.xml\n`)
+      console.log(`  site-pages: ${pages.length * LANGS.length} app pages, ${urls.length} addresses in the sitemap`)
       if (!env.SITE_URL && !warned) {
         warned = true
         console.warn(`\n  site-pages: SITE_URL is not set, so canonical links, link previews and the sitemap point at ${PLACEHOLDER_URL}. Build with SITE_URL=https://… before publishing.\n`)

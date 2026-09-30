@@ -6,7 +6,7 @@
 const peak = {
   lat: 35.8134, lon: 76.5654, elevation: 8051, name: 'Broad Peak', aka: 'Broad Peak · Faichan Kangri · K3',
   range: 'Karakoram, Baltoro', countries: 'Pakistan / China',
-  tagline: 'The twelfth highest mountain on Earth: a mile and a half of summit ridge across the glacier from K2, first climbed by four men with no porters, no oxygen and no fixed camps.',
+  tagline: 'The twelfth highest mountain on Earth: a kilometre and a half of summit ridge across the glacier from K2, first climbed by four men with no porters, no oxygen and no fixed camps.',
   summitText: 'The far end of a summit ridge one and a half kilometres long, with K2 filling the sky to the north. Buhl and Diemberger reached it at seven in the evening in 1957; the walk back along the ridge is where the mountain does its killing.',
   summitBlurb: 'Twelfth highest point on Earth, across the Godwin-Austen Glacier from K2. About 800 ascents and 30 deaths; the long summit ridge means a good share of recorded ascents stopped at the fore-summit.',
   figuresLead: 'A mountain climbed cleanly at the first attempt, whose true summit many visitors never reach.',

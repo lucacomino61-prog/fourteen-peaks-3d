@@ -149,6 +149,7 @@ export function RoutesMenu() {
       <h3 className="menu-label mono">Information</h3>
       <ul className="menu-links">
         <li><a href="#explorer" onClick={close}><Compass /> Free explorer <small>orbit, zoom, every route and camp</small></a></li>
+        <li><a href="#explorer" onClick={() => { close(); useStore.setState({ sun: { ...useStore.getState().sun, mode: 'now' } }) }}>Light it now <small>the real sun there, or any hour</small></a></li>
         <li><a href="#figures" onClick={close}>The numbers <small>ascents, deaths, fatality rate</small></a></li>
         <li><a href="#history" onClick={close}>History <small>{peak.historyTitle}</small></a></li>
         <li><button onClick={() => useStore.setState({ routesOpen: false, overviewOpen: true, overviewView: 'grid' })}>All fourteen peaks <small>pick one to open it</small></button></li>

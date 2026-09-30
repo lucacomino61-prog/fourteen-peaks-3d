@@ -96,6 +96,8 @@ const routes = [
       { name: 'Camp 5', alt: 6900, lat: 35.2600, lon: 74.6240, blurb: 'The Moor’s Head, the rock bump on the ridge west of Rakhiot Peak and Buhl’s last camp. He set out from here alone with a rucksack, no rope and two Pervitin tablets.' },
     ],
     hazards: ['rakhiot-peak', 'silver-saddle', 'summit-slopes', 'death-zone'],
+    // the summit push, as the text gives it (Buhl left Camp 5 at 2:30 am and reached the summit at 7 pm, 3 July 1953): lights the climb's last stretch (scene/Terrain.jsx)
+    push: { camp: 'camp-5', leaves: '02:30', arrives: '19:00', date: '1953-07-03' },
   },
   {
     id: 'rupal',
@@ -131,6 +133,8 @@ const routes = [
       { name: 'Camp 5', alt: 7200, lat: 35.2307, lon: 74.5907, blurb: 'At the foot of the Merkl Gully, the 1970 top camp. The brothers left it before dawn on 27 June.' },
     ],
     hazards: ['rupal-face', 'merkl-gully', 'summit-slopes', 'death-zone'],
+    // the summit push, as the text gives it (Camp 5: the brothers left it before dawn on 27 June (1970)): lights the climb's last stretch (scene/Terrain.jsx)
+    push: { camp: 'camp-5', leaves: 'predawn', date: '1970-06-27' },
   },
   {
     id: 'schell',

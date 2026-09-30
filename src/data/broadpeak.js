@@ -197,6 +197,8 @@ const routes = [
       { name: 'Camp 4', alt: 7400, lat: 35.8150, lon: 76.5612, blurb: 'The last camp; the summit push of 5 March started here at 5.15 am.' },
     ],
     hazards: ['spur-slopes', 'the-col', 'summit-ridge', 'death-zone'],
+    // the summit push, as the text gives it (Camp 4: the summit push of 5 March (2013) started at 5.15 am): lights the climb's last stretch (scene/Terrain.jsx)
+    push: { camp: 'camp-4', leaves: '05:15', date: '2013-03-05' },
   },
 ]
 

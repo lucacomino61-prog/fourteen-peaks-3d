@@ -48,6 +48,8 @@ const routes = [
       { name: 'Camp 4', alt: 7750, lat: 27.6972, lon: 88.1416, blurb: 'At the top of the Shelf below the Gangway. Summit pushes leave at 10 pm and return, at best, twenty hours later.' },
     ],
     hazards: ['lower-icefall', 'great-shelf', 'gangway', 'sacred-summit', 'death-zone'],
+    // the summit push, as the text gives it (Camp 4: summit pushes leave at 10 pm): lights the climb's last stretch (scene/Terrain.jsx)
+    push: { camp: 'camp-4', leaves: '22:00' },
   },
   {
     id: 'north',

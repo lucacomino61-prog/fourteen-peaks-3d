@@ -162,6 +162,8 @@ const routes = [
       { name: 'Camp 3', alt: 6900, lat: 35.7465, lon: 76.6585, blurb: 'The last camp; the summit push of 2 February left here at 3 am.' },
     ],
     hazards: ['gasherbrum-icefall', 'upper-slopes', 'summit-pyramid', 'death-zone'],
+    // the summit push, as the text gives it (Camp 3: the summit push of 2 February (2011) left at 3 am): lights the climb's last stretch (scene/Terrain.jsx)
+    push: { camp: 'camp-3', leaves: '03:00', date: '2011-02-02' },
   },
 ]
 

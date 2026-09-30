@@ -3,6 +3,7 @@ import { pad2 } from '../lib/format'
 import { alt, useUnits } from '../lib/units'
 import { SNOW, SIGNAL, hazardColor } from '../lib/palette'
 import { Eye, X, ArrowDown } from './Icons'
+import LightControl from './LightControl'
 
 function Detail() {
   const { routes, hazards, peak } = useMountain()
@@ -123,6 +124,7 @@ export default function Explorer() {
             <button className="toggle" aria-pressed={showContours} onClick={() => set({ showContours: !showContours })}>Contour map<i /></button>
             <button className="toggle" data-tone="signal" aria-pressed={showDeathZone} onClick={() => set({ showDeathZone: !showDeathZone })}>Death Zone, above {alt(8000, units)}<i /></button>
           </div>
+          <LightControl />
         </div>
         <div className="panel-foot">
           <span>Drag to orbit, scroll or pinch to zoom</span>

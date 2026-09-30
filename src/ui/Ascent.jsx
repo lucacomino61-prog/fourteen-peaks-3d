@@ -9,6 +9,7 @@ import { alt as altitude, inUnits, metresText, unitName, useUnits } from '../lib
 import { campSlug, routeEnd, routePath, stopTitle, routeTitle } from '../lib/meta'
 import { airShare, boilingC, toF } from '../lib/air'
 import Profile from './Profile'
+import { prepareClimbLight } from '../lib/climbLight'
 import { share } from '../lib/share'
 import { t } from '../i18n'
 import { Warning, ArrowRight, Link } from './Icons'
@@ -142,6 +143,8 @@ export default function Ascent({ terrain }) {
   const shownAlt = useRef(0) // the altimeter's height in metres, for a change of unit
   const trigger = useRef(null)
   const minAlt = stops[0]?.alt || 5000
+  // a documented summit push lights the climb's last stretch (lib/climbLight.js, scene/Terrain.jsx)
+  const lightAt = useMemo(() => prepareClimbLight(mountain, route, stops), [mountain, route, stops])
 
   useEffect(() => {
     if (!stops.length || !root.current || !path) return
@@ -162,9 +165,11 @@ export default function Ascent({ terrain }) {
         // resting on a stop (a scroll lands on whole pixels, a hair either side), the altimeter
         // reads the stop's documented height exactly
         const alt = Math.abs(seg - at) < 0.01 ? stops[at].alt : Math.round(modelAlt(path, t) + stops[i].gap + (stops[i + 1].gap - stops[i].gap) * f)
-        // the stop on screen goes in the address (lib/address.js); the height to the wind (lib/sound.js)
-        if (at !== shown) { shown = at; useStore.setState({ progress: t, altitude: alt, stop: stops[at].slug }) }
-        else useStore.setState({ progress: t, altitude: alt })
+        // the stop on screen goes in the address (lib/address.js); the height to the wind (lib/sound.js);
+        // the hour of a summit night to the light (scene/Terrain.jsx)
+        const climbLight = lightAt(t)
+        if (at !== shown) { shown = at; useStore.setState({ progress: t, altitude: alt, climbLight, stop: stops[at].slug }) }
+        else useStore.setState({ progress: t, altitude: alt, climbLight })
         setActive(at)
         if (altRef.current) {
           shownAlt.current = alt
@@ -180,7 +185,7 @@ export default function Ascent({ terrain }) {
     trigger.current = st
     ScrollTrigger.refresh()
     return () => { st.kill(); if (trigger.current === st) trigger.current = null }
-  }, [stops, path, motion])
+  }, [stops, path, motion, lightAt])
 
   /**
    * The profile asks for a place in the climb: a stop (by index or key) or a point between stops

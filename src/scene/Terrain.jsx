@@ -9,6 +9,9 @@ import { NIGHT, SNOW, SIGNAL } from '../lib/palette'
 import { onTerrainEvicted } from '../lib/terrain'
 import { loadPixels } from '../lib/pixels'
 import { markBusy } from '../lib/busy'
+import { light, DEFAULT_SUN_DIR, DEFAULT_SUN_COLOR } from '../lib/light'
+import { sunAt, sunVector, sunLight, momentAt, nowAt } from '../lib/sun'
+import { createSunShadow } from './sunShadow'
 
 // the site's two colours and its signal, as display values for the contour map
 const srgb = (hex) => { const c = parseInt(hex.slice(1), 16); return new THREE.Vector3(((c >> 16) & 255) / 255, ((c >> 8) & 255) / 255, (c & 255) / 255) }
@@ -202,8 +205,13 @@ vec3 getNormal(float bump, float dist) {
   return normalize(vec3(-dhdx, 1.0, dhdn));
 }
 
-// Sun shadow and ambient occlusion are baked per mountain (scripts/bake-light.mjs)
+// Sun shadow and ambient occlusion are baked per mountain (scripts/bake-light.mjs), for the usual
+// fixed sun; for any other hour the shadows come from the GPU pass (scene/sunShadow.js), blended
+// in by uUseRT. uNightColor is the night's cool fill (moon and sky glow), zero by day.
 uniform sampler2D uLight;
+uniform sampler2D uShadowMap;
+uniform float uUseRT;
+uniform vec3  uNightColor;
 
 void main() {
   float camDist = distance(vWorldPos, uCamPos);
@@ -214,7 +222,7 @@ void main() {
   vec3 n = getNormal(bump, camDist);
   float ndl = max(dot(n, uSunDir), 0.0);
   vec2 light = texture2D(uLight, vUv).rg;
-  float shadow = light.r;
+  float shadow = uUseRT > 0.001 ? mix(light.r, texture2D(uShadowMap, vUv).r, uUseRT) : light.r;
   float ao = light.g;
 
   float hemi = n.y * 0.5 + 0.5;
@@ -223,6 +231,8 @@ void main() {
   ambient *= 1.0 + snowiness * 0.35;
 
   vec3 col = albedo * (uSunColor * ndl * shadow + ambient);
+  // the night's fill: no shadows, from high in the south-east
+  col += albedo * uNightColor * (0.35 + 0.65 * max(dot(n, vec3(0.34, 0.83, 0.44)), 0.0)) * (0.5 + 0.5 * ao);
 
   vec3 v = normalize(uCamPos - vWorldPos);
   vec3 hv = normalize(uSunDir + v);
@@ -258,7 +268,9 @@ void main() {
 }
 `
 
-const SUN_DIR = new THREE.Vector3(-0.62, 0.26, 0.6).normalize()
+// the ambient from above under the usual light, and the night's cool fill at full night
+const DEFAULT_SKY = new THREE.Color('#4a63a0').multiplyScalar(0.5)
+const NIGHT_FILL = new THREE.Color('#7890c8').multiplyScalar(0.16)
 
 // texture sets per tier (WebP). First paint always uses the 1K albedo, then the rest streams in.
 // The summit patch has one vertex per texel of the 2048² heightmap (512 across its 7.9 km, 15.5 m
@@ -484,7 +496,8 @@ if (typeof window !== 'undefined') window.__k2perf = perfSummary
 export default function Terrain({ terrain, quality = 'high' }) {
   const tier = TIERS[quality] || TIERS.high
   const { gl, camera, scene } = useThree()
-  const { peak } = useMountain()
+  const mountain = useMountain()
+  const { peak } = mountain
   const hasDetail = !!terrain.detail && !!tier.detail
   const hasDetail2 = !!terrain.detail2 && !!tier.detail2
   const floatLinear = useMemo(() => gl.extensions.has('OES_texture_float_linear'), [gl])
@@ -512,6 +525,9 @@ export default function Terrain({ terrain, quality = 'high' }) {
     white.needsUpdate = true
     return {
       uLight: { value: white },
+      uShadowMap: { value: white },
+      uUseRT: { value: 0 },
+      uNightColor: { value: new THREE.Color(0, 0, 0) },
       uHeight: { value: heightTexture },
       uAlbedo: { value: first },
       uDetail: { value: first },
@@ -524,9 +540,9 @@ export default function Terrain({ terrain, quality = 'high' }) {
       uTexel: { value: new THREE.Vector2(1 / geo.W, 1 / geo.H) },
       uSpacing: { value: new THREE.Vector2(geo.sizeX / geo.W, geo.sizeZ / geo.H) },
       uSize: { value: new THREE.Vector2(geo.sizeX, geo.sizeZ) },
-      uSunDir: { value: SUN_DIR.clone() },
-      uSunColor: { value: new THREE.Color('#ffc99a').multiplyScalar(2.4) },
-      uSkyColor: { value: new THREE.Color('#4a63a0').multiplyScalar(0.5) },
+      uSunDir: { value: DEFAULT_SUN_DIR.clone() },
+      uSunColor: { value: DEFAULT_SUN_COLOR.clone() },
+      uSkyColor: { value: DEFAULT_SKY.clone() },
       uGroundColor: { value: new THREE.Color('#0a0d18').multiplyScalar(0.4) },
       uFogColor: { value: new THREE.Color('#0f1626') },
       uFogDensity: { value: 0.07 },
@@ -669,10 +685,78 @@ export default function Terrain({ terrain, quality = 'high' }) {
 
   const ndc = useMemo(() => new THREE.Vector2(), [])
   const ray = useMemo(() => new THREE.Raycaster(), [])
+
+  // ---- the light: the usual late sun, or any hour (the explorer's Light, a climb's summit night) ----
+  // The target comes from the store; the sun eases towards it, so a jump from dawn to dusk sweeps
+  // across the sky in about half a second (at once with animations stopped). Other hours than the
+  // usual one get their shadows from the GPU pass, made the first time it is needed.
+  const pass = useRef(null)
+  useEffect(() => () => { pass.current?.dispose(); pass.current = null }, [gl])
+  const sun = useMemo(() => ({
+    dir: DEFAULT_SUN_DIR.clone(), color: DEFAULT_SUN_COLOR.clone(), sky: DEFAULT_SKY.clone(), night: 0, rt: 0,
+    wantDir: new THREE.Vector3(), wantColor: new THREE.Color(), wantSky: new THREE.Color(), hour: { color: new THREE.Color(), sky: new THREE.Color(), night: 0 }, hourDir: new THREE.Vector3(),
+    shadowDir: new THREE.Vector3(), shadowOf: null, shadowQuick: false, movedAt: 0, size: new THREE.Vector2(),
+  }), [])
+  const lightTarget = (s) => {
+    if (s.mode === 'ascent' && s.climbLight) return s.climbLight
+    if (s.sun.mode === 'now') { const n = nowAt(mountain); return { ymd: n.ymd, minutes: n.minutes, blend: 1 } }
+    if (s.sun.mode === 'time') return { ymd: nowAt(mountain).ymd, minutes: s.sun.minutes, blend: 1 }
+    return null
+  }
+  const updateLight = (s, dt, still) => {
+    const L = sun
+    const target = lightTarget(s)
+    let b = 0
+    if (target) {
+      const { az, el } = sunAt(momentAt(mountain, target.ymd, target.minutes), peak.lat, peak.lon)
+      sunVector(az, el, L.hourDir)
+      sunLight(el, L.hour)
+      b = target.blend
+    }
+    L.wantDir.copy(DEFAULT_SUN_DIR).lerp(L.hourDir, b).normalize()
+    L.wantColor.copy(DEFAULT_SUN_COLOR).lerp(L.hour.color, b)
+    L.wantSky.copy(DEFAULT_SKY).lerp(L.hour.sky, b)
+    const k = still ? 1 : 1 - Math.exp(-Math.min(dt, 0.1) * 5)
+    const moving = L.dir.angleTo(L.wantDir) > 0.0015
+    L.dir.lerp(L.wantDir, k).normalize()
+    L.color.lerp(L.wantColor, k)
+    L.sky.lerp(L.wantSky, k)
+    L.night += (L.hour.night * b - L.night) * k
+    L.rt += (b - L.rt) * k
+    if (!target && L.rt < 0.002) L.rt = 0
+    // the shadows for this sun: again only when it has moved, quickly while it moves, in full once
+    // it rests (a quarter of a second)
+    const now = performance.now()
+    if (moving) L.movedAt = now
+    // (not while the heightmap is still going up to the GPU: its rows would read as zero)
+    if (L.rt > 0.001 && L.dir.y > 0.003 && s.terrainReady) {
+      if (!pass.current) pass.current = createSunShadow(gl, { manualBilinear: !floatLinear, size: quality === 'low' ? 512 : 1024 })
+      const settled = now - L.movedAt > 250
+      const height = uniforms.uHeight.value
+      if (L.shadowDir.angleTo(L.dir) > 0.0015 || L.shadowOf !== height || (settled && L.shadowQuick)) {
+        L.size.set(geo.sizeX, geo.sizeZ)
+        uniforms.uShadowMap.value = pass.current.render(height, uniforms.uTexel.value, L.size, L.dir, !settled)
+        L.shadowDir.copy(L.dir)
+        L.shadowOf = height
+        L.shadowQuick = !settled
+      }
+    }
+    uniforms.uSunDir.value.copy(L.dir)
+    uniforms.uSunColor.value.copy(L.color)
+    uniforms.uSkyColor.value.copy(L.sky)
+    uniforms.uNightColor.value.copy(NIGHT_FILL).multiplyScalar(L.night)
+    uniforms.uUseRT.value = L.rt
+    // shared with what else the sun lights (the plume)
+    light.dir.copy(L.dir)
+    light.color.copy(L.color)
+    light.night = L.night
+  }
+
   useFrame(({ camera, clock, size }, dt) => {
     uploader.step() // the next band of whichever texture is on its way to the GPU
     const s = useStore.getState()
     const still = s.motion === 'off'
+    updateLight(s, dt, still)
     uniforms.uCamPos.value.copy(camera.position)
     if (!still) uniforms.uTime.value = clock.elapsedTime // the Death Zone edge stops pulsing
     const ease = still ? 1 : Math.min(1, dt * 4)

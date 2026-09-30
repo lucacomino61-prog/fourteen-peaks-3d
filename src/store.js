@@ -78,6 +78,10 @@ export const useStore = create((set, get) => ({
   progress: 0, // 0..1 along the ascent
   altitude: null, // metres, the altimeter's reading on the climb (ui/Ascent.jsx; the wind follows it)
   weather: null, // the summit forecast once loaded (lib/weather.js)
+  // the explorer's Light: 'usual' (the site's baked late sun), 'time' (minutes on the mountain's
+  // clock, today) or 'now' (the real sun there, this minute); scene/Terrain.jsx lights it
+  sun: { mode: 'usual', minutes: 720 },
+  climbLight: null, // the light of a summit night on the climb ({ ymd, minutes, blend }: lib/climbLight.js)
   mountainId: INITIAL.id,
   home: PLACE.home, // the visit started on the home page and hasn't switched mountains (lib/address.js)
   stop: null, // the slug of the climb's stop on screen (ui/Ascent.jsx), for the address
@@ -116,7 +120,7 @@ export const useStore = create((set, get) => ({
         if (location.pathname !== url) history[how === 'replace' ? 'replaceState' : 'pushState'](null, '', url)
       } catch { /* the page still switches */ }
     }
-    set({ mountainId: id, home: false, stop: null, pendingStop: null, weather: null, overviewOpen: false, activeRoute: null, visibleRoutes: [], routesOpen: false, selected: null, hovered: null, progress: 0, mode: 'hero', fly: null, flying: false, paths: null })
+    set({ mountainId: id, home: false, stop: null, pendingStop: null, weather: null, climbLight: null, overviewOpen: false, activeRoute: null, visibleRoutes: [], routesOpen: false, selected: null, hovered: null, progress: 0, mode: 'hero', fly: null, flying: false, paths: null })
   },
   stepMountain: (dir) => {
     const i = mountains.findIndex((m) => m.id === get().mountainId)

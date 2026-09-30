@@ -53,6 +53,8 @@ const routes = [
       { name: 'Camp 4', alt: 7950, lat: 27.9725, lon: 86.9305, blurb: 'The South Col: a windswept saddle of rock in the Death Zone. Summit pushes leave around 9 pm for a 10 to 14 hour climb.' },
     ],
     hazards: ['khumbu-icefall', 'western-cwm', 'lhotse-face', 'south-col', 'balcony', 'hillary-step', 'death-zone'],
+    // the summit push, as the text gives it (Camp 4: leave around 9 pm for a 10 to 14 hour climb (arrives: the middle of that)): lights the climb's last stretch (scene/Terrain.jsx)
+    push: { camp: 'camp-4', leaves: '21:00', arrives: '09:00' },
   },
   {
     id: 'northcol',
@@ -88,6 +90,8 @@ const routes = [
       { name: 'Camp 3', alt: 8300, lat: 27.9990, lon: 86.9322, blurb: 'The highest camp in regular use on the mountain, on sloping ledges below the ridge crest. Summit night starts here at around 11 pm.' },
     ],
     hazards: ['north-col-slope', 'northeast-ridge', 'second-step', 'death-zone'],
+    // the summit push, as the text gives it (Camp 3: summit night starts at around 11 pm): lights the climb's last stretch (scene/Terrain.jsx)
+    push: { camp: 'camp-3', leaves: '23:00' },
   },
   {
     id: 'westridge',

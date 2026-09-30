@@ -54,6 +54,8 @@ const routes = [
       { name: 'Camp 4', alt: 7900, lat: 35.8755, lon: 76.5186, blurb: 'On the Shoulder, a broad snow plateau in the Death Zone. Summit pushes leave from here around midnight.' },
     ],
     hazards: ['rockfall-lower', 'houses-chimney', 'black-pyramid', 'shoulder', 'bottleneck', 'serac-traverse', 'death-zone'],
+    // the summit push, as the text gives it (Camp 4: summit pushes leave around midnight (the summit text: most arrive in the afternoon)): lights the climb's last stretch (scene/Terrain.jsx)
+    push: { camp: 'camp-4', leaves: '00:00' },
   },
   {
     id: 'cesen',

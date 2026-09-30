@@ -53,6 +53,8 @@ const routes = [
       { name: 'Camp 4', alt: 7800, lat: 27.9667, lon: 86.9276, blurb: 'A few tents on ledges below the couloir; most summit pushes leave from here around midnight.' },
     ],
     hazards: ['khumbu-icefall', 'lhotse-face', 'reiss-couloir', 'summit-ridge', 'death-zone'],
+    // the summit push, as the text gives it (Camp 4: most summit pushes leave around midnight): lights the climb's last stretch (scene/Terrain.jsx)
+    push: { camp: 'camp-4', leaves: '00:00' },
   },
   {
     id: 'southface',

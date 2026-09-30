@@ -67,6 +67,8 @@ const routes = [
       { name: 'Camp 4', alt: 7800, lat: 27.8974, lon: 87.0842, blurb: 'On the ridge below the French Couloir. Summit pushes leave at midnight for a 10 to 12 hour climb.' },
     ],
     hazards: ['barun-approach', 'makalu-la', 'nw-ridge', 'french-couloir', 'death-zone'],
+    // the summit push, as the text gives it (Camp 4: leave at midnight for a 10 to 12 hour climb (arrives: the middle of that)): lights the climb's last stretch (scene/Terrain.jsx)
+    push: { camp: 'camp-4', leaves: '00:00', arrives: '11:00' },
   },
   {
     id: 'westpillar',

@@ -147,7 +147,8 @@ export function RoutesMenu() {
         <li><a href="#explorer" onClick={close}><Compass /> Free explorer <small>orbit, zoom, every route and camp</small></a></li>
         <li><a href="#figures" onClick={close}>The numbers <small>ascents, deaths, fatality rate</small></a></li>
         <li><a href="#history" onClick={close}>History <small>{peak.historyTitle}</small></a></li>
-        <li><button onClick={() => useStore.setState({ routesOpen: false, overviewOpen: true })}>All fourteen peaks <small>grid or list</small></button></li>
+        <li><button onClick={() => useStore.setState({ routesOpen: false, overviewOpen: true, overviewView: 'grid' })}>All fourteen peaks <small>pick one to open it</small></button></li>
+        <li><button onClick={() => useStore.setState({ routesOpen: false, overviewOpen: true, overviewView: 'lineup' })}>Compare the fourteen <small>side by side at one scale, and a table</small></button></li>
         <li><button onClick={() => useStore.setState({ routesOpen: false, searchOpen: true })}><SearchIcon /> Search <small>peaks, routes, camps, hazards, years</small></button></li>
         <li><button onClick={() => { close(); shareMountain(mountain) }}><ShareIcon /> {canShare ? `Share ${peak.name}` : `Copy the link to ${peak.name}`} <small>send its page</small></button></li>
         <li><button onClick={() => useStore.setState({ routesOpen: false, correctionOpen: true })}>Suggest a correction <small>a wrong altitude, date or line</small></button></li>

@@ -471,13 +471,76 @@ section { position: relative; }
 .peak-card .alt { font-size: 0.75rem; color: rgb(236 235 230 / 0.74); }
 .peak-card .line { font-size: 0.75rem; color: rgb(236 235 230 / 0.6); margin-top: 4px; }
 @media (hover: hover) and (pointer: fine) { .peak-card:hover { transform: translateY(-2px); border-color: var(--line-strong); } }
-.peak-list { border-top: 1px solid var(--line-strong); }
-.peak-list-head, .peak-row { display: grid; grid-template-columns: 3rem minmax(10rem, 2fr) 7rem minmax(8rem, 1.6fr) 6rem 4rem 4rem; gap: 12px; align-items: baseline; }
-.peak-list-head { padding: 10px 12px; font-size: 0.6875rem; color: var(--snow-3); text-transform: uppercase; letter-spacing: 0.06em; }
-.peak-row { width: 100%; min-height: 52px; padding: 12px; text-align: left; border-top: 1px solid var(--line); font-size: 0.875rem; color: var(--snow-2); transition: background-color 140ms ease; }
-.peak-row b { font-family: var(--font-display); font-weight: 700; font-size: var(--step-1); color: var(--snow); text-transform: uppercase; letter-spacing: -0.02em; }
-.peak-row.is-current { box-shadow: inset 2px 0 0 var(--signal); background: rgb(var(--snow-rgb) / 0.05); }
-@media (hover: hover) and (pointer: fine) { .peak-row:hover { background: rgb(var(--snow-rgb) / 0.06); } }
+/* the comparison table (Overview, "Table"): sorts by any column, the name column stays in view */
+.cmp-scroll { overflow-x: auto; overscroll-behavior-x: contain; border-top: 1px solid var(--line-strong); }
+.cmp-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.cmp-table th, .cmp-table td { height: 52px; padding: 0 14px; text-align: left; white-space: nowrap; color: var(--snow-2); border-bottom: 1px solid var(--line); font-weight: 400; }
+.cmp-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.cmp-table thead th { height: auto; padding: 0; border-bottom-color: var(--line-strong); }
+.cmp-table thead button {
+  display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 0 14px;
+  font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--snow-3);
+  transition: color 140ms ease;
+}
+.cmp-table thead .num button { flex-direction: row-reverse; }
+.cmp-table th[aria-sort='ascending'] button, .cmp-table th[aria-sort='descending'] button { color: var(--snow); }
+.cmp-table .sort { width: 0; height: 0; border-inline: 4px solid transparent; border-top: 5px solid currentColor; opacity: 0.3; transition: transform 160ms var(--ease-out), opacity 140ms ease; }
+.cmp-table .sort[data-dir='1'] { opacity: 1; transform: rotate(180deg); }
+.cmp-table .sort[data-dir='-1'] { opacity: 1; }
+.cmp-table tbody th { position: sticky; left: 0; z-index: 1; background: var(--night); }
+.cmp-table thead th:nth-child(2) { position: sticky; left: 0; z-index: 2; background: var(--night); }
+.cmp-table tbody th a { display: inline-flex; align-items: center; min-height: 44px; font-family: var(--font-display); font-weight: 700; font-size: var(--step-1); letter-spacing: -0.02em; text-transform: uppercase; color: var(--snow); }
+.cmp-table sup { margin-left: 2px; color: var(--snow-3); }
+.cmp-table tr.is-current td:first-child { box-shadow: inset 2px 0 0 var(--signal); }
+.cmp-table tr.is-current td, .cmp-table tr.is-current th { background-color: rgb(var(--snow-rgb) / 0.05); }
+.cmp-table tr.is-current th { background-image: linear-gradient(rgb(var(--snow-rgb) / 0.05), rgb(var(--snow-rgb) / 0.05)); background-color: var(--night); }
+@media (hover: hover) and (pointer: fine) {
+  .cmp-table thead button:hover { color: var(--snow); }
+  .cmp-table tbody th a:hover { color: var(--ink-strong); }
+}
+.cmp-notes { max-width: 70ch; margin-top: var(--space-s); font-size: 0.8125rem; color: var(--snow-3); }
+
+/* the fourteen side by side (Overview, "Side by side"; ui/Lineup.jsx): one scale, the mountain on
+   screen in the signal, names in two staggered rows; wider than a phone, so it scrolls sideways */
+.lineup { margin: 0; }
+.lineup-scroll { overflow-x: auto; overscroll-behavior-x: contain; padding-bottom: 6px; }
+.lineup-chart { --h: clamp(14rem, 36vh, 24rem); position: relative; min-width: 54rem; padding: 14px 0 0 4.4rem; }
+.lineup-chart svg { display: block; width: 100%; height: var(--h); overflow: visible; }
+.ln-grid { stroke: var(--line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.ln-dz { stroke: var(--signal-ink); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.ln-fill { fill: rgb(var(--snow-rgb) / 0.1); transition: fill 160ms ease; }
+.ln-line { fill: none; stroke: var(--snow-2); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; transition: stroke 160ms ease; }
+.ln-peak.is-hover .ln-fill { fill: rgb(var(--snow-rgb) / 0.2); }
+.ln-peak.is-hover .ln-line { stroke: var(--snow); }
+.ln-peak.is-current .ln-fill { fill: rgb(255 91 46 / 0.16); }
+.ln-peak.is-current .ln-line { stroke: var(--signal-ink); stroke-width: 2; }
+.ln-y { position: absolute; left: 0; top: 14px; width: 4rem; height: var(--h); pointer-events: none; }
+.ln-y span { position: absolute; right: 10px; transform: translateY(-50%); font-size: 0.6875rem; color: var(--snow-3); white-space: nowrap; }
+.ln-names { --low: 4.4rem; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); }
+.ln-names li { position: relative; display: flex; justify-content: center; align-items: flex-start; padding-top: 10px; }
+.ln-names li.is-low { padding-top: var(--low); }
+/* the names at the ends keep inside the chart */
+.ln-names li:first-child { justify-content: flex-start; }
+.ln-names li:last-child { justify-content: flex-end; }
+.ln-names li:first-child a { justify-items: start; text-align: left; }
+.ln-names li:last-child a { justify-items: end; text-align: right; }
+/* a hairline from the slot down to its name */
+.ln-names li::before { content: ''; position: absolute; top: 0; left: 50%; width: 1px; height: 8px; background: var(--line-strong); }
+.ln-names li.is-low::before { height: calc(var(--low) - 2px); }
+.swipe-hint { display: none; margin-bottom: 10px; font-size: 0.6875rem; color: var(--snow-3); }
+@media (max-width: 760px) {
+  .swipe-hint { display: block; }
+  .lineup-chart { min-width: 64rem; }
+  .ln-names a b { font-size: 0.75rem; }
+}
+/* a name wider than its slot stays whole (no shrinking): centred over the slot, or held in at the ends */
+.ln-names a { position: relative; flex: none; display: grid; justify-items: center; gap: 1px; min-width: 44px; padding: 2px 4px; text-align: center; white-space: nowrap; color: var(--snow-2); transition: color 140ms ease; }
+.ln-names a b { font-family: var(--font-display); font-weight: 700; font-size: 0.8125rem; letter-spacing: -0.01em; text-transform: uppercase; color: var(--snow); }
+.ln-names a .mono { font-size: 0.6875rem; color: var(--snow-3); }
+/* the one on screen: a signal bar under its name (the name keeps its ink) */
+.ln-names a.is-current::after { content: ''; width: 18px; height: 2px; margin-top: 3px; border-radius: 1px; background: var(--signal-ink); }
+@media (hover: hover) and (pointer: fine) { .ln-names a:hover b { color: var(--ink-strong); } }
+.lineup figcaption { max-width: 70ch; margin-top: var(--space-s); font-size: 0.8125rem; color: var(--snow-3); }
 
 /* ---------- phones ---------- */
 @media (max-width: 760px) {
@@ -525,9 +588,8 @@ section { position: relative; }
   .peak-card .meta { padding: 28px 10px 10px; }
   .peak-card b { font-size: 0.9375rem; }
   .peak-card .line { display: none; }
-  .peak-list-head { display: none; }
-  .peak-row { grid-template-columns: 2.2rem 1fr auto; row-gap: 2px; }
-  .peak-row > :nth-child(n + 4) { display: none; }
+  .cmp-table th, .cmp-table td { padding: 0 10px; }
+  .cmp-table thead button { padding: 0 10px; }
 }
 
 /* ---------- platforms: iOS, Android, desktop ---------- */

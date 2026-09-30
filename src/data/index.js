@@ -19,9 +19,13 @@ export const mountains = [k2, everest, annapurna, kangchenjunga, lhotse, makalu,
   .sort((a, b) => b.peak.elevation - a.peak.elevation)
 export const byId = Object.fromEntries(mountains.map((m) => [m.id, m]))
 
-// A camp's address slug comes from its English name (/k2/abruzzi/camp-4/), fixed here before any
-// translation renames it, so a link works in every language.
-for (const m of mountains) for (const r of m.routes) for (const c of r.camps) c.slug = slugify(c.name)
+// A camp's address slug comes from its English name (/k2/abruzzi/camp-4/), and a figure's key from
+// its English label (lib/compare.js finds them by it), both fixed here before any translation
+// renames them, so links and the comparison work in every language.
+for (const m of mountains) {
+  for (const r of m.routes) for (const c of r.camps) c.slug = slugify(c.name)
+  for (const s of m.stats) s.key = s.label
+}
 
 // rank among the fourteen by height
 ;[...mountains].sort((a, b) => b.peak.elevation - a.peak.elevation).forEach((m, i) => { m.rank = i + 1 })

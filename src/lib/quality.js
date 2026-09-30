@@ -1,6 +1,9 @@
 // The quality tier and multisampling, decided once per visit before anything is loaded: the scene
 // picks its mesh density, textures and antialiasing from them (scene/Scene.jsx, scene/Terrain.jsx),
-// and the loader its heightmap (lib/terrain.js).
+// and the loader its heightmap (lib/terrain.js). The battery saver in the settings asks for the
+// light tier whatever the GPU.
+import { useStore } from '../store'
+
 let decided = null
 
 function decide() {
@@ -24,10 +27,13 @@ function decide() {
   return decided
 }
 
-function tierFor(renderer) {
-  // ?quality=low|medium|high forces a tier (to tell a GPU that is too slow from anything else)
+/** ?quality=low|medium|high forces a tier (to tell a GPU that is too slow from anything else). */
+function forcedTier() {
   const forced = new URLSearchParams(location.search).get('quality')
-  if (forced === 'low' || forced === 'medium' || forced === 'high') return forced
+  return forced === 'low' || forced === 'medium' || forced === 'high' ? forced : null
+}
+
+function tierFor(renderer) {
   const narrow = window.innerWidth < 800
   const weak = (navigator.hardwareConcurrency || 8) <= 2 || (navigator.deviceMemory || 8) <= 2
   if (narrow || weak) return 'low'
@@ -37,6 +43,6 @@ function tierFor(renderer) {
 }
 
 /** 'high' | 'medium' | 'low' */
-export const quality = () => decide().tier
+export const quality = () => forcedTier() || (useStore.getState().settings.saver ? 'low' : decide().tier)
 /** Whether the 3D canvas asks for 4× multisampling. */
 export const multisample = () => decide().msaa

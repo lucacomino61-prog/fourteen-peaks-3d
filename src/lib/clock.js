@@ -24,8 +24,9 @@ const FULL_MS = 1000 / 60, CALM_MS = 1000 / 30, STILL_MS = 1000 / 15
 const CALM_AFTER_MS = 1500
 let lastInput = 0, owed = 0, lastTick = 0, calm = false
 const wake = () => { lastInput = performance.now() }
-/** True while the 3D is drawn at the calm rate (Resolution.jsx ignores those frames' timing). */
-export const isCalm = () => calm
+/** True while the 3D is drawn at a reduced rate: at rest, or with the battery saver on
+ *  (Resolution.jsx ignores those frames' timing). */
+export const isCalm = () => calm || useStore.getState().settings.saver
 
 /** Smooth wheel scrolling only while motion is on (Stop animations and reduced motion get native scroll). */
 function syncLenis(motion) {
@@ -51,15 +52,19 @@ export function startClock() {
   gsap.ticker.add((time) => {
     if (lenis) lenis.raf(time * 1000)
     // the reading sections and the overview cover the stage: don't draw what nobody sees
-    // (battery on phones and laptops); the last frame stays up, dimmed
+    // (battery on phones and laptops); the last frame stays up, dimmed. Except while a mountain is
+    // still loading: its heightmap and textures go to the GPU a band per frame, and a reload that
+    // lands in the reading sections (the browser restores the scroll) left the loader up for good.
     const s = useStore.getState()
-    if (s.mode === 'idle' || s.overviewOpen || s.searchOpen || s.correctionOpen) return
+    if ((s.mode === 'idle' || s.overviewOpen || s.searchOpen || s.correctionOpen) && s.terrainReady) return
     const now = time * 1000
     const dt = lastTick ? Math.min(now - lastTick, 100) : FULL_MS
     lastTick = now
     // the hero turns by itself: always the full rate there, as while flying or loading
     calm = s.mode !== 'hero' && !s.flying && !s.loupeHold && performance.now() - lastInput > CALM_AFTER_MS && !isBusy()
-    const every = calm ? (s.motion === 'off' ? STILL_MS : CALM_MS) : FULL_MS
+    // the battery saver (settings) halves both rates
+    const saver = s.settings.saver ? 2 : 1
+    const every = (calm ? (s.motion === 'off' ? STILL_MS : CALM_MS) : FULL_MS) * saver
     owed += dt
     if (owed < every - 1.5) return // 1.5 ms of slack: a 60 Hz tick that comes a little early still draws
     owed = Math.min(owed - every, every)

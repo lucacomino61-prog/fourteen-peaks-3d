@@ -4,7 +4,7 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useStore, useMountain } from '../store'
 import { SNOW, routeColor } from '../lib/palette'
-import { fmt } from '../lib/format'
+import { alt as altitude, useUnits } from '../lib/units'
 
 function Marker({ terrain, pos, label, alt, color, id, routeId, kind = 'camp', big = false, dim = false }) {
   const ref = useRef()
@@ -12,6 +12,7 @@ function Marker({ terrain, pos, label, alt, color, id, routeId, kind = 'camp', b
   const selected = useStore((s) => s.selected)
   const set = useStore((s) => s.set)
   const isSel = selected?.id === id
+  const units = useUnits()
   const tick = useRef(0)
 
   useFrame(({ camera, clock }, dt) => {
@@ -55,7 +56,7 @@ function Marker({ terrain, pos, label, alt, color, id, routeId, kind = 'camp', b
           <span className="mk-dot" />
           <span className="mk-label">
             <b>{label}</b>
-            <i>{fmt(alt)}&nbsp;m</i>
+            <i>{altitude(alt, units)}</i>
           </span>
         </button>
       </Html>

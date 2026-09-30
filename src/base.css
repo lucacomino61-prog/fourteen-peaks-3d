@@ -1,17 +1,32 @@
 /* Tokens and base styles, shared by the app (index.css) and the plain pages (privacy, terms, 404). */
 
 /* ---------- tokens ---------- */
+/* The two colours as channels: --night is the ground, --snow the ink. The day theme (the settings,
+   lib/settings.js) swaps them, so every surface, text and tint built from them turns with it. What
+   is drawn on the terrain itself (map labels, the contour loupe's paper) keeps fixed colours: the
+   mountain looks the same in both themes. */
 :root {
-  --night: #0b0d12;
-  --snow: #ecebe6;
+  --night-rgb: 11 13 18;
+  --snow-rgb: 236 235 230;
+  --night: rgb(var(--night-rgb));
+  --snow: rgb(var(--snow-rgb));
   --signal: #ff5b2e;
-  --snow-2: rgb(236 235 230 / 0.74); /* secondary text on night: 9.8:1 */
-  --snow-3: rgb(236 235 230 / 0.58); /* labels: 6:1 */
-  --line: rgb(236 235 230 / 0.14);
-  --line-strong: rgb(236 235 230 / 0.3);
-  --panel: rgb(11 13 18 / 0.94);
-  --glass: rgb(11 13 18 / 0.72);
+  --signal-ink: #ff5b2e; /* the signal as text (darker in the day theme, for contrast) */
+  --ink-strong: #fff; /* hovered text and solid buttons */
+  --error-ink: #ffb49c;
+  --snow-2: rgb(var(--snow-rgb) / 0.74); /* secondary text on night: 9.8:1 */
+  --snow-3: rgb(var(--snow-rgb) / 0.58); /* labels: 6:1 */
+  --line: rgb(var(--snow-rgb) / 0.14);
+  --line-strong: rgb(var(--snow-rgb) / 0.3);
+  --panel: rgb(var(--night-rgb) / 0.94);
+  --glass: rgb(var(--night-rgb) / 0.72);
   --halo: 0 1px 2px rgb(0 0 0 / 0.9), 0 0 14px rgb(0 0 0 / 0.75); /* small type over snow and rock */
+  --halo-map: 0 1px 2px rgb(0 0 0 / 0.9), 0 0 14px rgb(0 0 0 / 0.75); /* the map's labels, both themes */
+  --sky-1: #161d2e; --sky-2: #0b1020; --sky-3: #06080d; /* behind the mountain: horizon to zenith */
+  --vignette: rgb(3 5 10 / 0.75);
+  --backdrop: rgb(3 5 10 / 0.72);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  --text-scale: 1; /* the text-size setting: every size is in rem */
 
   /* self-hosted variable fonts (@fontsource-variable, imported in main.jsx) */
   --font-display: 'Bricolage Grotesque Variable', 'Archivo Variable', system-ui, sans-serif;
@@ -42,11 +57,27 @@
   --radius: 4px;
   color-scheme: dark;
 }
+/* Day: night ink on snow, a pale sky behind the mountain. Secondary text keeps AA contrast
+   (74% ink: 7.8:1, 62%: 5.1:1) and the signal gets a darker ink for text (4.6:1). */
+:root[data-theme='day'] {
+  --night-rgb: 236 235 230;
+  --snow-rgb: 11 13 18;
+  --signal-ink: #c2380f;
+  --ink-strong: #000;
+  --error-ink: #b42d0b;
+  --snow-3: rgb(var(--snow-rgb) / 0.62);
+  --halo: 0 1px 2px rgb(255 255 255 / 0.9), 0 0 14px rgb(236 235 230 / 0.85);
+  --sky-1: #f7f4ec; --sky-2: #dfe6ee; --sky-3: #c3cfdd;
+  --vignette: rgb(236 235 230 / 0.45);
+  --backdrop: rgb(11 13 18 / 0.34);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  color-scheme: light;
+}
 
 /* ---------- base ---------- */
 *, *::before, *::after { box-sizing: border-box; }
 html, body, #root { margin: 0; }
-html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: var(--header-h); }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: var(--header-h); font-size: calc(var(--text-scale) * 100%); }
 body {
   background: var(--night);
   color: var(--snow);
@@ -64,7 +95,7 @@ p { text-wrap: pretty; }
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
 a { color: inherit; text-decoration: none; }
 a, button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
-:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; box-shadow: 0 0 0 6px rgb(11 13 18 / 0.85); border-radius: 2px; }
+:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; box-shadow: 0 0 0 6px rgb(var(--night-rgb) / 0.85); border-radius: 2px; }
 :focus:not(:focus-visible) { outline: none; }
 .mono { font-family: var(--font-mono); font-feature-settings: 'tnum'; }
 .display { font-size: var(--step-display); font-weight: 400; line-height: 0.92; letter-spacing: -0.045em; }
@@ -76,7 +107,7 @@ a, button { touch-action: manipulation; -webkit-tap-highlight-color: transparent
 .skip-link {
   position: fixed; left: var(--gutter); top: 10px; z-index: 100; display: inline-flex; align-items: center;
   min-height: 44px; padding: 0 16px; background: var(--snow); color: var(--night); border-radius: 99px;
-  font-size: 14px; font-weight: 600; transform: translateY(-200%);
+  font-size: 0.875rem; font-weight: 600; transform: translateY(-200%);
 }
 .skip-link:focus-visible { transform: none; }
 main:focus { outline: none; }

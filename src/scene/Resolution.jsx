@@ -38,11 +38,19 @@ export default function Resolution({ tier, onStruggle }) {
   // the most this screen may get: device pixels, the tier's ceiling, the pixel budget
   const maxDpr = Math.max(FLOOR, Math.min(window.devicePixelRatio || 1, CEILING[tier], Math.sqrt(BUDGET[tier] / Math.max(1, width * height))))
 
+  // the battery saver (settings) holds the ratio at 1 or below; switched off, it starts again from
+  // the tier's starting ratio and the steering takes over
+  const saver = useStore((s) => s.settings.saver)
   useEffect(() => {
     const s = st.current
-    const next = s.dpr ? Math.min(s.dpr, maxDpr) : Math.min(START[tier], maxDpr)
+    const next = saver ? Math.max(FLOOR, Math.min(1, maxDpr)) : s.dpr ? Math.min(s.dpr, maxDpr) : Math.min(START[tier], maxDpr)
     if (next !== s.dpr) { s.dpr = next; setDpr(next) }
-  }, [maxDpr, tier])
+  }, [maxDpr, tier, saver])
+  const wasSaver = useRef(saver)
+  useEffect(() => {
+    if (wasSaver.current && !saver) { const s = st.current; s.dpr = Math.min(START[tier], maxDpr); s.lockedAt = Infinity; setDpr(s.dpr) }
+    wasSaver.current = saver
+  }, [saver, tier, maxDpr])
 
   useFrame((_, dt) => {
     const s = st.current

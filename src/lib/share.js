@@ -4,7 +4,8 @@ import { taggedUrl } from './utm.js'
 import { track } from './analytics.js'
 import { useStore } from '../store'
 
-const toast = (text) => useStore.setState({ toast: { text, at: Date.now() } })
+// a confirmation (hidden from view when the visitor turned confirmations off) or an error (always shown)
+const toast = (text, kind) => useStore.setState({ toast: { text, kind, at: Date.now() } })
 
 export async function copyText(text) {
   try {
@@ -27,7 +28,7 @@ export async function copyText(text) {
 
 export async function copyLink(path) {
   const ok = await copyText(taggedUrl(path, 'copy'))
-  toast(ok ? 'Link copied' : 'Couldn’t copy: the link is in the address bar')
+  toast(ok ? 'Link copied' : 'Couldn’t copy: the link is in the address bar', ok ? 'confirm' : 'error')
   if (ok) track('Share', { method: 'copy' })
   return ok
 }

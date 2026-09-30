@@ -47,11 +47,24 @@ export default function Scene({ terrain }) {
   // tier is decided synchronously on first render so the terrain compiles once; only a GPU that
   // can't keep up even at half resolution gets it changed, to the lightest (<Resolution>)
   const [tier, setTier] = useState(() => { const q = quality(); useStore.setState({ quality: q }); return q })
+  const struggled = useRef(false)
   const struggle = () => {
     if (tier === 'low') return
+    struggled.current = true
     useStore.setState({ quality: 'low' })
     setTier('low')
   }
+  // the battery saver (settings) switches to the light tier and back, at once; a GPU that already
+  // needed the rescue stays light
+  const saver = useStore((s) => s.settings.saver)
+  const firstSaver = useRef(saver)
+  useEffect(() => {
+    if (saver === firstSaver.current) return
+    firstSaver.current = null
+    const q = struggled.current ? 'low' : quality()
+    useStore.setState({ quality: q })
+    setTier(q)
+  }, [saver])
   // bumped when a lost WebGL context comes back: the terrain remounts and sends its textures again
   // (it frees their CPU copies once they are on the GPU)
   const [glEpoch, setGlEpoch] = useState(0)

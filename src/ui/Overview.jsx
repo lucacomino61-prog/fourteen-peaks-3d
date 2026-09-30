@@ -2,7 +2,8 @@ import { useEffect, useRef } from 'react'
 import { useStore } from '../store'
 import { byRank } from '../data'
 import { jumpTo } from '../lib/clock'
-import { fmt, pad2 } from '../lib/format'
+import { pad2 } from '../lib/format'
+import { alt, useUnits } from '../lib/units'
 import { X } from './Icons'
 
 const stat = (m, label) => m.stats.find((s) => s.label === label)?.value || '–'
@@ -13,6 +14,7 @@ export default function Overview() {
   const current = useStore((s) => s.mountainId)
   const view = useStore((s) => s.overviewView)
   const setMountain = useStore((s) => s.setMountain)
+  const units = useUnits()
   const root = useRef()
   const close = () => useStore.setState({ overviewOpen: false })
 
@@ -62,7 +64,7 @@ export default function Overview() {
                 <span className="rank mono">{pad2(m.rank)}</span>
                 <span className="meta">
                   <b translate="no">{m.peak.name}</b>
-                  <span className="alt mono">{fmt(m.peak.elevation)}&nbsp;m · {m.peak.countries}</span>
+                  <span className="alt mono">{alt(m.peak.elevation, units)} · {m.peak.countries}</span>
                   <span className="line">{m.routes.length} routes · {stat(m, 'Deaths')} deaths</span>
                 </span>
               </button>
@@ -78,7 +80,7 @@ export default function Overview() {
                 <button className={`peak-row ${m.id === current ? 'is-current' : ''}`} onClick={() => pick(m.id)} aria-current={m.id === current ? 'true' : undefined}>
                   <span className="mono">{pad2(m.rank)}</span>
                   <b translate="no">{m.peak.name}</b>
-                  <span className="mono">{fmt(m.peak.elevation)}&nbsp;m</span>
+                  <span className="mono">{alt(m.peak.elevation, units)}</span>
                   <span>{m.peak.countries}</span>
                   <span className="mono">{stat(m, 'First ascent')}</span>
                   <span className="mono">{m.routes.length}</span>

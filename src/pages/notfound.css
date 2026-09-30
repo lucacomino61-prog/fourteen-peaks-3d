@@ -1,35 +1,35 @@
 /* The 404's contour map and loupe (pages/notfound.js): the ghost map in night, the ground under the
    loupe as the site's two-colour contour map, the 8,000 m line in signal. */
 .lost { margin-top: var(--space-xl); }
-.lost-code { font-size: 12px; color: var(--signal); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+.lost-code { font-size: 0.75rem; color: var(--signal-ink); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
 .lost-map { margin: var(--space-l) 0 0; }
 .lost-svg { position: relative; }
 .lost-svg svg {
   display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; border-radius: 12px;
-  background: rgb(236 235 230 / 0.03); box-shadow: inset 0 0 0 1px var(--line);
+  background: rgb(var(--snow-rgb) / 0.03); box-shadow: inset 0 0 0 1px var(--line);
   touch-action: none; cursor: crosshair; -webkit-user-select: none; user-select: none;
 }
 .lost-svg path { fill: none; vector-effect: non-scaling-stroke; stroke-linecap: round; }
-.lost-svg .ghost .minor { stroke: rgb(236 235 230 / 0.14); stroke-width: 1; }
-.lost-svg .ghost .index { stroke: rgb(236 235 230 / 0.3); stroke-width: 1.4; }
+.lost-svg .ghost .minor { stroke: rgb(var(--snow-rgb) / 0.14); stroke-width: 1; }
+.lost-svg .ghost .index { stroke: rgb(var(--snow-rgb) / 0.3); stroke-width: 1.4; }
 .lost-svg .ghost .dz { stroke: rgb(255 91 46 / 0.6); stroke-width: 1.6; }
-.lost-svg .lens rect { fill: var(--snow); }
-.lost-svg .lens .minor { stroke: var(--night); stroke-width: 1; }
-.lost-svg .lens .index { stroke: var(--night); stroke-width: 2; }
+.lost-svg .lens rect { fill: #ecebe6; }
+.lost-svg .lens .minor { stroke: #0b0d12; stroke-width: 1; }
+.lost-svg .lens .index { stroke: #0b0d12; stroke-width: 2; }
 .lost-svg .lens .dz { stroke: var(--signal); stroke-width: 2.6; }
 .lost-svg .ring { fill: none; stroke: var(--snow); stroke-width: 2; vector-effect: non-scaling-stroke; }
 .lost-svg .ring.is-top { stroke: var(--signal); stroke-width: 3; }
 .lost-read {
   position: absolute; transform: translate(-50%, 8px); pointer-events: none; white-space: nowrap;
-  padding: 3px 9px; border-radius: 99px; background: var(--night); color: var(--snow); font-size: 12px;
+  padding: 3px 9px; border-radius: 99px; background: var(--night); color: var(--snow); font-size: 0.75rem;
   box-shadow: 0 0 0 1px var(--line-strong);
 }
-.lost-map figcaption { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 12px; font-size: 13px; color: var(--snow-3); }
+.lost-map figcaption { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 12px; font-size: 0.8125rem; color: var(--snow-3); }
 .lost-map figcaption .mono { color: var(--snow); }
 .lost-found { margin-top: var(--space-s); font-size: var(--step-1); color: var(--snow) !important; }
 .lost-peaks { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: 0 28px; margin-top: var(--space-xs); }
 .lost-peaks a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; border-bottom: 1px solid var(--line); color: var(--snow); transition: border-color 160ms ease; }
 .lost-peaks a b { font-family: var(--font-display); font-weight: 600; }
-.lost-peaks .mono { color: var(--snow-3); font-size: 13px; }
+.lost-peaks .mono { color: var(--snow-3); font-size: 0.8125rem; }
 @media (hover: hover) and (pointer: fine) { .lost-peaks a:hover { border-color: var(--signal); } }
 @media print { .lost-map { display: none; } }

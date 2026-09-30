@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { useStore, useMountain } from '../store'
 import { fmt } from '../lib/format'
+import { inUnits, unitSymbol, useUnits } from '../lib/units'
 
 // The first screen while the terrain streams in: an altimeter that climbs with the download
 // towards the summit's height, and a skip. When the mountain is ready the counter tops out and a
@@ -10,6 +11,7 @@ import { fmt } from '../lib/format'
 export default function Loader({ progress, ready }) {
   const { peak } = useMountain()
   const motion = useStore((s) => s.motion)
+  const units = useUnits()
   const [phase, setPhase] = useState('loading') // 'loading' | 'leaving' | 'gone'
   const num = useRef()
   const count = useRef({ v: 0 })
@@ -17,7 +19,7 @@ export default function Loader({ progress, ready }) {
   // the count follows the download; GSAP tweens it, on the one clock
   useEffect(() => {
     if (phase !== 'loading') return
-    const target = peak.elevation * (ready ? 1 : progress)
+    const target = inUnits(peak.elevation, units) * (ready ? 1 : progress)
     const tw = gsap.to(count.current, {
       v: target,
       duration: motion === 'on' ? (ready ? 0.7 : 1.2) : 0,
@@ -26,7 +28,7 @@ export default function Loader({ progress, ready }) {
       onComplete: () => { if (ready) setPhase('leaving') },
     })
     return () => tw.kill()
-  }, [progress, ready, peak.elevation, phase, motion])
+  }, [progress, ready, peak.elevation, phase, motion, units])
 
   // the portal takes 800 ms (a fade when animations are stopped), then the loader is removed
   useEffect(() => {
@@ -39,7 +41,7 @@ export default function Loader({ progress, ready }) {
   return (
     <div className={`loader ${phase === 'leaving' ? 'is-leaving' : ''}`} role="status" aria-live="polite">
       <p className="loader-name" translate="no">{peak.name}</p>
-      <p className="loader-count mono" aria-hidden><span ref={num}>0</span><small>m</small></p>
+      <p className="loader-count mono" aria-hidden><span ref={num}>0</span><small>{unitSymbol(units)}</small></p>
       <p className="loader-note mono">{ready ? 'Terrain ready' : 'Loading the terrain · 4 million elevation samples'}</p>
       <button className="loader-skip" onClick={() => setPhase('leaving')}>Skip <span aria-hidden>→</span></button>
     </div>

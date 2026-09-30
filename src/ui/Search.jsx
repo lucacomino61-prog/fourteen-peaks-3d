@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useStore } from '../store'
 import { byRank } from '../data'
-import { fmt } from '../lib/format'
+import { alt } from '../lib/units'
 import { lockScroll } from '../lib/clock'
 import { goTo } from '../lib/navigate'
 import { track } from '../lib/analytics'
@@ -15,10 +15,10 @@ function buildIndex() {
   const items = []
   for (const m of byRank) {
     const p = m.peak
-    items.push({ type: 'Peak', label: p.name, sub: `${fmt(p.elevation)} m · ${p.range} · ${p.countries}`, text: `${p.name} ${p.aka || ''} ${p.range} ${p.countries} ${p.elevation}`, go: { mountain: m.id } })
+    items.push({ type: 'Peak', label: p.name, sub: `${alt(p.elevation)} · ${p.range} · ${p.countries}`, text: `${p.name} ${p.aka || ''} ${p.range} ${p.countries} ${p.elevation}`, go: { mountain: m.id } })
     m.routes.forEach((r) => {
       items.push({ type: 'Route', label: r.name, sub: `${p.name} · ${r.aka}`, text: `${r.name} ${r.aka} ${p.name} ${r.firstAscent || ''}`, go: { mountain: m.id, route: r.id } })
-      r.camps.forEach((c, k) => items.push({ type: 'Camp', label: c.name, sub: `${r.name}, ${p.name} · ${fmt(c.alt)} m`, text: `${c.name} ${r.name} ${p.name} ${c.alt}`, go: { mountain: m.id, route: r.id, camp: `${r.id}:${k}:${c.name}` } }))
+      r.camps.forEach((c, k) => items.push({ type: 'Camp', label: c.name, sub: `${r.name}, ${p.name} · ${alt(c.alt)}`, text: `${c.name} ${r.name} ${p.name} ${c.alt}`, go: { mountain: m.id, route: r.id, camp: `${r.id}:${k}:${c.name}` } }))
     })
     m.hazards.forEach((h) => items.push({ type: 'Hazard', label: h.name, sub: `${p.name} · ${h.kind}`, text: `${h.name} ${h.kind} ${p.name} ${h.alt}`, go: { mountain: m.id, hazard: h.id } }))
     m.timeline.forEach((t) => items.push({ type: 'History', label: `${t.year} · ${t.title}`, sub: p.name, text: `${t.year} ${t.title} ${t.text} ${p.name}`, go: { mountain: m.id, year: t.year } }))

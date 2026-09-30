@@ -2,22 +2,23 @@ import { useEffect, useRef } from 'react'
 import { useStore, useMountain } from '../store'
 import { mountains } from '../data'
 import { jumpTo } from '../lib/clock'
-import { fmt, pad2 } from '../lib/format'
+import { pad2, longDate } from '../lib/format'
+import { alt, metresText, useUnits } from '../lib/units'
 import { mountainPath, mountainTitle } from '../lib/meta'
 import { share, copyLink } from '../lib/share'
 import { analyticsConfigured } from '../lib/analytics'
-import { Compass, ArrowLeft, ArrowRight, X, Search as SearchIcon, Share as ShareIcon } from './Icons'
+import { Compass, ArrowLeft, ArrowRight, X, Search as SearchIcon, Share as ShareIcon, Sliders } from './Icons'
 
 const UPDATED = import.meta.env.VITE_LAST_UPDATED
 const REPO_URL = 'https://github.com/lucacomino61-prog/fourteen-peaks-3d'
-const longDate = (iso) => (iso ? new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }) : '')
+const openSettings = () => useStore.setState({ settingsOpen: true, routesOpen: false })
 
 // a system share sheet (phones, tablets): "Share"; everywhere else the link is copied
 const canShare = typeof navigator !== 'undefined' && !!navigator.share && typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches
 
 /** Share the mountain on screen: the system sheet on a phone, else its link is copied. */
 function shareMountain(m) {
-  share({ title: mountainTitle(m), text: `${m.peak.name}, ${fmt(m.peak.elevation)} m, in real 3D terrain`, path: mountainPath(m.id) })
+  share({ title: mountainTitle(m), text: `${m.peak.name}, ${alt(m.peak.elevation)}, in real 3D terrain`, path: mountainPath(m.id) })
 }
 
 /** Switch to the next (1) or previous (-1) mountain and go back to the top of the page. */
@@ -32,15 +33,17 @@ export function Nav() {
   const motion = useStore((s) => s.motion)
   const setMotion = useStore((s) => s.setMotion)
   const mode = useStore((s) => s.mode)
+  const units = useUnits()
   return (
     // over the reading sections the nav is solid, so nothing shows through under it
     <nav className="nav" aria-label="Site" data-solid={mode === 'idle' ? '1' : '0'}>
-      <a className="nav-brand" href="#top"><b translate="no">{peak.name}</b> <span className="mono">{fmt(peak.elevation)}&nbsp;m</span></a>
+      <a className="nav-brand" href="#top"><b translate="no">{peak.name}</b> <span className="mono">{alt(peak.elevation, units)}</span></a>
       <button className="nav-menu" aria-expanded={routesOpen} aria-controls="routes-menu" onClick={() => useStore.setState({ routesOpen: !routesOpen })}>Menu <i aria-hidden /></button>
       <div className="nav-end">
         <button className="nav-search" onClick={() => useStore.setState({ searchOpen: true, routesOpen: false })} aria-label="Search the fourteen" aria-keyshortcuts="/ Control+K Meta+K">
           <SearchIcon /><span>Search</span>
         </button>
+        <button className="nav-settings" onClick={openSettings} aria-label="Settings" aria-haspopup="dialog" title="Settings"><Sliders /></button>
         {/* the visible Stop-animations switch (html[data-motion]); reduced motion starts it pressed */}
         <button className="nav-motion" aria-pressed={motion === 'off'} onClick={() => setMotion(motion === 'on' ? 'off' : 'on')} title={motion === 'on' ? 'Stop animations' : 'Animations stopped'}>
           <i aria-hidden /><span>Stop animations</span>
@@ -53,12 +56,16 @@ export function Nav() {
 
 export function Hero({ loading }) {
   const { peak, id } = useMountain()
+  const units = useUnits()
   const index = mountains.findIndex((m) => m.id === id)
   const next = mountains[(index + 1) % mountains.length]
   const prev = mountains[(index - 1 + mountains.length) % mountains.length]
   useEffect(() => {
     const onKey = (e) => {
       if (useStore.getState().mode !== 'hero') return
+      // not while a dialog is open or a field has the keys (the settings' choices move with the
+      // arrows; a search field moves its caret)
+      if (document.querySelector('dialog[open]') || e.target.closest?.('input, textarea, select, [contenteditable="true"]')) return
       if (e.key === 'ArrowRight') stepMountain(1)
       if (e.key === 'ArrowLeft') stepMountain(-1)
     }
@@ -68,7 +75,7 @@ export function Hero({ loading }) {
   return (
     <section id="top" className="hero" aria-labelledby="peak-title">
       {/* the poster name behind the mountain is drawn in the stage (ui/Poster.jsx); this is its text */}
-      <h1 id="peak-title" className="visually-hidden"><span translate="no">{peak.name}</span>, {fmt(peak.elevation)}&nbsp;m</h1>
+      <h1 id="peak-title" className="visually-hidden"><span translate="no">{peak.name}</span>, {alt(peak.elevation, units)}</h1>
       <button className="switch switch-prev" onClick={() => stepMountain(-1)} aria-label={`Previous mountain: ${prev.peak.name}`}><ArrowLeft /></button>
       <button className="switch switch-next" onClick={() => stepMountain(1)} aria-label={`Next mountain: ${next.peak.name}`}><ArrowRight /></button>
       <div className="hero-min">
@@ -102,6 +109,7 @@ export function RoutesMenu() {
   const close = () => useStore.setState({ routesOpen: false })
   const active = useStore((s) => s.activeRoute)
   const choose = useStore((s) => s.chooseRoute)
+  const units = useUnits()
   const ref = useRef()
   useEffect(() => {
     if (!open) return
@@ -120,7 +128,7 @@ export function RoutesMenu() {
         <button className="close" onClick={close} aria-label="Close"><X /></button>
       </div>
       <div className="menu-about">
-        <h2><span translate="no">{peak.name}</span> <small className="mono">{fmt(peak.elevation)}&nbsp;m · {peak.countries}</small></h2>
+        <h2><span translate="no">{peak.name}</span> <small className="mono">{alt(peak.elevation, units)} · {peak.countries}</small></h2>
         <p>{peak.tagline}</p>
       </div>
       <h3 className="menu-label mono">{routes.length} routes · pick one to climb it</h3>
@@ -143,6 +151,7 @@ export function RoutesMenu() {
         <li><button onClick={() => useStore.setState({ routesOpen: false, searchOpen: true })}><SearchIcon /> Search <small>peaks, routes, camps, hazards, years</small></button></li>
         <li><button onClick={() => { close(); shareMountain(mountain) }}><ShareIcon /> {canShare ? `Share ${peak.name}` : `Copy the link to ${peak.name}`} <small>send its page</small></button></li>
         <li><button onClick={() => useStore.setState({ routesOpen: false, correctionOpen: true })}>Suggest a correction <small>a wrong altitude, date or line</small></button></li>
+        <li><button onClick={openSettings} aria-haspopup="dialog"><Sliders /> Settings <small>theme, text size, units, notifications</small></button></li>
       </ul>
       <div className="routes-menu-foot">
         <button onClick={() => stepMountain(-1)}><ArrowLeft /> {mountains[(index - 1 + mountains.length) % mountains.length].peak.name}</button>
@@ -152,14 +161,15 @@ export function RoutesMenu() {
   )
 }
 
-/** "8,611 m" → the number big, the unit small */
-function StatValue({ v }) {
-  const m = /^(.*\S)\s(m|km)$/.exec(v)
+/** "8,611 m" → the number big, the unit small (in feet when the settings say so) */
+function StatValue({ v, units }) {
+  const m = /^(.*\S)\s(m|km|ft)$/.exec(metresText(v, units))
   return m ? <>{m[1]}<span className="unit">{m[2]}</span></> : v
 }
 
 export function Figures() {
   const { stats, peak } = useMountain()
+  const units = useUnits()
   return (
     <section id="figures" className="section">
       <div className="wrap">
@@ -169,7 +179,7 @@ export function Figures() {
         </div>
         <dl className="stats">
           {stats.map((s) => (
-            <div key={s.label}><dt className="mono">{s.label}</dt><dd><b><StatValue v={s.value} /></b><small>{s.note}</small></dd></div>
+            <div key={s.label}><dt className="mono">{s.label}</dt><dd><b><StatValue v={s.value} units={units} /></b><small>{s.note}</small></dd></div>
           ))}
         </dl>
         <p className="routes-other">{peak.otherLines}</p>
@@ -227,6 +237,7 @@ export function Footer({ tile }) {
           <a href="/privacy/">Privacy</a>
           <a href="/terms/">Terms of use</a>
           {analyticsConfigured && <button type="button" onClick={() => useStore.setState({ consentOpen: 'asked' })}>Privacy choices</button>}
+          <button type="button" onClick={openSettings} aria-haspopup="dialog">Settings</button>
           <a href={REPO_URL}>Source</a>
         </nav>
         {UPDATED && <p className="mono">Last updated <time dateTime={UPDATED}>{longDate(UPDATED)}</time></p>}

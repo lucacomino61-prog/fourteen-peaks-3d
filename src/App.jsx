@@ -12,6 +12,8 @@ import Poster from './ui/Poster'
 import LoupeRing, { LoupePaper } from './ui/Loupe'
 import Loader from './ui/Loader'
 import Search from './ui/Search'
+import Settings from './ui/Settings'
+import { longDate } from './lib/format'
 import Correction from './ui/Correction'
 import Consent from './ui/Consent'
 import Toast from './ui/Toast'
@@ -25,6 +27,7 @@ import { initAnalytics, mustAsk, track } from './lib/analytics'
 
 gsap.registerPlugin(ScrollTrigger)
 if (import.meta.env.DEV) window.__k2 = useStore
+const UPDATED = import.meta.env.VITE_LAST_UPDATED
 
 // the arrival: campaign tags first, then visit counting if the visitor already agreed
 captureCampaign()
@@ -80,6 +83,21 @@ function useProgressFallback() {
   }, [])
 }
 
+/**
+ * "What's new" (a notification in the settings): the date of the build the visitor last saw is
+ * kept on the device (fp-seen); when this build is newer, a note says so once the mountain is up.
+ * A first visit only records the date.
+ */
+function useWhatsNew(ready) {
+  useEffect(() => {
+    if (!ready || !UPDATED) return
+    let seen = null
+    try { seen = localStorage.getItem('fp-seen'); localStorage.setItem('fp-seen', UPDATED) } catch { return }
+    if (seen && seen < UPDATED && useStore.getState().settings.whatsNew)
+      useStore.setState({ toast: { text: `Updated on ${longDate(UPDATED)} since your last visit`, kind: 'news', at: Date.now() } })
+  }, [ready])
+}
+
 /** The site's own counted events (only with the visitor's agreement: lib/analytics.js). */
 function useEvents() {
   useEffect(() => useStore.subscribe((s, prev) => {
@@ -132,6 +150,7 @@ export default function App() {
   useSearchKey()
   useProgressFallback()
   useEvents()
+  useWhatsNew(terrainReady)
   // once the current mountain is up, fetch its neighbours' first-paint files so the arrows are instant
   useEffect(() => {
     if (!terrainReady) return
@@ -171,6 +190,7 @@ export default function App() {
         </div>
       </main>
       <Search />
+      <Settings />
       <Correction />
       <Consent />
       <Toast />

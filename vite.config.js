@@ -5,6 +5,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { mountains } from './src/data/index.js'
 import { SITE_NAME, SITE_DESCRIPTION, mountainPath, mountainTitle, mountainDescription } from './src/lib/meta.js'
+import { PREPAINT } from './src/lib/settings.js'
 
 const PLACEHOLDER_URL = 'https://fourteen-peaks.example'
 const REPO_URL = 'https://github.com/lucacomino61-prog/fourteen-peaks-3d'
@@ -84,7 +85,7 @@ function sitePages(env) {
     jsonLd: { '@context': 'https://schema.org', '@type': 'WebPage', name: title, url: `${site}/${slug}/`, inLanguage: 'en', dateModified: updated, isPartOf: website },
   })
   const PAGES = {
-    privacy: { slug: 'privacy', title: 'Privacy', description: 'What this site keeps and sends: no cookies, no accounts; two settings in your browser, and visit counting only with your agreement.' },
+    privacy: { slug: 'privacy', title: 'Privacy', description: 'What this site keeps and sends: no cookies, no accounts; your settings in your browser, and visit counting only with your agreement.' },
     terms: { slug: 'terms', title: 'Terms of use', description: 'How to use the fourteen 8,000 m peaks in 3D: an educational model, not for navigation, with its data sources and their terms.' },
   }
 
@@ -114,6 +115,8 @@ function sitePages(env) {
         else if (/\/terms\/index\.html$/.test(file)) head = pageHead(PAGES.terms)
         else head = homeHead()
         return html
+          // the visitor's theme and text size (lib/settings.js) before anything is drawn
+          .replace('<meta charset="UTF-8" />', `<meta charset="UTF-8" />\n    <script>${PREPAINT}</script>`)
           .replace(/<!-- head:page -->[\s\S]*?<!-- \/head:page -->/, head ? `<!-- head:page -->\n    ${head}\n    <!-- /head:page -->` : '$&')
           .replaceAll('%LAST_UPDATED%', longDate(updated))
           .replaceAll('%LAST_UPDATED_ISO%', updated)

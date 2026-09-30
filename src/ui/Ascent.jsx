@@ -5,6 +5,7 @@ import { ROUTE_LIFT_M, fractionNear, pointAt } from '../lib/paths'
 import { useStore, useMountain } from '../store'
 import { jumpTo } from '../lib/clock'
 import { fmt, pad2 } from '../lib/format'
+import { alt as altitude, inUnits, metresText, unitName, useUnits } from '../lib/units'
 import { Warning, ArrowRight } from './Icons'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -53,14 +54,14 @@ function buildStops(terrain, route, path, H, peak) {
   return stops
 }
 
-function StopCard({ s, i, n, route, num, active }) {
+function StopCard({ s, i, n, route, num, active, units }) {
   const hz = s.hazard
   // on a phone the route's facts fold away behind a button, so the card leaves the route in view
   const [facts, setFacts] = useState(false)
   return (
     // the altitude is the altimeter's to show; the card names the stop (and tells screen readers the height)
     <article className={`ascent-card ${active ? 'is-active' : ''} ${s.overview ? 'is-overview' : ''}`} aria-hidden={!active} data-alt={s.alt}>
-      <h3>{s.title}<span className="visually-hidden">, {fmt(s.alt)}&nbsp;m</span>{s.overview && <span>{route.aka}</span>}</h3>
+      <h3>{s.title}<span className="visually-hidden">, {altitude(s.alt, units)}</span>{s.overview && <span>{route.aka}</span>}</h3>
       <p>{s.body}</p>
       {s.overview && (
         <>
@@ -71,7 +72,7 @@ function StopCard({ s, i, n, route, num, active }) {
             <div><dt>first ascent</dt><dd>{route.firstAscent}</dd></div>
             <div><dt>traffic</dt><dd>{route.share}</dd></div>
             <div><dt>difficulty</dt><dd>{route.difficulty}</dd></div>
-            <div><dt>vertical</dt><dd>{route.verticalGain}</dd></div>
+            <div><dt>vertical</dt><dd>{metresText(route.verticalGain, units)}</dd></div>
           </dl>
         </>
       )}
@@ -97,10 +98,12 @@ export default function Ascent({ terrain }) {
   const stops = useMemo(() => (path && route ? buildStops(terrain, route, path, H, peak) : []), [terrain, route, path, H, peak])
   const choose = useStore((s) => s.chooseRoute)
   const motion = useStore((s) => s.motion)
+  const units = useUnits()
   const [active, setActive] = useState(0)
   const root = useRef()
   const altRef = useRef()
   const dotRef = useRef()
+  const shownAlt = useRef(0) // the altimeter's height in metres, for a change of unit
   const minAlt = stops[0]?.alt || 5000, maxAlt = peak.elevation
 
   useEffect(() => {
@@ -121,7 +124,8 @@ export default function Ascent({ terrain }) {
         setActive(Math.round(seg))
         if (altRef.current) {
           const alt = Math.round(modelAlt(path, t) + stops[i].gap + (stops[i + 1].gap - stops[i].gap) * f)
-          altRef.current.textContent = fmt(alt)
+          shownAlt.current = alt
+          altRef.current.textContent = fmt(inUnits(alt))
           if (dotRef.current) dotRef.current.style.bottom = `${Math.min(100, Math.max(0, ((alt - minAlt) / (maxAlt - minAlt)) * 100))}%`
         }
       },
@@ -129,6 +133,9 @@ export default function Ascent({ terrain }) {
     ScrollTrigger.refresh()
     return () => st.kill()
   }, [stops, path, minAlt, maxAlt, motion])
+
+  // metres ↔ feet in the settings: the altimeter redraws where it is
+  useEffect(() => { if (altRef.current && shownAlt.current) altRef.current.textContent = fmt(inUnits(shownAlt.current, units)) }, [units])
 
   const pick = (id) => {
     if (id === activeRoute) return
@@ -206,17 +213,17 @@ export default function Ascent({ terrain }) {
             </button>
           ))}
         </div>
-        {stops.map((s, i) => <StopCard key={s.key} s={s} i={i} n={stops.length} route={route} num={num} active={i === active} />)}
+        {stops.map((s, i) => <StopCard key={s.key} s={s} i={i} n={stops.length} route={route} num={num} active={i === active} units={units} />)}
         <div className="altimeter" aria-live="off">
-          <small className="mono">altitude, metres</small>
-          <b className="mono"><span ref={altRef}>{fmt(minAlt)}</span></b>
+          <small className="mono">altitude, {unitName(units)}</small>
+          <b className="mono"><span ref={altRef}>{fmt(inUnits(minAlt, units))}</span></b>
           <div className="rail">
             <i style={{ bottom: '0%' }} />
             <i className="dz" style={{ bottom: `${((8000 - minAlt) / (maxAlt - minAlt)) * 100}%` }} title="8,000 m" />
             <i style={{ bottom: '100%' }} />
             <b ref={dotRef} style={{ bottom: '0%' }} />
           </div>
-          <small className="mono">the orange tick is 8,000&nbsp;m</small>
+          <small className="mono">the orange tick is {altitude(8000, units)}</small>
         </div>
       </div>
       <div className="ascent-track" style={{ marginTop: '-100dvh' }}>

@@ -2,6 +2,9 @@ import { create } from 'zustand'
 import { createContext, useContext } from 'react'
 import { byId, mountains } from './data'
 import { mountainPath } from './lib/meta.js'
+import { DEFAULTS, loadSettings, saveSettings, applySettings, onSystemTheme } from './lib/settings'
+
+const loadDefaults = () => ({ ...DEFAULTS })
 
 /** The mountain in the address: its own page (/k2/), or an older ?peak=k2 link. Null on the home page. */
 export function mountainFromUrl() {
@@ -26,11 +29,16 @@ try {
 } catch { /* keep the address */ }
 
 // the visible Stop-animations switch: remembered, and off from the start under reduced motion
+const motionDefault = () => (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches ? 'off' : 'on')
 const INITIAL_MOTION = (() => {
   try { const v = localStorage.getItem('fp-motion'); if (v === 'on' || v === 'off') return v } catch {}
-  return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches ? 'off' : 'on'
+  return motionDefault()
 })()
 if (typeof document !== 'undefined') document.documentElement.dataset.motion = INITIAL_MOTION
+
+// the settings (lib/settings.js): theme and text size are already on the page (the head's script)
+const INITIAL_SETTINGS = loadSettings()
+const INITIAL_THEME = typeof document !== 'undefined' ? applySettings(INITIAL_SETTINGS) : 'night'
 
 export const useStore = create((set, get) => ({
   mode: 'hero', // 'hero' | 'ascent' | 'explorer' | 'idle'
@@ -40,6 +48,23 @@ export const useStore = create((set, get) => ({
     document.documentElement.dataset.motion = motion
     set({ motion })
   },
+  settings: INITIAL_SETTINGS, // { theme, text, units, confirmations, whatsNew, saver }
+  theme: INITIAL_THEME, // what the page shows: 'night' | 'day' (a 'system' setting resolved)
+  settingsOpen: false,
+  setSetting: (key, value) => {
+    const settings = { ...get().settings, [key]: value }
+    saveSettings(settings)
+    set({ settings, theme: applySettings(settings) })
+  },
+  /** Everything back as it was on a first visit, animations included. */
+  resetSettings: () => {
+    const settings = loadDefaults()
+    saveSettings(settings)
+    try { localStorage.removeItem('fp-motion') } catch {}
+    const motion = motionDefault()
+    document.documentElement.dataset.motion = motion
+    set({ settings, theme: applySettings(settings), motion })
+  },
   showContours: false, // the explorer's contour-map layer: the whole terrain drawn as the map
   loupeHold: false, // a finger is holding the loupe: the drag moves the loupe, not the camera
   overviewView: 'grid', // 'grid' | 'list' in the All-fourteen overlay
@@ -48,7 +73,7 @@ export const useStore = create((set, get) => ({
   overviewOpen: false,
   searchOpen: false,
   correctionOpen: false,
-  toast: null, // { text, at }: a short confirmation (link copied …)
+  toast: null, // { text, at, kind }: kind 'confirm' (default), 'error' or 'news' (ui/Toast.jsx)
   consentOpen: false, // 'first' (asked on arrival) | 'asked' (from the footer) | false
   terrainReady: false,
   readyId: null, // the mountain whose terrain was last revealed
@@ -91,6 +116,12 @@ export const useStore = create((set, get) => ({
       visibleRoutes: s.visibleRoutes.includes(id) ? s.visibleRoutes.filter((r) => r !== id) : [...s.visibleRoutes, id],
     })),
 }))
+
+// a 'system' theme follows the device when it switches between light and dark
+onSystemTheme(() => {
+  const s = useStore.getState()
+  if (s.settings.theme === 'system') useStore.setState({ theme: applySettings(s.settings) })
+})
 
 /** Scene subtrees are wrapped in this with the mountain whose terrain is actually loaded. */
 export const MountainCtx = createContext(null)

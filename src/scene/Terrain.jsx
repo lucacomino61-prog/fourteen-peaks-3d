@@ -4,7 +4,7 @@ import { useLoader, useFrame, useThree } from '@react-three/fiber'
 import { useStore, useMountain } from '../store'
 import { heightCalibration, modelAltitude, realAltitude } from '../lib/calibrate'
 import { loupe, attachLoupe } from '../lib/loupe'
-import { fmt } from '../lib/format'
+import { alt as altitude } from '../lib/units'
 import { NIGHT, SNOW, SIGNAL } from '../lib/palette'
 import { onTerrainEvicted } from '../lib/terrain'
 import { loadPixels } from '../lib/pixels'
@@ -548,6 +548,16 @@ export default function Terrain({ terrain, quality = 'high' }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [first, terrain.id])
 
+  // The distance haze fades towards the theme's sky (settings): night blue, or a day haze a shade
+  // darker than the pale sky, so far ridges still stand against it (given in the shader's linear
+  // units, so that it comes out of the tone curve as #cfd6de), and thinner, since a bright haze
+  // takes more contrast from the snow than a dark one.
+  const theme = useStore((s) => s.theme)
+  useEffect(() => {
+    if (theme === 'day') { uniforms.uFogColor.value.setRGB(1.47, 1.67, 1.97); uniforms.uFogDensity.value = 0.045 }
+    else { uniforms.uFogColor.value.set('#0f1626'); uniforms.uFogDensity.value = 0.07 }
+  }, [uniforms, theme])
+
   // Before the first frame with this heightmap. A heightmap not yet on the GPU goes up by the band:
   // on the first mount while the terrain is hidden for its compile (the reveal waits for both),
   // and when the full one replaces the 512² one, which stays on screen until it's all there.
@@ -694,7 +704,7 @@ export default function Terrain({ terrain, quality = 'high' }) {
     if (r > 0 && loupe.read) {
       const alt = Math.round(realAltitude(hit.y * 1000, cal) / 10) * 10
       const { lat, lon } = terrain.geo.toLatLon(hit.x, hit.z)
-      const text = `≈ ${fmt(alt)} m · ${lat.toFixed(3)}° N ${lon.toFixed(3)}° E`
+      const text = `≈ ${altitude(alt)} · ${lat.toFixed(3)}° N ${lon.toFixed(3)}° E`
       if (loupe.read.textContent !== text) loupe.read.textContent = text
     }
   })

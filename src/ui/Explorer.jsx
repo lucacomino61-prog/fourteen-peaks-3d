@@ -1,5 +1,6 @@
 import { useStore, useMountain } from '../store'
-import { fmt, pad2 } from '../lib/format'
+import { pad2 } from '../lib/format'
+import { alt, useUnits } from '../lib/units'
 import { SNOW, SIGNAL, hazardColor } from '../lib/palette'
 import { Eye, X, ArrowDown } from './Icons'
 
@@ -8,6 +9,7 @@ function Detail() {
   const selected = useStore((s) => s.selected)
   const active = useStore((s) => s.activeRoute)
   const set = useStore((s) => s.set)
+  const units = useUnits()
   let content = null, color = null
   if (selected?.type === 'camp') {
     const i = routes.findIndex((x) => x.id === selected.routeId)
@@ -17,7 +19,7 @@ function Detail() {
       color = r.id === active ? SIGNAL : SNOW
       content = (
         <>
-          <div className="kicker"><span>{pad2(i + 1)} {r.name}</span><span>{fmt(c.alt)}&nbsp;m</span></div>
+          <div className="kicker"><span>{pad2(i + 1)} {r.name}</span><span>{alt(c.alt, units)}</span></div>
           <h3>{c.name}</h3>
           <p>{c.blurb}</p>
           <div className="row">
@@ -33,7 +35,7 @@ function Detail() {
       color = hazardColor(h.severity)
       content = (
         <>
-          <div className="kicker"><span>{h.kind}</span><span>≈ {fmt(h.alt)}&nbsp;m</span></div>
+          <div className="kicker"><span>{h.kind}</span><span>≈ {alt(h.alt, units)}</span></div>
           <h3>{h.name}</h3>
           <p>{h.blurb}</p>
           {h.incidents.length > 0 && <ul>{h.incidents.map((i) => <li key={i}>{i}</li>)}</ul>}
@@ -44,7 +46,7 @@ function Detail() {
     color = SNOW
     content = (
       <>
-        <div className="kicker"><span>{peak.lat.toFixed(4)} N, {peak.lon.toFixed(4)} E</span><span>{fmt(peak.elevation)}&nbsp;m</span></div>
+        <div className="kicker"><span>{peak.lat.toFixed(4)} N, {peak.lon.toFixed(4)} E</span><span>{alt(peak.elevation, units)}</span></div>
         <h3>{peak.name}</h3>
         <p>{peak.summitBlurb}</p>
       </>
@@ -86,6 +88,7 @@ export default function Explorer() {
   const showDeathZone = useStore((s) => s.showDeathZone)
   const showContours = useStore((s) => s.showContours)
   const selected = useStore((s) => s.selected)
+  const units = useUnits()
 
   const focus = (id) => set({ activeRoute: id, visibleRoutes: visible.includes(id) ? visible : [...visible, id], selected: { type: 'route', id }, fly: { route: id } })
 
@@ -118,7 +121,7 @@ export default function Explorer() {
             <button className="toggle" aria-pressed={showCamps} onClick={() => set({ showCamps: !showCamps })}>Camps<i /></button>
             <button className="toggle" aria-pressed={showHazards} onClick={() => set({ showHazards: !showHazards })}>Hazard zones<i /></button>
             <button className="toggle" aria-pressed={showContours} onClick={() => set({ showContours: !showContours })}>Contour map<i /></button>
-            <button className="toggle" data-tone="signal" aria-pressed={showDeathZone} onClick={() => set({ showDeathZone: !showDeathZone })}>Death Zone, above 8,000&nbsp;m<i /></button>
+            <button className="toggle" data-tone="signal" aria-pressed={showDeathZone} onClick={() => set({ showDeathZone: !showDeathZone })}>Death Zone, above {alt(8000, units)}<i /></button>
           </div>
         </div>
         <div className="panel-foot">

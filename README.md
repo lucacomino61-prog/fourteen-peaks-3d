@@ -141,6 +141,15 @@ That runs three scripts:
   invalid, sent, failed, discarded: its success rate). Campaign tags (`utm_…`) are kept for the
   visit (`src/lib/utm.js`), sent with events and corrections, and taken out of the address bar.
 - **Reading bar.** A signal hairline at the top edge, a CSS scroll timeline where supported.
+- **Settings** (`src/ui/Settings.jsx`, `src/lib/settings.js`; the sliders button in the nav, the
+  menu, the footer): theme Night / Day / System, text size (90–130 %, every size is in rem), heights
+  in metres or feet (`src/lib/units.js`: figures, labels, the altimeter; the descriptions keep
+  metres), Animations, a battery saver (the light tier, half the frame rate, resolution 1× at most),
+  and two notifications: confirmations such as "Link copied" (off: read out to screen readers,
+  not shown; errors always show) and "What's new" (on a later visit, a note when the build's
+  last-updated date is newer than the one seen, `fp-seen`). Everything applies at once and is kept
+  on the device (`fp-settings`, only what differs from the defaults); theme and text size are set
+  by a script in every page's head before anything is drawn, so nothing flashes.
 - **Checks.** `npm run check` renders every page in headless Chrome and checks every link (inside
   the site against `dist/`, and with `-- --external` the outside ones too), then walks the
   correction form. Settings for the build are in `.env.example`; what the owner still has to decide

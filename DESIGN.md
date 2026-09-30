@@ -39,7 +39,19 @@ Two colours carry the page; one signal marks only what needs marking.
 
 Routes are told apart by **number** (01–05 in tabs, menus, lists and cards), never by hue. Lesser
 hazards are dashed snow rings; grave ones solid signal. The same values live in `src/lib/palette.js`
-for the 3D. Dark only.
+for the 3D.
+
+**Themes** (the settings): Night is the default. **Day** swaps the two colours: `--night-rgb` is the
+ground and `--snow-rgb` the ink, and every surface, text and tint is built from them
+(`rgb(var(--snow-rgb) / 0.14)`), so Day is snow paper with night ink. Day also changes a few tokens:
+- `--snow-3` rises to 62% (5.1:1).
+- The signal gets a darker ink for text, `--signal-ink` `#c2380f` (4.6:1).
+- The halo turns light.
+- The sky behind the mountain goes pale: `--sky-1…3`, from `#f7f4ec` at the horizon to `#c3cfdd`.
+- The grain turns dark.
+- The terrain's distance haze turns to a pale `#cfd6de`, thinner.
+
+**System** follows the device. What is drawn on the terrain keeps fixed colours in both themes, like the mountain itself: map labels with their dark halo (`--halo-map`), hazard icons, the thumbnails in All fourteen, and the contour loupe's paper and ink (in the app and on the 404).
 
 ## Type
 
@@ -54,8 +66,9 @@ Self-hosted variable fonts (`@fontsource-variable`).
   tracking −0.045em; uppercase 700 for names (nav, menu, cards, list).
 - **Text:** Archivo 400–600, body `--step-0`, line-height 1.55, measure ≤ 62ch.
 - **Measurements:** JetBrains Mono with tabular figures: the altimeter (poster-size, up to 152 px),
-  the loader's count, altitudes, coordinates, labels. Numbers are written `8,611 m` with a
-  non-breaking space whatever the browser's locale (`src/lib/format.js`).
+  the loader's count, altitudes, coordinates, labels. Numbers are written `8,611 m` (or `28,251 ft`
+  with feet chosen in the settings, `src/lib/units.js`) with a non-breaking space whatever the
+  browser's locale (`src/lib/format.js`).
 
 ## Space and shape
 
@@ -68,8 +81,14 @@ phones: at `3xl` two neighbours stood 216–240 px apart, too loose for a page r
 ## Components
 
 - **Nav:** peak name (display, uppercase) + height (mono) · Menu · Search (pill with a magnifier;
-  icon-only on phones, in the menu below 420 px) · Stop animations (pill with a dot; pressed = a
-  signal square; icon-only on phones) · All fourteen.
+  icon-only on phones, in the menu below 420 px) · Settings (round pill with sliders; in the menu
+  below 420 px) · Stop animations (pill with a dot; pressed = a signal square; icon-only on phones)
+  · All fourteen.
+- **Settings:** a solid dialog (full screen on phones) in four groups under mono labels:
+  Appearance (theme, text size), Units, Motion and power, Notifications.
+  - **Controls.** A choice is a pill track whose thumb (snow) slides under the chosen option: a radio group, arrows move it, 200 ms ease-out. An on/off is the explorer's toggle as a `role="switch"`, with what it does in a note underneath.
+  - **Footer.** "Reset to defaults" and "Saved on this device" on the left, a solid "Done" on the right.
+  - Every change shows at once, so the page is the preview. Text size scales everything, because every size is in rem (`--text-scale` on `html`).
 - **Reading bar:** a 2 px signal hairline across the top edge, filled by the page's scroll.
 - **Hero:** the poster name behind the mountain; bottom-left `02 / 14 · range` (opens the overview)
   and the snow pill "Climb a route →" (the call to action: opens the routes); bottom-right mono side

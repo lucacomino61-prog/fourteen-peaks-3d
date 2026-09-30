@@ -6,20 +6,20 @@
   min-height: var(--header-h); padding: env(safe-area-inset-top, 0px) max(var(--gutter), env(safe-area-inset-right, 0px)) 0 max(var(--gutter), env(safe-area-inset-left, 0px));
   background: var(--night); box-shadow: 0 1px 0 var(--line);
 }
-.page-brand { display: inline-flex; align-items: center; min-height: 44px; font-family: var(--font-display); font-weight: 700; font-size: 16px; letter-spacing: -0.01em; text-transform: uppercase; }
+.page-brand { display: inline-flex; align-items: center; min-height: 44px; font-family: var(--font-display); font-weight: 700; font-size: 1rem; letter-spacing: -0.01em; text-transform: uppercase; }
 .page-back {
   display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid var(--line-strong); border-radius: 99px;
-  font-size: 14px; color: var(--snow-2); transition: color 160ms ease, border-color 160ms ease;
+  font-size: 0.875rem; color: var(--snow-2); transition: color 160ms ease, border-color 160ms ease;
 }
 @media (hover: hover) and (pointer: fine) {
-  .page-back:hover { color: var(--snow); border-color: rgb(236 235 230 / 0.6); }
-  .page-brand:hover { color: #fff; }
+  .page-back:hover { color: var(--snow); border-color: rgb(var(--snow-rgb) / 0.6); }
+  .page-brand:hover { color: var(--ink-strong); }
 }
 
 .doc { width: min(68ch, 100% - 2 * var(--gutter)); margin: var(--space-2xl) auto var(--space-3xl); }
 .doc h1 { font-size: var(--step-display); font-weight: 400; line-height: 0.92; letter-spacing: -0.045em; margin-bottom: var(--space-m); }
 .doc .lead { font-size: var(--step-1); color: var(--snow); line-height: 1.4; margin-bottom: var(--space-l); }
-.doc .updated { font-family: var(--font-mono); font-size: 12px; color: var(--snow-3); margin-bottom: var(--space-xl); }
+.doc .updated { font-family: var(--font-mono); font-size: 0.75rem; color: var(--snow-3); margin-bottom: var(--space-xl); }
 .doc h2 { font-size: var(--step-2); font-weight: 600; margin: var(--space-xl) 0 var(--space-xs); }
 .doc p, .doc li { color: var(--snow-2); max-width: 66ch; }
 .doc p + p { margin-top: 0.8em; }
@@ -29,15 +29,15 @@
 .doc code { font-family: var(--font-mono); font-size: 0.88em; color: var(--snow); }
 .choice { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 1em; }
 .choice button {
-  min-height: 44px; padding: 0 16px; border: 1px solid var(--line-strong); border-radius: 99px; font-size: 14px; color: var(--snow);
+  min-height: 44px; padding: 0 16px; border: 1px solid var(--line-strong); border-radius: 99px; font-size: 0.875rem; color: var(--snow);
   transition: border-color 160ms ease, background-color 160ms ease;
 }
 .choice button[aria-pressed='true'] { background: var(--snow); color: var(--night); border-color: var(--snow); }
-@media (hover: hover) and (pointer: fine) { .choice button:hover { border-color: rgb(236 235 230 / 0.6); } }
+@media (hover: hover) and (pointer: fine) { .choice button:hover { border-color: rgb(var(--snow-rgb) / 0.6); } }
 
 .page-foot {
   border-top: 1px solid var(--line); padding: var(--space-l) var(--gutter) calc(var(--space-l) + env(safe-area-inset-bottom, 0px));
-  display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 13px; color: var(--snow-3);
+  display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 0.8125rem; color: var(--snow-3);
 }
 .page-foot a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; color: var(--snow-2); }
 @media (hover: hover) and (pointer: fine) { .page-foot a:hover { color: var(--snow); } }

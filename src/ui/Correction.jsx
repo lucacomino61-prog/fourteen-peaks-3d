@@ -4,10 +4,13 @@ import { byId, byRank } from '../data'
 import { lockScroll } from '../lib/clock'
 import { track } from '../lib/analytics'
 import { campaign } from '../lib/utm'
+import { fmt } from '../lib/format'
+import { t, LANG, withLang } from '../i18n'
 import { X } from './Icons'
 
 // Where corrections go: the form service at VITE_FORM_ENDPOINT (Formspree, Web3Forms, a Worker…
-// anything that takes a JSON POST), or else a prefilled issue in the site's public repository.
+// anything that takes a JSON POST), or else a prefilled issue in the site's public repository. What
+// is sent names its topic in English, whatever the page's language, with the language beside it.
 const ENDPOINT = import.meta.env.VITE_FORM_ENDPOINT || ''
 const REPO_URL = 'https://github.com/lucacomino61-prog/fourteen-peaks-3d'
 const TOPICS = ['A route, camp or hazard position', 'An altitude or a figure', 'A date, a name or history', 'Something else']
@@ -16,14 +19,14 @@ const EMPTY = { topic: TOPICS[0], details: '', source: '', email: '', website: '
 function validate(v) {
   const e = {}
   const details = v.details.trim()
-  if (details.length < 20) e.details = details ? 'Say a little more: what is wrong, and what should it say? (20 characters at least)' : 'Write what is wrong and what it should say.'
-  else if (details.length > 2000) e.details = `Keep it under 2,000 characters (now ${details.length.toLocaleString('en-GB')}).`
+  if (details.length < 20) e.details = details ? t('Say a little more: what is wrong, and what should it say? (20 characters at least)') : t('Write what is wrong and what it should say.')
+  else if (details.length > 2000) e.details = t('Keep it under {max} characters (now {n}).', { max: fmt(2000), n: fmt(details.length) })
   if (v.source.trim()) {
     let ok = false
     try { ok = /^https?:$/.test(new URL(v.source.trim()).protocol) } catch { /* not an address */ }
-    if (!ok) e.source = 'Paste the full address of the source, starting with https://, or leave it empty.'
+    if (!ok) e.source = t('Paste the full address of the source, starting with https://, or leave it empty.')
   }
-  if (v.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email.trim())) e.email = 'Check the email address, or leave it empty.'
+  if (v.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email.trim())) e.email = t('Check the email address, or leave it empty.')
   return e
 }
 const LABELS = { details: 'What should change', source: 'Source', email: 'Your email' }
@@ -87,7 +90,7 @@ export default function Correction() {
     const m = byId[mountain]
     const payload = {
       mountain: m.peak.name, topic: v.topic, details: v.details.trim(), source: v.source.trim(), email: v.email.trim(),
-      page: `${location.origin}/${mountain}/`, came_from: campaign().utm_source || '',
+      page: `${location.origin}${withLang(`/${mountain}/`)}`, came_from: campaign().utm_source || '', lang: LANG,
     }
     if (!ENDPOINT) {
       // no form service: the correction goes as a prefilled public issue (the visitor submits it there)
@@ -120,66 +123,66 @@ export default function Correction() {
       onClick={(e) => { if (e.target === dialog.current) requestClose() }}>
       <div className="fix-box">
         <div className="fix-head">
-          <h2 id="fix-title">Suggest a correction</h2>
-          <button type="button" className="close" onClick={requestClose} aria-label="Close"><X /></button>
+          <h2 id="fix-title">{t('Suggest a correction')}</h2>
+          <button type="button" className="close" onClick={requestClose} aria-label={t('Close')}><X /></button>
         </div>
 
         {status === 'sent' || status === 'github' ? (
           <div className="fix-done" role="status">
-            <p className="fix-done-title">{status === 'sent' ? 'Thank you. Your correction is on its way.' : 'Your correction is ready on GitHub.'}</p>
+            <p className="fix-done-title">{status === 'sent' ? t('Thank you. Your correction is on its way.') : t('Your correction is ready on GitHub.')}</p>
             <p>{status === 'sent'
-              ? 'It will be checked against the source before the page changes.'
-              : 'Submit the issue in the tab that opened to send it; nothing is sent until you do. No tab? Your browser may have blocked it: allow pop-ups for this site and press Continue again.'}</p>
+              ? t('It will be checked against the source before the page changes.')
+              : t('Submit the issue in the tab that opened to send it; nothing is sent until you do. No tab? Your browser may have blocked it: allow pop-ups for this site and press Continue again.')}</p>
             <div className="fix-actions">
-              {status === 'github' && <button type="button" className="btn-ghost" onClick={() => setStatus('editing')}>Back to the form</button>}
-              <button type="button" className="btn-solid" onClick={shut}>Close</button>
+              {status === 'github' && <button type="button" className="btn-ghost" onClick={() => setStatus('editing')}>{t('Back to the form')}</button>}
+              <button type="button" className="btn-solid" onClick={shut}>{t('Close')}</button>
             </div>
           </div>
         ) : (
           <form className="fix-form" onSubmit={submit} noValidate>
-            <p className="fix-lead">Seen a wrong altitude, date or line? Tell us what it should say, with a source if you have one.</p>
+            <p className="fix-lead">{t('Seen a wrong altitude, date or line? Tell us what it should say, with a source if you have one.')}</p>
 
             {errorList.length > 0 && (
               <div className="fix-summary" role="alert" tabIndex={-1} ref={summary}>
-                <p>{errorList.length === 1 ? 'One thing to fix before sending:' : `${errorList.length} things to fix before sending:`}</p>
-                <ul>{errorList.map((k) => <li key={k}><a href={`#fix-${k}`} onClick={(e) => { e.preventDefault(); document.getElementById(`fix-${k}`)?.focus() }}>{LABELS[k]}: {errors[k]}</a></li>)}</ul>
+                <p>{errorList.length === 1 ? t('One thing to fix before sending:') : t('{n} things to fix before sending:', { n: fmt(errorList.length) })}</p>
+                <ul>{errorList.map((k) => <li key={k}><a href={`#fix-${k}`} onClick={(e) => { e.preventDefault(); document.getElementById(`fix-${k}`)?.focus() }}>{t(LABELS[k])}: {errors[k]}</a></li>)}</ul>
               </div>
             )}
 
             <div className="fix-row">
               <div className="fix-field">
-                <label htmlFor="fix-mountain">Mountain</label>
+                <label htmlFor="fix-mountain">{t('Mountain')}</label>
                 <select id="fix-mountain" value={mountain} onChange={(e) => setMountain(e.target.value)}>
                   {byRank.map((m) => <option key={m.id} value={m.id}>{m.peak.name}</option>)}
                 </select>
               </div>
               <div className="fix-field">
-                <label htmlFor="fix-topic">About</label>
+                <label htmlFor="fix-topic">{t('About')}</label>
                 <select id="fix-topic" value={v.topic} onChange={change('topic')}>
-                  {TOPICS.map((t) => <option key={t}>{t}</option>)}
+                  {TOPICS.map((topic) => <option key={topic} value={topic}>{t(topic)}</option>)}
                 </select>
               </div>
             </div>
 
             <div className="fix-field">
-              <label htmlFor="fix-details">What should change <span className="req">required</span></label>
+              <label htmlFor="fix-details">{t('What should change')} <span className="req">{t('required')}</span></label>
               <textarea {...field('details')} rows={5} maxLength={2400} required autoCapitalize="sentences" />
-              <p className="fix-hint" id="fix-details-hint">What the page says, what it should say, and how you know.</p>
+              <p className="fix-hint" id="fix-details-hint">{t('What the page says, what it should say, and how you know.')}</p>
               {errors.details && <p className="fix-error" id="fix-details-error">{errors.details}</p>}
             </div>
 
             <div className="fix-field">
-              <label htmlFor="fix-source">Source <span className="opt">optional</span></label>
+              <label htmlFor="fix-source">{t('Source')} <span className="opt">{t('optional')}</span></label>
               <input {...field('source')} type="url" inputMode="url" autoComplete="off" autoCapitalize="off" spellCheck="false" placeholder="https://" />
-              <p className="fix-hint" id="fix-source-hint">A book, an article or an expedition report online.</p>
+              <p className="fix-hint" id="fix-source-hint">{t('A book, an article or an expedition report online.')}</p>
               {errors.source && <p className="fix-error" id="fix-source-error">{errors.source}</p>}
             </div>
 
             {ENDPOINT && (
               <div className="fix-field">
-                <label htmlFor="fix-email">Your email <span className="opt">optional</span></label>
+                <label htmlFor="fix-email">{t('Your email')} <span className="opt">{t('optional')}</span></label>
                 <input {...field('email')} type="email" inputMode="email" autoComplete="email" autoCapitalize="off" spellCheck="false" />
-                <p className="fix-hint" id="fix-email-hint">Only to answer you. See the <a href="/privacy/">privacy page</a>.</p>
+                <p className="fix-hint" id="fix-email-hint">{t('Only to answer you.')} <a href={withLang('/privacy/')}>{t('The privacy page')}</a></p>
                 {errors.email && <p className="fix-error" id="fix-email-error">{errors.email}</p>}
               </div>
             )}
@@ -191,26 +194,26 @@ export default function Correction() {
             </div>
 
             {status === 'failed' && (
-              <p className="fix-error fix-failed" role="alert">It didn’t go through (no connection, or the form service is down). Your text is still here: try again in a moment.</p>
+              <p className="fix-error fix-failed" role="alert">{t('It didn’t go through (no connection, or the form service is down). Your text is still here: try again in a moment.')}</p>
             )}
 
             <div className="fix-actions">
-              <button type="button" className="btn-ghost" onClick={requestClose}>Cancel</button>
+              <button type="button" className="btn-ghost" onClick={requestClose}>{t('Cancel')}</button>
               <button type="submit" className="btn-solid" aria-busy={status === 'sending'}>
-                {status === 'sending' ? 'Sending…' : status === 'failed' ? 'Try again' : ENDPOINT ? 'Send correction' : 'Continue on GitHub'}
+                {status === 'sending' ? t('Sending…') : status === 'failed' ? t('Try again') : ENDPOINT ? t('Send correction') : t('Continue on GitHub')}
               </button>
             </div>
-            {!ENDPOINT && <p className="fix-hint">Corrections are collected as public issues in the site’s repository; you need a GitHub account to submit one.</p>}
+            {!ENDPOINT && <p className="fix-hint">{t('Corrections are collected as public issues in the site’s repository; you need a GitHub account to submit one.')}</p>}
           </form>
         )}
       </div>
 
       <dialog className="confirm" ref={confirm} aria-labelledby="confirm-title" aria-describedby="confirm-text">
-        <h3 id="confirm-title">Discard this correction?</h3>
-        <p id="confirm-text">What you wrote will be lost.</p>
+        <h3 id="confirm-title">{t('Discard this correction?')}</h3>
+        <p id="confirm-text">{t('What you wrote will be lost.')}</p>
         <div className="fix-actions">
-          <button type="button" className="btn-ghost" onClick={() => confirm.current?.close()} autoFocus>Keep writing</button>
-          <button type="button" className="btn-danger" onClick={discard}>Discard</button>
+          <button type="button" className="btn-ghost" onClick={() => confirm.current?.close()} autoFocus>{t('Keep writing')}</button>
+          <button type="button" className="btn-danger" onClick={discard}>{t('Discard')}</button>
         </div>
       </dialog>
     </dialog>

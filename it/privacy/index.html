@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b0d12" />
+    <meta name="color-scheme" content="dark" />
+    <!-- head:page -->
+    <title>Privacy · Le quattordici vette di 8000 m in 3D</title>
+    <!-- /head:page -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Vai al contenuto</a>
+    <header class="page-bar">
+      <a class="page-brand" href="/it/">Le quattordici</a>
+      <a class="page-back" href="/it/">Torna alle montagne</a>
+    </header>
+    <main id="main" class="doc" tabindex="-1">
+      <h1>Privacy</h1>
+      <p class="lead">Nessun account, nessuna pubblicità, nessun cookie. Questo è tutto ciò che il sito conserva o invia, e dove.</p>
+      <p class="updated">Ultimo aggiornamento <time datetime="%LAST_UPDATED_ISO%">%LAST_UPDATED%</time></p>
+
+      <h2>Cosa resta sul tuo dispositivo</h2>
+      <p>Alcune impostazioni sono conservate nella memoria locale del browser, così sopravvivono a un ricaricamento della pagina. Non lasciano mai il tuo dispositivo, e cancellando i dati del sito vengono rimosse.</p>
+      <ul>
+        <li><code>fp-motion</code>: se hai fermato le animazioni.</li>
+        <li><code>fp-settings</code>: ciò che hai cambiato nelle impostazioni (tema, dimensione del testo, metri o piedi, il suono del vento, se la previsione per la vetta si carica da sola, le due notifiche, il risparmio batteria), e solo quello.</li>
+        <li><code>fp-seen</code>: la data della versione del sito che hai visto l’ultima volta, perché «Novità» possa dirti quando è cambiata.</li>
+        <li><code>fp-guess</code>: il tuo miglior punteggio in «Indovina la montagna», se ci hai giocato.</li>
+        <li><code>fp-stats</code>: la tua risposta sul conteggio delle visite, quando il sito te lo chiede.</li>
+        <li><code>fp-utm</code> (solo per questa visita): l’etichetta di campagna del link da cui sei arrivato, se ne aveva una.</li>
+      </ul>
+
+      <h2>Il conteggio delle visite</h2>
+      <!-- policy:analytics -->
+
+      <h2>Le correzioni che invii</h2>
+      <!-- policy:corrections -->
+
+      <h2>Il meteo in vetta, solo se lo chiedi</h2>
+      <p>La previsione per una vetta arriva da <a href="https://open-meteo.com/">Open-Meteo</a>. Non gli viene chiesto nulla finché non premi «Mostra il meteo in vetta» (o non attivi «Carica la previsione da solo» nelle impostazioni). A quel punto il tuo browser invia a Open-Meteo le coordinate della montagna e, come per qualunque richiesta su internet, il tuo indirizzo e il tipo di browser; le sue <a href="https://open-meteo.com/en/terms">condizioni</a> dicono che può conservare gli indirizzi per ragioni tecniche e che cancella i suoi registri dopo 90 giorni. Una volta che l’hai chiesta, anche le altre montagne che apri durante la stessa visita caricano la loro previsione. La previsione resta nel tuo browser per la visita, un’ora al massimo (<code>fp-weather</code>, <code>fp-weather-asked</code>, nella memoria di sessione).</p>
+
+      <h2>Tutto il resto arriva da questo sito</h2>
+      <p>Il terreno 3D, le immagini satellitari, i caratteri e il codice sono tutti serviti da questo sito. Guardare una montagna non invia alcuna richiesta a Google, a Esri o ad altri terzi; solo il meteo in vetta, se lo chiedi, arriva da fuori (vedi sopra).</p>
+
+      <h2>I registri del server</h2>
+      <p>Come quasi tutti i siti web, il server che consegna queste pagine può registrare i normali log di accesso (indirizzo, ora, pagina richiesta, browser) per mantenere il servizio sicuro e funzionante. Sono conservati dal fornitore dell’hosting secondo la sua politica e non vengono usati per seguire nessuno.</p>
+
+      <h2>Domande</h2>
+      <p>Questo sito è pubblicato da Luca Comino. Per qualunque domanda su questa pagina scrivi nel <a href="%REPO_URL%/issues">repository pubblico</a> del sito.</p>
+    </main>
+    <footer class="page-foot">
+      <nav aria-label="Sito"><a href="/it/">Le quattordici</a> · <a href="/it/terms/">Condizioni d’uso</a> · <a href="%REPO_URL%">Codice sorgente</a> · <a href="/privacy/" hreflang="en" lang="en">English</a></nav>
+      <span class="mono">Aggiornato il %LAST_UPDATED%</span>
+    </footer>
+    <script type="module" src="/src/pages/page.js"></script>
+  </body>
+</html>

@@ -8,8 +8,9 @@ import { X } from './Icons'
 // known term (three at most, so a paragraph doesn't turn into a list of links) becomes a button
 // with a dotted underline; pressing it opens the definition beside it, with a link to all of them.
 
-// whole words, letters of any alphabet (arête); no lookbehind, which older Safari can't parse
-const RULES = glossary.map((g) => ({ id: g.id, re: new RegExp(`(^|[^\\p{L}\\p{N}])(${g.match})(?![\\p{L}\\p{N}])`, 'iu') }))
+// whole words, letters of any alphabet (arête); no lookbehind, which older Safari can't parse. A
+// term marked `cased` keeps its case: Italian "sherpa" is the people, "Sherpa" a surname
+const RULES = glossary.map((g) => ({ id: g.id, re: new RegExp(`(^|[^\\p{L}\\p{N}])(${g.match})(?![\\p{L}\\p{N}])`, g.cased ? 'u' : 'iu') }))
 
 /** The marked terms of a text: [{ id, start, end }], in order, never overlapping, `max` at most */
 function marksIn(text, max = 3) {

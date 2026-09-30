@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b0d12" />
+    <meta name="color-scheme" content="dark" />
+    <!-- head:page -->
+    <title>Indovina la montagna · Le quattordici vette di 8000 m in 3D</title>
+    <!-- /head:page -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Vai al contenuto</a>
+    <header class="page-bar">
+      <a class="page-brand" href="/it/">Le quattordici</a>
+      <a class="page-back" href="/it/">Torna alle montagne</a>
+    </header>
+    <main id="main" class="doc game" tabindex="-1">
+      <p class="game-kicker mono">Un gioco</p>
+      <h1>Indovina la montagna</h1>
+      <p class="lead">Dieci delle quattordici, disegnate a curve di livello dai loro modelli di elevazione: il nord in alto, 10&nbsp;km di lato, una curva ogni 200&nbsp;m e la curva degli 8000&nbsp;m in arancione. Quale sarà?</p>
+      <section class="game-board" data-board aria-labelledby="game-round">
+        <div class="game-top mono">
+          <span id="game-round" data-round>Turno 1 di 10</span>
+          <span data-score>0 giuste</span>
+        </div>
+        <figure class="game-map">
+          <div class="game-canvas">
+            <canvas data-map role="img" aria-label="Carta a curve di livello della montagna da indovinare"></canvas>
+            <span class="game-north mono" aria-hidden="true">N ↑</span>
+          </div>
+          <figcaption class="mono"><span class="game-scale" aria-hidden="true"><i></i>2 km</span><span data-caption>Curve ogni 200 m, direttrici ogni 1000 m</span></figcaption>
+        </figure>
+        <div class="game-options" data-options role="group" aria-label="La tua risposta"></div>
+        <p class="game-status" data-status role="status" aria-live="polite"></p>
+        <div class="game-actions">
+          <button type="button" class="pill" data-hint>Mostra un indizio</button>
+          <button type="button" class="btn-solid" data-next hidden>Prossima montagna</button>
+        </div>
+      </section>
+      <section class="game-end" data-end hidden aria-labelledby="game-end-title">
+        <h2 id="game-end-title" data-end-title>Dieci montagne, 0 giuste</h2>
+        <p data-end-note></p>
+        <div class="game-actions">
+          <button type="button" class="btn-solid" data-again>Gioca ancora</button>
+          <button type="button" class="pill" data-share>Condividi il punteggio</button>
+        </div>
+      </section>
+      <noscript><p>Il gioco disegna le sue carte con JavaScript, che in questo browser è disattivato.</p></noscript>
+      <h2>Le quattordici</h2>
+      <ol class="lost-peaks">
+          <!-- list:peaks -->
+      </ol>
+    </main>
+    <footer class="page-foot">
+      <nav aria-label="Sito"><a href="/it/">Le quattordici</a> · <a href="/it/privacy/">Privacy</a> · <a href="/it/terms/">Condizioni d’uso</a> · <a href="/guess/" hreflang="en" lang="en">English</a></nav>
+    </footer>
+    <script type="module" src="/src/pages/guess.js"></script>
+  </body>
+</html>

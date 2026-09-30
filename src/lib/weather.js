@@ -21,7 +21,7 @@ const rad = (d) => (d * Math.PI) / 180
 // otherwise get whichever zone the coordinates fall in: K2 came out on China's clock.
 const ZONES = { Nepal: 'Asia/Kathmandu', Pakistan: 'Asia/Karachi', China: 'Asia/Shanghai', India: 'Asia/Kolkata' }
 export function zoneOf(m) {
-  const country = String(m.peak.countries || '').split('/')[0].replace(/\(.*\)/, '').trim()
+  const country = m.peak.clock // in English, whatever the page's language (src/data/index.js)
   return { country, zone: ZONES[country] || 'UTC' }
 }
 

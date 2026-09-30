@@ -12,7 +12,7 @@ import { LANG } from './i18n'
 
 // an address that names no mountain, route or stop goes to the 404 page (static hosts serve it by
 // themselves; this covers servers that fall back to the app instead)
-if (!parsePath(location.pathname).valid) location.replace('/404.html')
+if (!parsePath(location.pathname).valid) location.replace(LANG === 'it' ? '/404.html?lang=it' : '/404.html')
 // the page's language comes from its address (the development server serves one HTML for all)
 document.documentElement.lang = LANG
 

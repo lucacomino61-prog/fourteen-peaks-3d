@@ -7,6 +7,11 @@ import '../base.css'
 import './page.css'
 import { CONSENT_KEY, refusedByBrowser } from '../lib/consent.js'
 
+// the answer's words in the page's language (it/privacy/ is Italian)
+const WORDS = document.documentElement.lang === 'it'
+  ? { refused: 'il tuo browser chiede ai siti di non tracciarlo, quindi non viene contato nulla', yes: 'conta le mie visite', no: 'non contarle', none: 'non ancora data' }
+  : { refused: 'your browser asks sites not to track it, so nothing is counted', yes: 'count my visits', no: 'don’t count them', none: 'not given yet' }
+
 const choice = document.querySelector('[data-choice]')
 if (choice) {
   const state = choice.querySelector('[data-choice-state]')
@@ -15,11 +20,11 @@ if (choice) {
   const paint = () => {
     const v = read()
     if (refusedByBrowser()) {
-      state.textContent = 'your browser asks sites not to track it, so nothing is counted'
+      state.textContent = WORDS.refused
       buttons.forEach((b) => { b.hidden = true })
       return
     }
-    state.textContent = v === 'yes' ? 'count my visits' : v === 'no' ? 'don’t count them' : 'not given yet'
+    state.textContent = v === 'yes' ? WORDS.yes : v === 'no' ? WORDS.no : WORDS.none
     buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.choiceSet === v)))
   }
   buttons.forEach((b) => b.addEventListener('click', () => {

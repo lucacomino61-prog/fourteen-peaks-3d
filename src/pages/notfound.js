@@ -3,12 +3,24 @@
 // the way back shows. No animation loop: the loupe moves only when the pointer or a key does.
 import './page.js'
 import './notfound.css'
+import { langOf, withLang } from '../i18n/lang.js'
+
+// One 404 serves every address. An Italian one (/it/…), or the app sending an Italian address here
+// (?lang=it), reads in Italian: each element's data-it, the links under /it/, Italian numbers.
+const IT = langOf(location.pathname) === 'it' || new URLSearchParams(location.search).get('lang') === 'it'
+if (IT) {
+  document.documentElement.lang = 'it'
+  document.title = 'Fuori via (404) · Le quattordici vette di 8000 m in 3D'
+  for (const el of document.querySelectorAll('[data-it]')) el.innerHTML = el.dataset.it
+  for (const a of document.querySelectorAll('a[href^="/"]')) a.setAttribute('href', withLang(a.getAttribute('href'), 'it'))
+  for (const el of document.querySelectorAll('.lost-peaks .mono')) el.textContent = el.textContent.replace(/\d{1,3}(?:,\d{3})+/, (n) => Number(n.replace(/,/g, '')).toLocaleString('it-IT'))
+}
 
 const W = 120, H = 80 // grid cells
 const VW = 1200, VH = 800 // SVG units
 const LOW = 404, HIGH = 8404
 const R = 110 // loupe radius, SVG units
-const fmt = (n) => Math.round(n).toLocaleString('en-GB')
+const fmt = (n) => Math.round(n).toLocaleString(IT ? 'it-IT' : 'en-GB')
 
 // the terrain: a main peak, a shoulder, a second summit, the valley you start in, a little noise
 function heightfield() {
@@ -84,7 +96,7 @@ if (host) {
   const pos = { x: ((lo % (W + 1)) / W) * VW, y: (Math.floor(lo / (W + 1)) / H) * VH }
 
   host.innerHTML = `
-    <svg viewBox="0 0 ${VW} ${VH}" tabindex="0" role="img" aria-label="A mountain that does not exist, drawn as contour lines every 500 metres, with the 8,000 metre line in orange. The loupe reads the ground under the pointer; the arrow keys move it.">
+    <svg viewBox="0 0 ${VW} ${VH}" tabindex="0" role="img" aria-label="${IT ? 'Una montagna che non esiste, disegnata a curve di livello ogni 500 metri, con la curva degli 8000 metri in arancione. La lente legge il terreno sotto il puntatore; i tasti freccia la spostano.' : 'A mountain that does not exist, drawn as contour lines every 500 metres, with the 8,000 metre line in orange. The loupe reads the ground under the pointer; the arrow keys move it.'}">
       <defs><clipPath id="lens"><circle r="${R}" cx="${pos.x}" cy="${pos.y}"/></clipPath></defs>
       <g class="ghost">${layer()}</g>
       <g class="lens" clip-path="url(#lens)"><rect width="${VW}" height="${VH}"/>${layer()}</g>
@@ -122,7 +134,7 @@ if (host) {
     if (atTop && !top) {
       top = true
       found.hidden = false
-      live.textContent = `${text}. Summit: the way back is under the map.`
+      live.textContent = IT ? `${text}. Vetta: la via del ritorno è sotto la mappa.` : `${text}. Summit: the way back is under the map.`
     } else if (announce) live.textContent = text
   }
   const fromEvent = (e) => {

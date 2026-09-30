@@ -2,7 +2,8 @@
 //
 //   npm run build && node scripts/check-site.mjs [--external]
 //
-// Pages: the home page, the fourteen mountain pages, privacy, terms and the 404, each rendered in
+// Pages: the home page, the fourteen mountain pages, a route and a stop, the game, the glossary,
+// privacy, terms and the 404, and the Italian home, mountain, stop and pages, each rendered in
 // headless Chrome so the links the app draws are counted too. A link inside the site must point at
 // a file in dist/ (or an id on its page); with --external, links to other sites are fetched as
 // well (network needed). Then the correction form: its checks, the confirmation before
@@ -19,7 +20,8 @@ const EXTERNAL = process.argv.includes('--external')
 const PORT = 4213
 const BASE = `http://127.0.0.1:${PORT}`
 const DIST = path.resolve('dist')
-const PAGES = ['/', ...mountains.map((m) => `/${m.id}/`), '/k2/abruzzi/', '/k2/abruzzi/camp-4/', '/guess/', '/privacy/', '/terms/', '/404.html']
+const PAGES = ['/', ...mountains.map((m) => `/${m.id}/`), '/k2/abruzzi/', '/k2/abruzzi/camp-4/', '/guess/', '/glossary/', '/privacy/', '/terms/', '/404.html',
+  '/it/', '/it/k2/', '/it/k2/abruzzi/camp-4/', '/it/guess/', '/it/glossary/', '/it/privacy/', '/it/terms/']
 const problems = []
 const note = (msg) => { problems.push(msg); console.log(`  ✗ ${msg}`) }
 
@@ -52,7 +54,8 @@ for (const p of PAGES) {
   const found = await page.evaluate(() => {
     const out = []
     for (const a of document.querySelectorAll('a[href]')) out.push({ url: a.href, raw: a.getAttribute('href'), what: `link “${(a.textContent || a.getAttribute('aria-label') || '').trim().slice(0, 40)}”` })
-    for (const l of document.querySelectorAll('link[href]:not([rel=canonical]):not([rel=preconnect])')) out.push({ url: l.href, raw: l.getAttribute('href'), what: `<link rel=${l.rel}>` })
+    // the canonical and the other languages' addresses point at SITE_URL, not at this server
+    for (const l of document.querySelectorAll('link[href]:not([rel=canonical]):not([rel=preconnect]):not([rel=alternate])')) out.push({ url: l.href, raw: l.getAttribute('href'), what: `<link rel=${l.rel}>` })
     for (const s of document.querySelectorAll('script[src], img[src]')) out.push({ url: s.src, raw: s.getAttribute('src'), what: `<${s.tagName.toLowerCase()}>` })
     const ids = [...document.querySelectorAll('[id]')].map((e) => e.id)
     return { out, ids }

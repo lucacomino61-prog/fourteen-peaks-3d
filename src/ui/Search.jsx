@@ -5,6 +5,7 @@ import { alt } from '../lib/units'
 import { lockScroll } from '../lib/clock'
 import { goTo } from '../lib/navigate'
 import { track } from '../lib/analytics'
+import { t, plural } from '../i18n'
 import { Search as SearchIcon, X } from './Icons'
 
 // case- and accent-insensitive, and "8,611" finds 8611
@@ -21,7 +22,7 @@ function buildIndex() {
       r.camps.forEach((c, k) => items.push({ type: 'Camp', label: c.name, sub: `${r.name}, ${p.name} · ${alt(c.alt)}`, text: `${c.name} ${r.name} ${p.name} ${c.alt}`, go: { mountain: m.id, route: r.id, camp: `${r.id}:${k}:${c.name}` } }))
     })
     m.hazards.forEach((h) => items.push({ type: 'Hazard', label: h.name, sub: `${p.name} · ${h.kind}`, text: `${h.name} ${h.kind} ${p.name} ${h.alt}`, go: { mountain: m.id, hazard: h.id } }))
-    m.timeline.forEach((t) => items.push({ type: 'History', label: `${t.year} · ${t.title}`, sub: p.name, text: `${t.year} ${t.title} ${t.text} ${p.name}`, go: { mountain: m.id, year: t.year } }))
+    m.timeline.forEach((e) => items.push({ type: 'History', label: `${e.year} · ${e.title}`, sub: p.name, text: `${e.year} ${e.title} ${e.text} ${p.name}`, go: { mountain: m.id, year: e.year } }))
   }
   return items.map((it, i) => ({ ...it, id: `sr-${i}`, key: norm(it.label), hay: norm(`${it.label} ${it.text}`) }))
 }
@@ -87,29 +88,29 @@ export default function Search() {
       <div className="search-box">
         <div className="search-field">
           <SearchIcon />
-          <label id="search-label" htmlFor="search-input" className="visually-hidden">Search the fourteen peaks</label>
+          <label id="search-label" htmlFor="search-input" className="visually-hidden">{t('Search the fourteen peaks')}</label>
           <input
             id="search-input" ref={input} type="search" value={query} autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck="false" enterKeyHint="go"
-            placeholder="Peaks, routes, camps, hazards, years…"
+            placeholder={t('Peaks, routes, camps, hazards, years…')}
             role="combobox" aria-expanded={results.length > 0} aria-controls="search-results" aria-autocomplete="list"
             aria-activedescendant={results[active]?.id}
             onChange={(e) => { setQuery(e.target.value); setActive(0) }} onKeyDown={onKey}
           />
-          <button type="button" className="close" onClick={close} aria-label="Close search"><X /></button>
+          <button type="button" className="close" onClick={close} aria-label={t('Close search')}><X /></button>
         </div>
-        <ul id="search-results" className="search-results" role="listbox" aria-label={query ? 'Results' : 'The fourteen peaks'}>
+        <ul id="search-results" className="search-results" role="listbox" aria-label={query ? t('Results') : t('The fourteen peaks')}>
           {results.map((it, i) => (
             <li key={it.id} id={it.id} role="option" aria-selected={i === active} className={i === active ? 'is-active' : ''}
               onMouseMove={() => { if (i !== active) setActive(i) }} onClick={() => go(it)}>
-              <span className="type mono">{it.type}</span>
+              <span className="type mono">{t(it.type)}</span>
               <span className="txt"><b translate={it.type === 'Peak' ? 'no' : undefined}>{it.label}</b><small>{it.sub}</small></span>
             </li>
           ))}
         </ul>
         <p className="search-status" role="status">
-          {query.trim() && !results.length ? <>Nothing matches “{query.trim()}”. Try a peak, a route, a camp or a year.</> : query.trim() ? `${results.length} result${results.length === 1 ? '' : 's'}` : ''}
+          {query.trim() && !results.length ? t('Nothing matches “{q}”. Try a peak, a route, a camp or a year.', { q: query.trim() }) : query.trim() ? plural(results.length, '{n} result', '{n} results') : ''}
         </p>
-        <p className="search-hint mono" aria-hidden="true">↑ ↓ to move · Enter to go · Esc to close</p>
+        <p className="search-hint mono" aria-hidden="true">{t('↑ ↓ to move · Enter to go · Esc to close')}</p>
       </div>
     </dialog>
   )

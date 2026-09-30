@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useStore } from '../store'
 import { answer, analyticsName } from '../lib/analytics'
+import { t, withLang } from '../i18n'
 
 /**
  * The question about visit counting. It only exists when counting is set up for the build and the
@@ -12,14 +13,14 @@ export default function Consent() {
   const ref = useRef()
   useEffect(() => { if (open === 'asked') ref.current?.focus() }, [open])
   if (!open) return null
-  const reply = (yes) => { answer(yes); useStore.setState({ consentOpen: false, toast: { text: yes ? 'Thanks: visits are counted, without cookies' : 'Understood: nothing is counted', at: Date.now() } }) }
+  const reply = (yes) => { answer(yes); useStore.setState({ consentOpen: false, toast: { text: yes ? t('Thanks: visits are counted, without cookies') : t('Understood: nothing is counted'), at: Date.now() } }) }
   return (
     <section className="consent" aria-labelledby="consent-title" ref={ref} tabIndex={-1}>
-      <h2 id="consent-title">Count this visit?</h2>
-      <p>This site sets no cookies. With your OK, {analyticsName} counts visits anonymously, so we can see which mountains and routes people open. <a href="/privacy/">Privacy</a></p>
+      <h2 id="consent-title">{t('Count this visit?')}</h2>
+      <p>{t('This site sets no cookies. With your OK, {name} counts visits anonymously, so we can see which mountains and routes people open.', { name: analyticsName })} <a href={withLang('/privacy/')}>{t('Privacy')}</a></p>
       <div className="consent-actions">
-        <button type="button" className="btn-solid" onClick={() => reply(true)}>Count my visit</button>
-        <button type="button" className="btn-ghost" onClick={() => reply(false)}>No thanks</button>
+        <button type="button" className="btn-solid" onClick={() => reply(true)}>{t('Count my visit')}</button>
+        <button type="button" className="btn-ghost" onClick={() => reply(false)}>{t('No thanks')}</button>
       </div>
     </section>
   )

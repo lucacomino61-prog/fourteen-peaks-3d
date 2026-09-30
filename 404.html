@@ -12,30 +12,31 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to the content</a>
+    <!-- one 404 for every address: on an Italian one (/it/…) the script puts in each data-it (src/pages/notfound.js) -->
+    <a class="skip-link" href="#main" data-it="Vai al contenuto">Skip to the content</a>
     <header class="page-bar">
-      <a class="page-brand" href="/">The fourteen</a>
-      <a class="page-back" href="/">Back to the mountains</a>
+      <a class="page-brand" href="/" data-it="Le quattordici">The fourteen</a>
+      <a class="page-back" href="/" data-it="Torna alle montagne">Back to the mountains</a>
     </header>
     <main id="main" class="doc lost" tabindex="-1">
-      <p class="lost-code mono">Error 404</p>
-      <h1>Off route</h1>
-      <p class="lead">No page lives at this address. You are standing at 404&nbsp;m on a mountain that doesn’t exist: point at the map to read the ground, and climb to its summit to find the way back.</p>
+      <p class="lost-code mono" data-it="Errore 404">Error 404</p>
+      <h1 data-it="Fuori via">Off route</h1>
+      <p class="lead" data-it="A questo indirizzo non c’è nessuna pagina. Sei a 404&amp;nbsp;m su una montagna che non esiste: punta la mappa per leggere il terreno, e sali fino alla vetta per trovare la via del ritorno.">No page lives at this address. You are standing at 404&nbsp;m on a mountain that doesn’t exist: point at the map to read the ground, and climb to its summit to find the way back.</p>
       <figure class="lost-map">
         <div class="lost-svg" data-map></div>
         <figcaption>
           <span class="mono" data-readout aria-live="polite">≈ 404 m</span>
-          <span data-hint>Move the pointer over the map, drag on a touch screen, or use the arrow keys.</span>
+          <span data-hint data-it="Muovi il puntatore sulla mappa, trascina su uno schermo touch, oppure usa i tasti freccia.">Move the pointer over the map, drag on a touch screen, or use the arrow keys.</span>
         </figcaption>
       </figure>
-      <p class="lost-found" data-found hidden>Summit. Now down safely: <a href="/">back to the fourteen</a>.</p>
-      <h2>The fourteen</h2>
+      <p class="lost-found" data-found hidden data-it='Vetta. Ora giù con prudenza: &lt;a href="/"&gt;torna alle quattordici&lt;/a&gt;.'>Summit. Now down safely: <a href="/">back to the fourteen</a>.</p>
+      <h2 data-it="Le quattordici">The fourteen</h2>
       <ol class="lost-peaks">
           <!-- list:peaks -->
       </ol>
     </main>
     <footer class="page-foot">
-      <nav aria-label="Site"><a href="/">The fourteen</a> · <a href="/guess/">Guess the mountain</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms of use</a></nav>
+      <nav aria-label="Site" data-it='&lt;a href="/"&gt;Le quattordici&lt;/a&gt; · &lt;a href="/guess/"&gt;Indovina la montagna&lt;/a&gt; · &lt;a href="/privacy/"&gt;Privacy&lt;/a&gt; · &lt;a href="/terms/"&gt;Condizioni d’uso&lt;/a&gt;'><a href="/">The fourteen</a> · <a href="/guess/">Guess the mountain</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms of use</a></nav>
     </footer>
     <script type="module" src="/src/pages/notfound.js"></script>
   </body>

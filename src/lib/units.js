@@ -3,6 +3,7 @@
 import { useStore } from '../store'
 import { fmt } from './format'
 import { toF } from './air'
+import { t } from '../i18n'
 
 const FEET = 3.28084
 
@@ -18,8 +19,8 @@ export const alt = (m, units = currentUnits()) => `${fmt(inUnits(m, units))}\u00
 /** "m" | "ft" */
 export const unitSymbol = (units = currentUnits()) => (units === 'ft' ? 'ft' : 'm')
 
-/** "metres" | "feet" */
-export const unitName = (units = currentUnits()) => (units === 'ft' ? 'feet' : 'metres')
+/** "metres" | "feet", in the page's language */
+export const unitName = (units = currentUnits()) => (units === 'ft' ? t('feet') : t('metres'))
 
 /**
  * A short fact written in metres ("3,600 m", "about 4,500 m to 8,200 m") in the unit in use.

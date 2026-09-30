@@ -9,6 +9,7 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "check": "node scripts/check-site.mjs",
+    "check:it": "node scripts/check-it.mjs",
     "og": "node scripts/og.mjs",
     "skylines": "node scripts/make-skylines.mjs",
     "guess": "node scripts/make-guess.mjs",

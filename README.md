@@ -109,12 +109,13 @@ That runs three scripts:
 
 ## Pages, sharing and the launch checklist
 
-- **Pages.** The app (`index.html`) plus three plain pages: `privacy/`, `terms/` and `404.html`,
-  with shared tokens in `src/base.css`. The 404 is an imaginary mountain drawn as contour lines,
+- **Pages.** The app (`index.html`) plus the plain pages: `guess/`, `glossary/`, `privacy/`,
+  `terms/` (each also under `it/`) and `404.html`, with shared tokens in `src/base.css`. The 404 is an imaginary mountain drawn as contour lines,
   read through the contour loupe: it starts at 404 m, and its summit (8,404 m) shows the way back.
   A server that answers unknown addresses with the app sends them to `/404.html` (`main.jsx`).
-- **One page per mountain.** At build time the `site-pages` plugin (`vite.config.js`) writes
-  `dist/<id>/index.html` for each mountain, with its own title, description, canonical link,
+- **One page per mountain, route and stop, in each language.** At build time the `site-pages`
+  plugin (`vite.config.js`) writes `dist/<id>/index.html` for each mountain (and each route and stop
+  of its climbs, and all of them again under `it/`: 1,246 pages), with its own title, description, canonical link,
   Open Graph and Twitter tags and JSON-LD (`WebPage` about a `Mountain`), all derived from the
   data (`src/lib/meta.js`). The app keeps the head in step when you switch (`src/lib/head.js`);
   Back and Forward move between mountains. It also writes `sitemap.xml` and `robots.txt`, stamps
@@ -150,10 +151,55 @@ That runs three scripts:
   last-updated date is newer than the one seen, `fp-seen`). Everything applies at once and is kept
   on the device (`fp-settings`, only what differs from the defaults); theme and text size are set
   by a script in every page's head before anything is drawn, so nothing flashes.
+- **Two languages.** English at `/…`, Italian at `/it/…`: every mountain, route and stop page, the
+  game, the glossary, privacy and terms (the 404 reads Italian on an Italian address). The
+  interface's words are keyed by their English (`src/i18n/`, `t('…')`, the Italian in
+  `src/i18n/it.js`). The mountains' texts, the glossary and the season notes have Italian overlays
+  in `src/data/it/`, laid over the data by `src/data/localize.js`: in place on an Italian page, as
+  copies in the build. Ids, positions, heights, camp slugs, figure keys and the clock's country stay
+  English, so addresses, the comparison table and the times work in both. Each page names its
+  other language (`hreflang`); the footer and Settings switch to the same place in the other one.
 - **Checks.** `npm run check` renders every page in headless Chrome and checks every link (inside
   the site against `dist/`, and with `-- --external` the outside ones too), then walks the
-  correction form. Settings for the build are in `.env.example`; what the owner still has to decide
-  is in `NEEDS_CONTENT.md`.
+  correction form. `npm run check:it` pairs every Italian text with its English: nothing missing,
+  the overlays in the data's shape, every number the same (8,611 → 8611, 28,251 → 28.251, 1.5 →
+  1,5), and every interface text translated. Settings for the build are in `.env.example`; what
+  the owner still has to decide is in `NEEDS_CONTENT.md`.
+
+## On each mountain
+
+- **Addresses for every moment.** `/k2/` is the mountain, `/k2/abruzzi/` a route, `/k2/abruzzi/camp-4/`
+  a stop of its climb (a camp's slug, a hazard's id, `summit`, `finish` or `join`); the address
+  follows the scroll and every one of them is a built page with its own head (`src/lib/address.js`).
+- **The climb in profile.** The altimeter holds the route's side view, height against distance,
+  with its camps and hazards; drag along it or use the arrow keys to move the climb
+  (`src/ui/Profile.jsx`). Beside it, the air at that height as a share of sea level's (J. B. West's
+  model atmosphere, 1996) and the temperature water boils at (the Antoine equation), `src/lib/air.js`.
+- **All fourteen compared.** The overview shows them as a grid, a sortable table (height, range,
+  countries, season, first ascent, first in winter, summits, deaths) or side by side at one scale,
+  outlines cut from each elevation model (`npm run skylines` → `src/data/skylines.json`).
+- **Climbing season.** A strip of the twelve months in "The numbers", with a line and its sources
+  (`src/data/seasons.js`); the table sorts by it.
+- **History on the mountain.** A timeline entry whose own text names a place the model has carries
+  it (`at`: a hazard, a camp, the summit or a route). The explorer's History layer puts a flag on
+  each place with its years; "Show on the mountain" in the history flies there (`src/lib/history.js`,
+  `src/scene/Events.jsx`).
+- **The light.** The explorer's Light control lights the mountain at any hour of today on its own
+  clock, or "Now" with the real sun (NOAA's solar position algorithm, `src/lib/sun.js`); the shadows
+  are ray-marched on the GPU when the sun moves (`src/scene/sunShadow.js`). A route whose text gives
+  its summit push (`push` in the data) climbs its last stretch in the dark (`src/lib/climbLight.js`).
+- **Summit weather** (`src/lib/weather.js`, `src/ui/Weather.jsx`): only when asked (or switched on in
+  the settings), from Open-Meteo, interpolated to the summit's height: seven days of wind and
+  temperature, and the snow plume blown in the real wind direction (`src/scene/Plume.jsx`).
+- **Glossary.** The climbing words are marked where they appear (the first of each in a text, three
+  at most) and open their definition beside them; all of them on `/glossary/`
+  (`src/data/glossary.js`, `src/ui/Glossed.jsx`).
+- **Guess the mountain** (`/guess/`): ten of the fourteen as contour maps from their elevation
+  models (`npm run guess` → `public/guess/`).
+- **3D printing.** "Download for 3D printing" makes a closed STL of 12 km around the summit, 150 mm
+  across, in the browser from the elevation data alone (`src/lib/stl.js`).
+- **Wind.** An optional sound in the settings: wind made from noise that grows as you climb and
+  follows the summit forecast (`src/lib/sound.js`).
 
 ## How the 3D works
 

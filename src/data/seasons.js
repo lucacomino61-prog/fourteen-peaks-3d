@@ -2,7 +2,7 @@
 // and the sources it rests on, each of them read for this (1 = January). Shown in "The numbers",
 // the comparison table and the fact sheet; a day in the season also sets the sun of a summit night
 // on the climb when the route's own text gives no date (lib/climbLight.js).
-import { LOCALE } from '../i18n/lang.js'
+import { LANG, LOCALE } from '../i18n/lang.js'
 
 const HT_2026 = 'The Himalayan Times, “Spring 2026 climbing season opens with summits on three 8,000ers”, 19 April 2026'
 const EW_NEPAL = 'Explorersweb, “Everest and Other 8,000’ers in Nepal By the Numbers”, 5 December 2025'
@@ -30,6 +30,12 @@ export const seasons = {
   gasherbrum1: { months: [6, 7, 8], note: 'The Karakoram summer, from the end of June to August.', sources: [EW_KARAKORAM] },
   gasherbrum2: { months: [6, 7, 8], note: 'The Karakoram summer, from the end of June to August.', sources: [EW_KARAKORAM, EW_2022] },
   nangaparbat: { months: [6, 7], note: 'Summer, and early in it: in 2025 the teams reached base camp by 6 June and the first summits came on 30 June.', sources: [EW_KARAKORAM] },
+}
+
+// an Italian page reads the notes in Italian (src/data/it/seasons.js); the sources are cited as published
+if (LANG === 'it') {
+  const { default: notes } = await import('./it/seasons.js')
+  for (const [id, note] of Object.entries(notes)) if (seasons[id]) seasons[id].note = note
 }
 
 /** The months in runs: [4, 5, 9, 10] → [[4, 5], [9, 10]] */

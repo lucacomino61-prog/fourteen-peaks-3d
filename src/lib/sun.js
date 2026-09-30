@@ -11,7 +11,7 @@ const deg = (r) => (r * 180) / Math.PI
 /** The mountain's clock, minutes east of UTC (none of these countries keeps summer time). */
 const OFFSETS = { Nepal: 345, Pakistan: 300, China: 480, India: 330 }
 export function clockOf(m) {
-  const country = String(m.peak.countries || '').split('/')[0].replace(/\(.*\)/, '').trim()
+  const country = m.peak.clock // in English, whatever the page's language (src/data/index.js)
   return { country, offset: OFFSETS[country] ?? 0 }
 }
 

@@ -9,6 +9,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { deflateSync, inflateSync } from 'fflate'
 import { mountains } from '../src/data/index.js'
+import { mountains as italian } from '../src/data/it/index.js'
 
 const KM = 10
 const SIZE = 160
@@ -91,7 +92,9 @@ for (const m of mountains) {
   out[k] = m.peak.elevation
   const bytes = encode(out, SIZE, SIZE)
   await fs.writeFile(`public/guess/${m.id}.q16`, bytes)
-  index.push({ id: m.id, name: m.peak.name, elevation: m.peak.elevation, range: m.peak.range, countries: m.peak.countries, lo: Math.round(lo), hi: Math.round(Math.max(hi, m.peak.elevation)) })
+  // the Italian page's hints name the range and the countries in Italian (src/data/it/)
+  const it = italian[m.id]?.peak || {}
+  index.push({ id: m.id, name: m.peak.name, elevation: m.peak.elevation, range: m.peak.range, countries: m.peak.countries, it: { range: it.range || m.peak.range, countries: it.countries || m.peak.countries }, lo: Math.round(lo), hi: Math.round(Math.max(hi, m.peak.elevation)) })
   console.log(`${m.id.padEnd(14)} ${(bytes.length / 1024).toFixed(1)} KB  ${Math.round(lo)}–${m.peak.elevation} m`)
 }
 await fs.writeFile('public/guess/index.json', JSON.stringify({ km: KM, size: SIZE, mountains: index }))

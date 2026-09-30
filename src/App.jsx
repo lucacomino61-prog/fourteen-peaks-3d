@@ -16,6 +16,7 @@ import Loader from './ui/Loader'
 import Search from './ui/Search'
 import Settings from './ui/Settings'
 import { longDate } from './lib/format'
+import { t } from './i18n'
 import Correction from './ui/Correction'
 import Consent from './ui/Consent'
 import Toast from './ui/Toast'
@@ -122,7 +123,7 @@ function useWhatsNew(ready) {
     let seen = null
     try { seen = localStorage.getItem('fp-seen'); localStorage.setItem('fp-seen', UPDATED) } catch { return }
     if (seen && seen < UPDATED && useStore.getState().settings.whatsNew)
-      useStore.setState({ toast: { text: `Updated on ${longDate(UPDATED)} since your last visit`, kind: 'news', at: Date.now() } })
+      useStore.setState({ toast: { text: t('Updated on {date} since your last visit', { date: longDate(UPDATED) }), kind: 'news', at: Date.now() } })
   }, [ready])
 }
 
@@ -204,7 +205,7 @@ export default function App() {
 
   return (
     <>
-      <a className="skip-link" href="#main">Skip to the content</a>
+      <a className="skip-link" href="#main">{t('Skip to the content')}</a>
       {/* how far down the page: a hairline at the top edge */}
       <div className="progress" aria-hidden="true"><i /></div>
       {/* in the explorer the wheel zooms the camera, so smooth scrolling keeps out of the stage */}

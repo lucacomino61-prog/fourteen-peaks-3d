@@ -6,7 +6,7 @@ import './page.js'
 import './notfound.css'
 import './guess.css'
 import { decodeQ16 } from '../lib/q16.js'
-import { t, withLang } from '../i18n/index.js'
+import { t, withLang, LANG } from '../i18n/index.js'
 import { fmt } from '../lib/format.js'
 
 const ROUNDS = 10
@@ -244,5 +244,10 @@ if (board) {
     heights(game.order[game.round].id).then((g) => draw($('[data-map]'), g))
   })
   ro.observe($('[data-map]'))
-  fetch('/guess/index.json').then((r) => r.json()).then((data) => { index = data; start() })
+  // an Italian page takes each mountain's range and countries in Italian (scripts/make-guess.mjs)
+  fetch('/guess/index.json').then((r) => r.json()).then((data) => {
+    if (LANG === 'it') data.mountains = data.mountains.map((m) => ({ ...m, ...m.it }))
+    index = data
+    start()
+  })
 }

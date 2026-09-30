@@ -1,7 +1,9 @@
 // The words of the mountains' texts a reader may not know, explained where they appear (tap the
 // underlined word: ui/Glossed.jsx) and all together on /glossary/. Written for this site and checked
 // against the sources below. `match` is the regular expression (case-insensitive, whole words) that
-// finds the word in a text: the first one in each text is marked.
+// finds the word in a text: the first one in each text is marked; `cased: true` makes it match the
+// case as written.
+import { LANG } from '../i18n/lang.js'
 
 export const glossary = [
   { id: 'eight-thousander', term: 'Eight-thousander', match: 'eight-thousanders?|8,000ers?',
@@ -83,6 +85,13 @@ export const glossary = [
   { id: 'prominence', term: 'Prominence', match: 'prominence',
     def: 'How far a summit rises above the lowest col that joins it to any higher mountain: its height in its own right.' },
 ]
+
+// an Italian page marks and explains the Italian words (src/data/it/glossary.js): its own term,
+// the expression that finds it in the Italian texts, and the definition
+if (LANG === 'it') {
+  const { default: words } = await import('./it/glossary.js')
+  for (const g of glossary) Object.assign(g, words[g.id])
+}
 
 export const termById = Object.fromEntries(glossary.map((g) => [g.id, g]))
 

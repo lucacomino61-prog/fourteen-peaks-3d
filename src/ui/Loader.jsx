@@ -3,6 +3,7 @@ import { gsap } from 'gsap'
 import { useStore, useMountain } from '../store'
 import { fmt } from '../lib/format'
 import { inUnits, unitSymbol, useUnits } from '../lib/units'
+import { t } from '../i18n'
 
 // The first screen while the terrain streams in: an altimeter that climbs with the download
 // towards the summit's height, and a skip. When the mountain is ready the counter tops out and a
@@ -42,8 +43,8 @@ export default function Loader({ progress, ready }) {
     <div className={`loader ${phase === 'leaving' ? 'is-leaving' : ''}`} role="status" aria-live="polite">
       <p className="loader-name" translate="no">{peak.name}</p>
       <p className="loader-count mono" aria-hidden><span ref={num}>0</span><small>{unitSymbol(units)}</small></p>
-      <p className="loader-note mono">{ready ? 'Terrain ready' : 'Loading the terrain · 4 million elevation samples'}</p>
-      <button className="loader-skip" onClick={() => setPhase('leaving')}>Skip <span aria-hidden>→</span></button>
+      <p className="loader-note mono">{ready ? t('Terrain ready') : t('Loading the terrain · 4 million elevation samples')}</p>
+      <button className="loader-skip" onClick={() => setPhase('leaving')}>{t('Skip')} <span aria-hidden>→</span></button>
     </div>
   )
 }

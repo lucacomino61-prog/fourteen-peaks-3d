@@ -1,5 +1,5 @@
 import { useStore, useMountain } from '../store'
-import { pad2 } from '../lib/format'
+import { fmt, pad2 } from '../lib/format'
 import { alt, useUnits } from '../lib/units'
 import { SNOW, SIGNAL, hazardColor } from '../lib/palette'
 import { placeOf } from '../lib/history'
@@ -29,8 +29,8 @@ function Detail() {
           <h3>{c.name}</h3>
           <p><Glossed text={c.blurb} /></p>
           <div className="row">
-            <div><span>position (approx.)</span>{c.lat.toFixed(4)} N, {c.lon.toFixed(4)} E</div>
-            <div><span>route</span>{r.aka}</div>
+            <div><span>{t('position (approx.)')}</span>{c.lat.toFixed(4)} N, {c.lon.toFixed(4)} E</div>
+            <div><span>{t('route')}</span>{r.aka}</div>
           </div>
         </>
       )
@@ -90,8 +90,8 @@ function Detail() {
           <h3>{r.name}</h3>
           <p><Glossed text={r.summary} /></p>
           <div className="row">
-            <div><span>first ascent</span>{r.firstAscent}</div>
-            <div><span>difficulty</span><Glossed text={r.difficulty} /></div>
+            <div><span>{t('first ascent')}</span>{r.firstAscent}</div>
+            <div><span>{t('difficulty')}</span><Glossed text={r.difficulty} /></div>
           </div>
         </>
       )
@@ -101,7 +101,7 @@ function Detail() {
     // focusable (not in the tab order), so "Show on the mountain" can move focus to the card it opens
     <aside className={`detail ${content ? 'is-open' : ''}`} style={{ '--c': color }} aria-live="polite" inert={!content} tabIndex={-1}>
       {content}
-      <button className="close" onClick={() => set({ selected: null })} aria-label="Close"><X /></button>
+      <button className="close" onClick={() => set({ selected: null })} aria-label={t('Close')}><X /></button>
     </aside>
   )
 }
@@ -124,11 +124,11 @@ export default function Explorer() {
 
   return (
     // data-detail: on a phone the detail sheet takes the panel's place instead of covering it
-    <section id="explorer" className="explorer" aria-label="Explore all routes" data-detail={selected ? '1' : '0'}>
+    <section id="explorer" className="explorer" aria-label={t('Explore all routes')} data-detail={selected ? '1' : '0'}>
       <div className="panel" data-lenis-prevent>
         <div className="panel-head">
-          <h2>{routes.length} ways up</h2>
-          <p>Select a route to fly to it. Click any camp or hazard on the mountain; the loupe reads the ground under the pointer.</p>
+          <h2>{t('{n} ways up', { n: fmt(routes.length) })}</h2>
+          <p>{t('Select a route to fly to it. Click any camp or hazard on the mountain; the loupe reads the ground under the pointer.')}</p>
         </div>
         <div className="panel-body">
           <ol className="route-list">
@@ -141,28 +141,28 @@ export default function Explorer() {
                     <b>{r.name}</b>
                     <span>{r.aka}</span>
                   </button>
-                  <button className="eye" onClick={() => toggleRoute(r.id)} aria-pressed={on} aria-label={on ? `Hide ${r.name}` : `Show ${r.name}`}><Eye off={!on} /></button>
+                  <button className="eye" onClick={() => toggleRoute(r.id)} aria-pressed={on} aria-label={on ? t('Hide {name}', { name: r.name }) : t('Show {name}', { name: r.name })}><Eye off={!on} /></button>
                 </li>
               )
             })}
           </ol>
           <div className="layer-list">
-            <h3 className="mono">Layers</h3>
-            <button className="toggle" aria-pressed={showCamps} onClick={() => set({ showCamps: !showCamps })}>Camps<i /></button>
-            <button className="toggle" aria-pressed={showHazards} onClick={() => set({ showHazards: !showHazards })}>Hazard zones<i /></button>
+            <h3 className="mono">{t('Layers')}</h3>
+            <button className="toggle" aria-pressed={showCamps} onClick={() => set({ showCamps: !showCamps })}>{t('Camps')}<i /></button>
+            <button className="toggle" aria-pressed={showHazards} onClick={() => set({ showHazards: !showHazards })}>{t('Hazard zones')}<i /></button>
             <button className="toggle" aria-pressed={showHistory} onClick={() => set({ showHistory: !showHistory, selected: showHistory && selected?.type === 'history' ? null : selected })}>{t('History, where it happened')}<i /></button>
-            <button className="toggle" aria-pressed={showContours} onClick={() => set({ showContours: !showContours })}>Contour map<i /></button>
-            <button className="toggle" data-tone="signal" aria-pressed={showDeathZone} onClick={() => set({ showDeathZone: !showDeathZone })}>Death Zone, above {alt(8000, units)}<i /></button>
+            <button className="toggle" aria-pressed={showContours} onClick={() => set({ showContours: !showContours })}>{t('Contour map')}<i /></button>
+            <button className="toggle" data-tone="signal" aria-pressed={showDeathZone} onClick={() => set({ showDeathZone: !showDeathZone })}>{t('Death Zone, above {alt}', { alt: alt(8000, units) })}<i /></button>
           </div>
           <LightControl />
         </div>
         <div className="panel-foot">
-          <span>Drag to orbit, scroll or pinch to zoom</span>
-          <button className="btn-ghost btn-small" onClick={() => set({ fly: { route: 'overview' }, selected: null })}>Reset view</button>
+          <span>{t('Drag to orbit, scroll or pinch to zoom')}</span>
+          <button className="btn-ghost btn-small" onClick={() => set({ fly: { route: 'overview' }, selected: null })}>{t('Reset view')}</button>
         </div>
       </div>
       <Detail />
-      <a className="explorer-continue btn-ghost btn-small" href="#history">History <ArrowDown /></a>
+      <a className="explorer-continue btn-ghost btn-small" href="#history">{t('History')} <ArrowDown /></a>
     </section>
   )
 }

@@ -224,15 +224,15 @@ const hazards = [
 ]
 
 const timeline = [
-  { year: 1964, highlight: true, title: 'The last of the fourteen', text: 'A Chinese expedition of 195 members puts Xu Jing and nine others on the summit on 2 May, the last 8,000 m peak to be climbed and the only first ascent made without Western climbers.' },
-  { year: 1980, title: 'Opened', text: 'Tibet opens to foreign expeditions; a German team makes the second ascent by the north side.' },
-  { year: 1982, title: 'Southwest Face', text: 'Doug Scott, Alex MacIntyre and Roger Baxter-Jones climb the face in alpine style, direct to the true summit.' },
-  { year: 1987, title: 'Kukuczka’s fourteenth', text: 'Jerzy Kukuczka completes the fourteen 8,000 m peaks by a new route on the west ridge with Artur Hajzer, a year after Messner and in half the time.' },
-  { year: 1990, title: 'By night', text: 'Loretan, Troillet and Kurtyka climb the south-west face in a single push with no bivouac gear, two weeks after doing the same on Cho Oyu.' },
+  { year: 1964, at: 'summit', highlight: true, title: 'The last of the fourteen', text: 'A Chinese expedition of 195 members puts Xu Jing and nine others on the summit on 2 May, the last 8,000 m peak to be climbed and the only first ascent made without Western climbers.' },
+  { year: 1980, at: 'route:normal', title: 'Opened', text: 'Tibet opens to foreign expeditions; a German team makes the second ascent by the north side.' },
+  { year: 1982, at: 'route:british', title: 'Southwest Face', text: 'Doug Scott, Alex MacIntyre and Roger Baxter-Jones climb the face in alpine style, direct to the true summit.' },
+  { year: 1987, at: 'route:westridge', title: 'Kukuczka’s fourteenth', text: 'Jerzy Kukuczka completes the fourteen 8,000 m peaks by a new route on the west ridge with Artur Hajzer, a year after Messner and in half the time.' },
+  { year: 1990, at: 'route:swiss', title: 'By night', text: 'Loretan, Troillet and Kurtyka climb the south-west face in a single push with no bivouac gear, two weeks after doing the same on Cho Oyu.' },
   { year: 1999, title: 'Alex Lowe', text: 'Alex Lowe, the finest all-round climber of his generation, and David Bridges are killed by an avalanche on 5 October while scouting a ski descent of the south face. Conrad Anker survives.' },
-  { year: 2005, highlight: true, title: 'Winter', text: 'Piotr Morawski and Simone Moro make the first winter ascent on 14 January, reaching the true summit.' },
-  { year: 2011, title: 'Steck', text: 'Ueli Steck solos the south-west face in ten and a half hours from base camp.' },
-  { year: 2014, title: 'Avalanche', text: 'Sebastian Haag and Andrea Zambaldi are killed on 24 September by an avalanche at about 7,900 m, just below the summit ridge and above Camp 3 on the normal route.' },
+  { year: 2005, at: 'summit', highlight: true, title: 'Winter', text: 'Piotr Morawski and Simone Moro make the first winter ascent on 14 January, reaching the true summit.' },
+  { year: 2011, at: 'hazard:sw-face', title: 'Steck', text: 'Ueli Steck solos the south-west face in ten and a half hours from base camp.' },
+  { year: 2014, at: 'hazard:summit-ridge', title: 'Avalanche', text: 'Sebastian Haag and Andrea Zambaldi are killed on 24 September by an avalanche at about 7,900 m, just below the summit ridge and above Camp 3 on the normal route.' },
   { year: 2023, title: 'The race', text: 'Two American women, Anna Gutu and Gina Rzucidlo, each trying to become the first American woman to climb all fourteen, die with their guides in two avalanches on the same day, 7 October. China closes the mountain for the season.' },
 ]
 

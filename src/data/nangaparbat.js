@@ -281,19 +281,19 @@ const hazards = [
 ]
 
 const timeline = [
-  { year: 1895, title: 'Mummery', text: 'Albert Mummery, the finest climber of his day, attempts the Diamir Face and vanishes with two Gurkhas while crossing to the Rakhiot side: the first deaths on any 8,000 m peak.' },
-  { year: 1934, highlight: true, title: 'The storm', text: 'A German expedition is caught by a storm above the Silver Saddle. Willy Merkl, Uli Wieland, Willo Welzenbach and six Sherpas die in the retreat; the Sherpa Gaylay stays with Merkl to the end.' },
-  { year: 1937, title: 'Buried', text: 'An avalanche buries Camp 4 at night on 15 June; seven Germans and nine Sherpas die. The mountain becomes a German national obsession.' },
-  { year: 1953, highlight: true, title: 'Buhl', text: 'Hermann Buhl reaches the summit alone on 3 July, without oxygen, after seventeen hours from Camp 5. He spends the night standing on a ledge and returns after forty-one hours, frostbitten and hallucinating.' },
-  { year: 1962, title: 'Diamir Face', text: 'Toni Kinshofer, Siegfried Löw and Anderl Mannhardt climb the Diamir Face; Löw dies in a fall on the descent.' },
-  { year: 1970, highlight: true, title: 'The Rupal Face', text: 'Reinhold and Günther Messner climb the highest wall in the world and descend the far side. Günther is killed by an avalanche near the bottom; Reinhold, with frostbitten feet, is found by villagers days later.' },
-  { year: 1976, title: 'Schell route', text: 'Four Austrians climb a new route around the Rupal Face by the Mazeno Gap and the south-west ridge.' },
+  { year: 1895, at: 'route:kinshofer', title: 'Mummery', text: 'Albert Mummery, the finest climber of his day, attempts the Diamir Face and vanishes with two Gurkhas while crossing to the Rakhiot side: the first deaths on any 8,000 m peak.' },
+  { year: 1934, at: 'hazard:silver-saddle', highlight: true, title: 'The storm', text: 'A German expedition is caught by a storm above the Silver Saddle. Willy Merkl, Uli Wieland, Willo Welzenbach and six Sherpas die in the retreat; the Sherpa Gaylay stays with Merkl to the end.' },
+  { year: 1937, at: 'camp:rakhiot:camp-4', title: 'Buried', text: 'An avalanche buries Camp 4 at night on 15 June; seven Germans and nine Sherpas die. The mountain becomes a German national obsession.' },
+  { year: 1953, at: 'summit', highlight: true, title: 'Buhl', text: 'Hermann Buhl reaches the summit alone on 3 July, without oxygen, after seventeen hours from Camp 5. He spends the night standing on a ledge and returns after forty-one hours, frostbitten and hallucinating.' },
+  { year: 1962, at: 'route:kinshofer', title: 'Diamir Face', text: 'Toni Kinshofer, Siegfried Löw and Anderl Mannhardt climb the Diamir Face; Löw dies in a fall on the descent.' },
+  { year: 1970, at: 'route:rupal', highlight: true, title: 'The Rupal Face', text: 'Reinhold and Günther Messner climb the highest wall in the world and descend the far side. Günther is killed by an avalanche near the bottom; Reinhold, with frostbitten feet, is found by villagers days later.' },
+  { year: 1976, at: 'route:schell', title: 'Schell route', text: 'Four Austrians climb a new route around the Rupal Face by the Mazeno Gap and the south-west ridge.' },
   { year: 1978, title: 'Alone', text: 'Reinhold Messner climbs a new line on the Diamir Face solo, the first solo ascent of an 8,000 m peak from base camp.' },
-  { year: 2005, title: 'Central pillar, and a body', text: 'Vince Anderson and Steve House climb the central pillar of the Rupal Face in alpine style. On the Diamir side, melting ice releases Günther Messner’s remains.' },
-  { year: 2012, title: 'Mazeno Ridge', text: 'Sandy Allan and Rick Allen complete the ten-kilometre Mazeno Ridge after eighteen days, the longest ridge climb on any 8,000 m peak.' },
-  { year: 2013, title: 'The attack', text: 'On 22 June gunmen enter the Diamir Base Camp at night and murder ten climbers and a local cook.' },
-  { year: 2016, title: 'Winter', text: 'Simone Moro, Ali Sadpara and Alex Txikon make the first winter ascent on 26 February, after more than thirty attempts over three decades.' },
-  { year: 2018, title: 'Revol and Mackiewicz', text: 'Élisabeth Revol and Tomasz Mackiewicz reach the summit in winter; Mackiewicz, blind and frostbitten, is left at 7,200 m and dies. Revol is rescued by Adam Bielecki and Denis Urubko, helicoptered from K2.' },
+  { year: 2005, at: 'hazard:rupal-face', title: 'Central pillar, and a body', text: 'Vince Anderson and Steve House climb the central pillar of the Rupal Face in alpine style. On the Diamir side, melting ice releases Günther Messner’s remains.' },
+  { year: 2012, at: 'route:mazeno', title: 'Mazeno Ridge', text: 'Sandy Allan and Rick Allen complete the ten-kilometre Mazeno Ridge after eighteen days, the longest ridge climb on any 8,000 m peak.' },
+  { year: 2013, at: 'camp:kinshofer:base-camp', title: 'The attack', text: 'On 22 June gunmen enter the Diamir Base Camp at night and murder ten climbers and a local cook.' },
+  { year: 2016, at: 'summit', title: 'Winter', text: 'Simone Moro, Ali Sadpara and Alex Txikon make the first winter ascent on 26 February, after more than thirty attempts over three decades.' },
+  { year: 2018, at: 'summit', title: 'Revol and Mackiewicz', text: 'Élisabeth Revol and Tomasz Mackiewicz reach the summit in winter; Mackiewicz, blind and frostbitten, is left at 7,200 m and dies. Revol is rescued by Adam Bielecki and Denis Urubko, helicoptered from K2.' },
 ]
 
 const stats = [

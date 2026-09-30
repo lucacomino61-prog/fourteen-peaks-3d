@@ -81,8 +81,13 @@ export function lockScroll(on) {
   if (lenis) { if (locked) lenis.stop(); else lenis.start() }
 }
 
-/** Jump the page to y without animation, whether or not Lenis is running. */
+/**
+ * Jump the page to y without animation, whether or not Lenis is running. The page itself jumps
+ * first: Lenis skips a jump to where it believes the page already is, and it learns of a scroll it
+ * did not make only at the next frame. Focus scrolled a history entry's button into view, Enter
+ * asked for the explorer, where Lenis still thought the page was, and the page stayed put.
+ */
 export function jumpTo(y) {
+  window.scrollTo(0, y) // (Safari before 16 rejects behavior: 'instant')
   if (lenis) lenis.scrollTo(y, { immediate: true, force: true })
-  else window.scrollTo(0, y) // (Safari before 16 rejects behavior: 'instant')
 }

@@ -2,12 +2,16 @@ import { useStore, useMountain } from '../store'
 import { pad2 } from '../lib/format'
 import { alt, useUnits } from '../lib/units'
 import { SNOW, SIGNAL, hazardColor } from '../lib/palette'
+import { placeOf } from '../lib/history'
+import { historyAt } from '../lib/navigate'
+import { t } from '../i18n'
 import { Eye, X, ArrowDown } from './Icons'
 import LightControl from './LightControl'
 import Glossed from './Glossed'
 
 function Detail() {
-  const { routes, hazards, peak } = useMountain()
+  const m = useMountain()
+  const { routes, hazards, peak } = m
   const selected = useStore((s) => s.selected)
   const active = useStore((s) => s.activeRoute)
   const set = useStore((s) => s.set)
@@ -53,6 +57,28 @@ function Detail() {
         <p><Glossed text={peak.summitBlurb} /></p>
       </>
     )
+  } else if (selected?.type === 'history') {
+    // a year of the history where it happened (scene/Events.jsx): the entry, the other years at the
+    // same place, and the way back to the history
+    const place = placeOf(m, selected.id)
+    const here = m.timeline.filter((e) => e.at === selected.id)
+    const e = here.find((x) => x.year === selected.year) || here[0]
+    if (place && e) {
+      color = SIGNAL
+      content = (
+        <>
+          <div className="kicker"><span>{t('History')} · {place.kind === 'summit' ? t('the summit') : place.name}</span><span>{place.alt ? `${place.approx ? '≈ ' : ''}${alt(place.alt, units)}` : t('the route')}</span></div>
+          <h3><span className="detail-year mono">{e.year}</span> {e.title}</h3>
+          <p><Glossed text={e.text} /></p>
+          {here.length > 1 && (
+            <div className="detail-years" role="group" aria-label={t('Years at this place')}>
+              {here.map((x) => <button key={x.year} type="button" className="mono" aria-pressed={x === e} onClick={() => set({ selected: { ...selected, year: x.year } })}>{x.year}</button>)}
+            </div>
+          )}
+          <a className="detail-back" href={`#y${e.year}`} onClick={(ev) => { ev.preventDefault(); historyAt(e.year) }}><ArrowDown /> {t('Read it in the history')}</a>
+        </>
+      )
+    }
   } else if (selected?.type === 'route') {
     const i = routes.findIndex((x) => x.id === selected.id)
     const r = routes[i]
@@ -72,7 +98,8 @@ function Detail() {
     }
   }
   return (
-    <aside className={`detail ${content ? 'is-open' : ''}`} style={{ '--c': color }} aria-live="polite" inert={!content}>
+    // focusable (not in the tab order), so "Show on the mountain" can move focus to the card it opens
+    <aside className={`detail ${content ? 'is-open' : ''}`} style={{ '--c': color }} aria-live="polite" inert={!content} tabIndex={-1}>
       {content}
       <button className="close" onClick={() => set({ selected: null })} aria-label="Close"><X /></button>
     </aside>
@@ -89,6 +116,7 @@ export default function Explorer() {
   const showHazards = useStore((s) => s.showHazards)
   const showDeathZone = useStore((s) => s.showDeathZone)
   const showContours = useStore((s) => s.showContours)
+  const showHistory = useStore((s) => s.showHistory)
   const selected = useStore((s) => s.selected)
   const units = useUnits()
 
@@ -122,6 +150,7 @@ export default function Explorer() {
             <h3 className="mono">Layers</h3>
             <button className="toggle" aria-pressed={showCamps} onClick={() => set({ showCamps: !showCamps })}>Camps<i /></button>
             <button className="toggle" aria-pressed={showHazards} onClick={() => set({ showHazards: !showHazards })}>Hazard zones<i /></button>
+            <button className="toggle" aria-pressed={showHistory} onClick={() => set({ showHistory: !showHistory, selected: showHistory && selected?.type === 'history' ? null : selected })}>{t('History, where it happened')}<i /></button>
             <button className="toggle" aria-pressed={showContours} onClick={() => set({ showContours: !showContours })}>Contour map<i /></button>
             <button className="toggle" data-tone="signal" aria-pressed={showDeathZone} onClick={() => set({ showDeathZone: !showDeathZone })}>Death Zone, above {alt(8000, units)}<i /></button>
           </div>

@@ -259,17 +259,17 @@ const hazards = [
 const timeline = [
   { year: 1849, title: 'Hooker', text: 'The botanist Joseph Hooker travels through Sikkim and sketches the massif; for a few years it is thought to be the highest mountain in the world.' },
   { year: 1899, title: 'The circuit', text: 'Douglas Freshfield walks around the whole mountain with the photographer Vittorio Sella, producing the first map of the massif.' },
-  { year: 1905, title: 'Crowley', text: 'Aleister Crowley leads the first attempt, up the Yalung side. After a quarrel he stays in his tent while an avalanche kills Alexis Pache and three porters.' },
-  { year: 1931, title: 'Bauer', text: 'Paul Bauer’s Bavarian team, tunnelling ice caves up the north-east spur, reaches 7,700 m on their second attempt. Hermann Schaller and Pasang Sherpa die in a fall.' },
-  { year: 1955, highlight: true, title: 'First ascent', text: 'Joe Brown and George Band reach the summit on 25 May, followed by Norman Hardie and Tony Streather the next day. Honouring a promise to the Chogyal of Sikkim, they stop a few feet below the sacred top.' },
-  { year: 1977, title: 'From Sikkim', text: 'An Indian Army expedition completes Bauer’s spur; Prem Chand and Nima Dorje make the second ascent of the mountain.' },
-  { year: 1979, title: 'Lightweight', text: 'Doug Scott, Peter Boardman and Joe Tasker climb the north ridge as a team of four with no oxygen and no Sherpas, a turning point in Himalayan style.' },
-  { year: 1986, highlight: true, title: 'Winter', text: 'Krzysztof Wielicki and Jerzy Kukuczka make the first winter ascent on 11 January. Andrzej Czok dies of pulmonary oedema on the descent.' },
-  { year: 1989, title: 'The traverse', text: 'A Soviet expedition crosses all four 8,000 m summits along the ridge, several climbers in both directions.' },
+  { year: 1905, at: 'route:swface', title: 'Crowley', text: 'Aleister Crowley leads the first attempt, up the Yalung side. After a quarrel he stays in his tent while an avalanche kills Alexis Pache and three porters.' },
+  { year: 1931, at: 'route:nespur', title: 'Bauer', text: 'Paul Bauer’s Bavarian team, tunnelling ice caves up the north-east spur, reaches 7,700 m on their second attempt. Hermann Schaller and Pasang Sherpa die in a fall.' },
+  { year: 1955, at: 'summit', highlight: true, title: 'First ascent', text: 'Joe Brown and George Band reach the summit on 25 May, followed by Norman Hardie and Tony Streather the next day. Honouring a promise to the Chogyal of Sikkim, they stop a few feet below the sacred top.' },
+  { year: 1977, at: 'route:nespur', title: 'From Sikkim', text: 'An Indian Army expedition completes Bauer’s spur; Prem Chand and Nima Dorje make the second ascent of the mountain.' },
+  { year: 1979, at: 'route:north', title: 'Lightweight', text: 'Doug Scott, Peter Boardman and Joe Tasker climb the north ridge as a team of four with no oxygen and no Sherpas, a turning point in Himalayan style.' },
+  { year: 1986, at: 'summit', highlight: true, title: 'Winter', text: 'Krzysztof Wielicki and Jerzy Kukuczka make the first winter ascent on 11 January. Andrzej Czok dies of pulmonary oedema on the descent.' },
+  { year: 1989, at: 'route:traverse', title: 'The traverse', text: 'A Soviet expedition crosses all four 8,000 m summits along the ridge, several climbers in both directions.' },
   { year: 1992, title: 'Rutkiewicz', text: 'Wanda Rutkiewicz, the first woman to climb K2, disappears above 8,200 m on 13 May while attempting her ninth 8,000 m peak.' },
-  { year: 1998, title: 'First woman', text: 'Ginette Harrison reaches the summit on 18 May, the last of the 8,000 m peaks to be climbed by a woman.' },
-  { year: 2019, title: 'Deadliest season', text: 'Four climbers die descending from the summit in one week, exhausted in the Gangway; the mountain’s worst year.' },
-  { year: 2023, title: 'Where is the top?', text: 'Drone footage shows that many recent “summits” stopped at a rock bump below the true summit. Nepal begins verifying summit claims with photographs.' },
+  { year: 1998, at: 'summit', title: 'First woman', text: 'Ginette Harrison reaches the summit on 18 May, the last of the 8,000 m peaks to be climbed by a woman.' },
+  { year: 2019, at: 'hazard:gangway', title: 'Deadliest season', text: 'Four climbers die descending from the summit in one week, exhausted in the Gangway; the mountain’s worst year.' },
+  { year: 2023, at: 'hazard:sacred-summit', title: 'Where is the top?', text: 'Drone footage shows that many recent “summits” stopped at a rock bump below the true summit. Nepal begins verifying summit claims with photographs.' },
 ]
 
 const stats = [

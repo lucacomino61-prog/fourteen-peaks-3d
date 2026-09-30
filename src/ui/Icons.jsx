@@ -12,4 +12,5 @@ export const Compass = () => (<svg {...base}><circle cx="12" cy="12" r="9" /><pa
 export const Search = () => (<svg {...base}><circle cx="11" cy="11" r="6.5" /><path d="M16 16l4.5 4.5" /></svg>)
 export const Share = () => (<svg {...base}><path d="M12 15V3M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" /></svg>)
 export const Sliders = () => (<svg {...base}><path d="M4 7h9M17 7h3M4 17h3M11 17h9" /><circle cx="15" cy="7" r="2" /><circle cx="9" cy="17" r="2" /></svg>)
+export const Flag = () => (<svg {...base}><path d="M5 21V4M5 4h12.5L15 8.5l2.5 4.5H5" /></svg>)
 export const Link = () => (<svg {...base}><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" /></svg>)

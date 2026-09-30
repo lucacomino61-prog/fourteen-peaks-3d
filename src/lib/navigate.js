@@ -1,6 +1,7 @@
 // Go to a place in the site from anywhere (search): a mountain, one of its routes, a camp or a
 // hazard in the explorer, or a year of its history. Another mountain first loads, so the rest
-// waits until its terrain is on screen with its routes laid out.
+// waits until its terrain is on screen with its routes laid out. And back and forth between a year
+// of the history and the place on the mountain where it happened (lib/history.js).
 import { useStore } from '../store'
 import { jumpTo } from './clock'
 
@@ -22,6 +23,29 @@ export function scrollToId(id, { below = false } = {}) {
   if (!el.getClientRects().length && el.firstElementChild) el = el.firstElementChild
   const nav = below ? (document.querySelector('.nav')?.getBoundingClientRect().bottom || 0) + 16 : 0
   jumpTo(el.getBoundingClientRect().top + window.scrollY - nav)
+}
+
+/**
+ * A year of the history on the mountain: the explorer, with its History layer on and the entry open
+ * in the detail card, flown to the place the entry names. A route is drawn and made the active one;
+ * a camp's route is drawn. Focus moves to the card, whose link leads back (historyAt).
+ */
+export function showOnMap(entry) {
+  const st = useStore.getState()
+  const [kind, id] = entry.at.split(':')
+  const shown = st.visibleRoutes.includes(id) ? st.visibleRoutes : [...st.visibleRoutes, id]
+  const patch = { showHistory: true, selected: { type: 'history', id: entry.at, year: entry.year }, fly: { at: entry.at } }
+  if (kind === 'route') Object.assign(patch, { activeRoute: id, visibleRoutes: shown, fly: { route: id } })
+  else if (kind === 'camp') patch.visibleRoutes = shown
+  useStore.setState(patch)
+  scrollToId('explorer')
+  requestAnimationFrame(() => document.querySelector('.detail')?.focus({ preventScroll: true }))
+}
+
+/** Back from the map to the year in the history, focus on its "Show on the mountain" */
+export function historyAt(year) {
+  scrollToId(`y${year}`, { below: true })
+  document.querySelector(`#y${year} .tl-map`)?.focus({ preventScroll: true })
 }
 
 export function goTo({ mountain, route, camp, hazard, year }) {

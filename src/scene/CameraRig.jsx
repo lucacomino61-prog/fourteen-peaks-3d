@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { pointAt } from '../lib/paths'
+import { placeOf, placePoint } from '../lib/history'
 import { useStore, useMountain } from '../store'
 
 // with animations stopped (the nav switch, or reduced motion) the camera jumps instead of easing
@@ -59,13 +60,45 @@ function routePose(terrain, paths, summit, id, far = 1, portrait = false) {
   return { pos, target: new THREE.Vector3(mid.x, mid.y + 0.2 - drop * 0.6, mid.z) }
 }
 
+/**
+ * A good camera pose for one place (a year of the history, lib/history.js): from the place's own
+ * side of the mountain, a little above it, as close as the place and the summit above it both fit
+ * in the frame (on a phone, in the strip between the nav and the detail sheet, which can cover the
+ * lower half); higher if a ridge hides the place. A place too far out for the summit to stay inside the 11 km where the terrain is
+ * drawn is framed alone; the summit itself gets the overview.
+ */
+function placePose(terrain, summit, p, far = 1, portrait = false) {
+  const run = Math.hypot(p.x - summit.x, p.z - summit.z)
+  if (run < 0.2) return routePose(terrain, {}, summit, 'overview', far, portrait)
+  _v.set(p.x - summit.x, 0, p.z - summit.z).normalize()
+  const k = 0.35 // camera height over distance: down about 19° to the place
+  const fit = portrait ? 0.22 : 0.42 // the angle, in radians, place and summit may span (about 13° and 24° of 40°)
+  const rise = summit.y - p.y
+  let d = 2.5
+  while (d < 10 && Math.atan2(rise - k * d, d + run) + Math.atan(k) > fit) d += 0.1
+  const both = Math.hypot(d + run, rise - k * d) <= 10.5
+  if (!both) d = 4.5
+  const pos = new THREE.Vector3(p.x + _v.x * d, p.y + k * d, p.z + _v.z * d)
+  const ground = terrain.heightAtScene(pos.x, pos.z) / 1000 + 0.3
+  if (pos.y < ground) pos.y = ground
+  for (let i = 0; i < 30 && !inView(terrain, pos, p); i++) pos.y += 0.1
+  // aim halfway (in angle) between the place and the summit; on a phone 7.5° lower, so both sit
+  // between the nav (the top 13% of the screen) and the middle, where a long entry's sheet can reach
+  const toPlace = Math.atan2(p.y - pos.y, d)
+  const toSummit = both ? Math.atan2(summit.y - pos.y, d + run) : toPlace
+  const pitch = (toPlace + toSummit) / 2 - (portrait ? 0.13 : 0)
+  // the orbit's centre on that line, as far out as the place
+  return { pos, target: new THREE.Vector3(pos.x - _v.x * d, pos.y + Math.tan(pitch) * d, pos.z - _v.z * d) }
+}
+
 export default function CameraRig({ terrain, paths, controls }) {
   const { camera, size } = useThree()
   const aspect = size.width / Math.max(1, size.height)
   const portrait = aspect < 1
   const far = portrait ? 1.7 : aspect < 1.4 ? 1.25 : 1 // pull back on narrow frames
   const mode = useStore((s) => s.mode)
-  const { peak } = useMountain()
+  const m = useMountain()
+  const { peak } = m
   const summit = useMemo(() => terrain.snapToPeak(peak.lat, peak.lon), [terrain, peak])
   const look = useRef(summit.clone())
   const first = useRef(true)
@@ -103,29 +136,36 @@ export default function CameraRig({ terrain, paths, controls }) {
   // phones: vertical swipes over the hero still scroll the page, horizontal ones turn the mountain
   useEffect(() => { gl.domElement.style.setProperty('touch-action', mode === 'hero' ? 'pan-y' : 'none') }, [gl, mode])
 
+  // where a fly request goes: a route's whole line, or one place (the history's "Show on the mountain")
+  const poseFor = useCallback((fly) => {
+    const p = fly.at ? placePoint(terrain, paths, placeOf(m, fly.at)) : null
+    return p ? placePose(terrain, summit, p, far, portrait) : routePose(terrain, paths, summit, fly.route, far, portrait)
+  }, [terrain, paths, summit, m, far, portrait])
+
   useEffect(() => {
     const c = controls.current
     if (!c) return
     if (mode === 'explorer') {
       c.target.copy(look.current)
       c.update()
-      // arriving from the ascent: settle onto the active route
-      const id = useStore.getState().activeRoute
-      flying.current = { ...routePose(terrain, paths, summit, id, far, portrait), t: 0 }
-      useStore.setState({ flying: true })
+      // arriving from the ascent: settle onto the active route, or where a request made on the way
+      // asks (the history's "Show on the mountain" jumps here and waits for the explorer)
+      const s = useStore.getState()
+      flying.current = { ...poseFor(s.fly || { route: s.activeRoute }), t: 0 }
+      useStore.setState({ fly: null, flying: true })
     } else {
       flying.current = null
       useStore.setState({ flying: false })
     }
-  }, [mode, controls, terrain, paths, summit, far, portrait])
+  }, [mode, controls, poseFor])
 
-  // fly requests from the UI
+  // fly requests from the UI, in the explorer; one made elsewhere waits for it (above)
   useEffect(() => useStore.subscribe((s, prev) => {
-    if (s.fly && s.fly !== prev.fly) {
-      flying.current = { ...routePose(terrain, paths, summit, s.fly.route, far, portrait), t: 0 }
+    if (s.fly && s.fly !== prev.fly && s.mode === 'explorer') {
+      flying.current = { ...poseFor(s.fly), t: 0 }
       useStore.setState({ fly: null, flying: true })
     }
-  }), [terrain, paths, summit, far, portrait])
+  }), [poseFor])
 
   useFrame(({ clock }, dt) => {
     const c = controls.current

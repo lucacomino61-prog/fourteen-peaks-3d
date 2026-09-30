@@ -214,13 +214,13 @@ const hazards = [
 ]
 
 const timeline = [
-  { year: 1956, highlight: true, title: 'First ascent', text: 'Fritz Moravec, Josef Larch and Hans Willenpart reach the summit on 7 July after an open bivouac at 7,150 m, having lost their high camp to an avalanche.' },
-  { year: 1975, title: 'The women’s rope', text: 'Halina Krüger-Syrokomska and Anna Okopińska summit on 12 August, the first all-female rope team on an 8,000 m peak.' },
-  { year: 1982, title: 'Messner', text: 'Reinhold Messner climbs the mountain with the Pakistanis Sher Khan and Nazir Sabir.' },
-  { year: 1983, title: 'The Polish fortnight', text: 'Jerzy Kukuczka and Wojciech Kurtyka climb a new route over Gasherbrum II East on 1 July, then a new route on Hidden Peak a week later.' },
-  { year: 1984, title: 'The traverse', text: 'Messner and Hans Kammerlander climb Gasherbrum II and Hidden Peak in one push without returning to base camp, the first traverse of two 8,000 m peaks.' },
+  { year: 1956, at: 'summit', highlight: true, title: 'First ascent', text: 'Fritz Moravec, Josef Larch and Hans Willenpart reach the summit on 7 July after an open bivouac at 7,150 m, having lost their high camp to an avalanche.' },
+  { year: 1975, at: 'summit', title: 'The women’s rope', text: 'Halina Krüger-Syrokomska and Anna Okopińska summit on 12 August, the first all-female rope team on an 8,000 m peak.' },
+  { year: 1982, at: 'summit', title: 'Messner', text: 'Reinhold Messner climbs the mountain with the Pakistanis Sher Khan and Nazir Sabir.' },
+  { year: 1983, at: 'route:east', title: 'The Polish fortnight', text: 'Jerzy Kukuczka and Wojciech Kurtyka climb a new route over Gasherbrum II East on 1 July, then a new route on Hidden Peak a week later.' },
+  { year: 1984, at: 'route:traverse', title: 'The traverse', text: 'Messner and Hans Kammerlander climb Gasherbrum II and Hidden Peak in one push without returning to base camp, the first traverse of two 8,000 m peaks.' },
   { year: 1996, title: 'The commercial peak', text: 'With a straightforward line and a shared base camp, Gasherbrum II becomes the standard first 8,000 m peak of the Karakoram; dozens summit each July.' },
-  { year: 2011, highlight: true, title: 'Winter', text: 'Simone Moro, Denis Urubko and Cory Richards make the first winter ascent of a Karakoram 8,000 m peak on 2 February and survive an avalanche on the descent.' },
+  { year: 2011, at: 'summit', highlight: true, title: 'Winter', text: 'Simone Moro, Denis Urubko and Cory Richards make the first winter ascent of a Karakoram 8,000 m peak on 2 February and survive an avalanche on the descent.' },
   { year: 2023, title: 'Record season', text: 'More than a hundred summits in one summer as the Karakoram catches up with Nepal’s commercial model.' },
 ]
 

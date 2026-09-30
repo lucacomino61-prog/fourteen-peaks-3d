@@ -225,15 +225,15 @@ const hazards = [
 
 const timeline = [
   { year: 1892, title: 'Hidden Peak', text: 'Martin Conway’s expedition, the first to explore the upper Baltoro, names the mountain Hidden Peak because it cannot be seen until the head of the glacier.' },
-  { year: 1934, title: 'Reconnaissance', text: 'André Roch and Hans Ertl of Dyhrenfurth’s International Himalayan Expedition climb the south spur to about 6,300 m, the line that would be followed in 1958.' },
-  { year: 1936, title: 'The French', text: 'A French expedition led by Henry de Ségogne pushes the IHE spur, reconnoitred by Roch and Ertl in 1934, to about 6,800 m.' },
-  { year: 1958, highlight: true, title: 'First ascent', text: 'Pete Schoening and Andy Kauffman reach the summit on 5 July for Nick Clinch’s small American expedition, the only first ascent of an 8,000 m peak by Americans.' },
-  { year: 1975, highlight: true, title: 'Alpine style', text: 'Reinhold Messner and Peter Habeler climb the north-west face in three days with one tent and no fixed rope: the first alpine-style ascent of an 8,000 m peak.' },
-  { year: 1977, title: 'Southwest ridge', text: 'Andrej Štremfelj and Nejc Zaplotnik open a new route for a Yugoslav expedition.' },
+  { year: 1934, at: 'route:roch', title: 'Reconnaissance', text: 'André Roch and Hans Ertl of Dyhrenfurth’s International Himalayan Expedition climb the south spur to about 6,300 m, the line that would be followed in 1958.' },
+  { year: 1936, at: 'route:roch', title: 'The French', text: 'A French expedition led by Henry de Ségogne pushes the IHE spur, reconnoitred by Roch and Ertl in 1934, to about 6,800 m.' },
+  { year: 1958, at: 'summit', highlight: true, title: 'First ascent', text: 'Pete Schoening and Andy Kauffman reach the summit on 5 July for Nick Clinch’s small American expedition, the only first ascent of an 8,000 m peak by Americans.' },
+  { year: 1975, at: 'route:messner', highlight: true, title: 'Alpine style', text: 'Reinhold Messner and Peter Habeler climb the north-west face in three days with one tent and no fixed rope: the first alpine-style ascent of an 8,000 m peak.' },
+  { year: 1977, at: 'route:swridge', title: 'Southwest ridge', text: 'Andrej Štremfelj and Nejc Zaplotnik open a new route for a Yugoslav expedition.' },
   { year: 1982, title: 'The north face', text: 'A German expedition (Günter Sturm, Michl Dacher and Sigi Hupfauer) climbs a new route on the north face; Marie-José Valençot becomes the first woman on the summit, and Sylvain Saudan makes the first ski descent from the top of an 8,000 m peak.' },
-  { year: 1983, title: 'The Polish fortnight', text: 'Jerzy Kukuczka and Wojciech Kurtyka climb a new route on the south-west face on 23 July, a week after a new route on Gasherbrum II.' },
+  { year: 1983, at: 'route:swface', title: 'The Polish fortnight', text: 'Jerzy Kukuczka and Wojciech Kurtyka climb a new route on the south-west face on 23 July, a week after a new route on Gasherbrum II.' },
   { year: 1984, title: 'The double traverse', text: 'Messner and Hans Kammerlander traverse Gasherbrum II and Gasherbrum I without returning to base camp, the first traverse of two 8,000 m peaks.' },
-  { year: 2012, title: 'Winter', text: 'Adam Bielecki and Janusz Gołąb make the first winter ascent on 9 March. The same day Gerfried Göschl, Cedric Hählen and Nisar Hussain Sadpara of a second expedition disappear near the summit.' },
+  { year: 2012, at: 'summit', title: 'Winter', text: 'Adam Bielecki and Janusz Gołąb make the first winter ascent on 9 March. The same day Gerfried Göschl, Cedric Hählen and Nisar Hussain Sadpara of a second expedition disappear near the summit.' },
   { year: 2013, title: 'Lost', text: 'Three Spanish climbers disappear on the summit day in July; the summer’s second tragedy on the Karakoram 8,000ers after the Nanga Parbat attack.' },
 ]
 

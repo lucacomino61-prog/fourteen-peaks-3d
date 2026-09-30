@@ -7,12 +7,13 @@ import { alt, metresText, useUnits } from '../lib/units'
 import { mountainPath, mountainTitle } from '../lib/meta'
 import { share, copyLink } from '../lib/share'
 import { downloadStl, PRINT, printScale } from '../lib/stl'
-import { withLang } from '../i18n'
+import { t, withLang } from '../i18n'
 import { WeatherLine, WeatherPanel } from './Weather'
 import Glossed from './Glossed'
 import Season from './Season'
 import { analyticsConfigured } from '../lib/analytics'
-import { Compass, ArrowLeft, ArrowRight, X, Search as SearchIcon, Share as ShareIcon, Sliders } from './Icons'
+import { showOnMap } from '../lib/navigate'
+import { Compass, ArrowLeft, ArrowRight, X, Flag, Search as SearchIcon, Share as ShareIcon, Sliders } from './Icons'
 
 const UPDATED = import.meta.env.VITE_LAST_UPDATED
 const REPO_URL = 'https://github.com/lucacomino61-prog/fourteen-peaks-3d'
@@ -210,10 +211,19 @@ export function History() {
           <p>{peak.historyLead}</p>
         </div>
         <ol className="timeline">
-          {timeline.map((t) => (
-            <li key={t.year} id={`y${t.year}`} className={`tl-item ${t.highlight ? 'is-key' : ''}`}>
-              <div className="year mono">{t.year}</div>
-              <div className="body"><h3>{t.title}</h3><p><Glossed text={t.text} /></p></div>
+          {timeline.map((e) => (
+            <li key={e.year} id={`y${e.year}`} className={`tl-item ${e.highlight ? 'is-key' : ''}`}>
+              <div className="year mono">{e.year}</div>
+              <div className="body">
+                <h3>{e.title}</h3>
+                <p><Glossed text={e.text} /></p>
+                {/* where its own text names a place the model has (lib/history.js) */}
+                {e.at && (
+                  <button type="button" className="tl-map" onClick={() => showOnMap(e)} aria-label={`${t('Show on the mountain')}: ${e.year}, ${e.title}`}>
+                    <Flag /><span>{t('Show on the mountain')}</span>
+                  </button>
+                )}
+              </div>
             </li>
           ))}
         </ol>

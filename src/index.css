@@ -405,12 +405,23 @@ section { position: relative; }
 }
 .detail.is-open { opacity: 1; transform: none; pointer-events: auto; }
 .detail .kicker { font-family: var(--font-mono); font-size: 0.75rem; color: var(--snow-3); display: flex; justify-content: space-between; gap: 12px; padding-right: 36px; }
+.detail .kicker span:last-child { flex: none; white-space: nowrap; }
 .detail h3 { font-size: var(--step-2); font-weight: 600; }
 .detail p { font-size: 0.875rem; color: var(--snow-2); line-height: 1.5; }
 .detail ul { margin: 4px 0 0; padding: 0 0 0 16px; list-style: disc; font-size: 0.8125rem; color: var(--snow-2); display: grid; gap: 4px; }
 .detail .close { position: absolute; top: 8px; right: 8px; }
 .detail .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; font-size: 0.8125rem; padding-top: 8px; border-top: 1px solid var(--line); }
 .detail .row span { color: var(--snow-3); display: block; font-size: 0.6875rem; font-family: var(--font-mono); margin-bottom: 2px; }
+/* a year of the history (ui/Explorer.jsx): the year, the other years at the place, the way back */
+.detail .detail-year { color: var(--signal-ink); margin-right: 0.2em; }
+.detail-years { display: flex; flex-wrap: wrap; gap: 6px; }
+.detail-years button { min-height: 32px; padding: 0 10px; border: 1px solid var(--line); border-radius: 99px; font-size: 0.75rem; color: var(--snow-2); transition: border-color 160ms ease, color 160ms ease, transform 160ms var(--ease-out); }
+.detail-years button:active { transform: scale(0.97); }
+.detail-years button[aria-pressed='true'] { border-color: var(--snow); color: var(--snow); }
+@media (hover: hover) and (pointer: fine) { .detail-years button:hover { border-color: rgb(var(--snow-rgb) / 0.6); color: var(--snow); } }
+.detail-back { display: inline-flex; align-items: center; gap: 6px; justify-self: start; min-height: 32px; font-size: 0.8125rem; color: var(--snow-2); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
+.detail-back svg { width: 14px; height: 14px; }
+@media (hover: hover) and (pointer: fine) { .detail-back:hover { color: var(--snow); text-decoration-color: currentColor; } }
 
 /* markers (inside canvas Html) */
 /* the dot's centre sits on the 3D point (half the dot's width back, half the row's height up) */
@@ -437,9 +448,21 @@ section { position: relative; }
 .hz-grave .hz-icon { background: var(--hz); color: #0b0d12; }
 .hz-label { font-size: 0.75rem; color: #fff; white-space: nowrap; text-shadow: var(--halo-map); }
 .stage[data-mode='explorer'] .hz { pointer-events: auto; cursor: pointer; }
+/* a year of the history where it happened (scene/Events.jsx): a flag whose pole stands on the 3D
+   point, its years on the cloth; the colours are the map's own, not the theme's, like the labels */
+.ev { position: relative; display: grid; justify-items: start; transform: translate(-1px, -100%); transition: opacity 260ms ease; }
+/* the pole's foot: all that stays of a flag crowded out by a more important name */
+.ev::after { content: ''; position: absolute; left: -2px; bottom: -3px; width: 6px; height: 6px; background: #ecebe6; transform: rotate(45deg); box-shadow: 0 0 0 1.5px rgb(0 0 0 / 0.35); transition: background-color 160ms ease; }
+.ev.is-selected::after { background: #ff5b2e; }
+.ev[data-hidden='1'] { opacity: 0; }
+.ev-tag { padding: 4px 7px; font-size: 0.6875rem; line-height: 1; white-space: nowrap; color: #0b0d12; background: #ecebe6; border-radius: 0 2px 2px 0; box-shadow: 0 1px 8px rgb(0 0 0 / 0.4); transition: opacity 200ms ease, background-color 160ms ease; }
+.ev-pole { width: 2px; height: 22px; background: #ecebe6; box-shadow: 0 0 0 1px rgb(0 0 0 / 0.3); transition: opacity 200ms ease, background-color 160ms ease; }
+.ev.is-selected .ev-tag, .ev.is-selected .ev-pole { background: #ff5b2e; }
+@media (hover: hover) and (pointer: fine) { .ev:not(.is-selected):hover .ev-tag { background: #fff; } }
+.stage[data-mode='explorer'] .ev { pointer-events: auto; cursor: pointer; }
 /* a name crowded out by a more important one (scene/Declutter.jsx): the dot or icon stays */
 .mk-label, .hz-label { transition: opacity 200ms ease; }
-.mk[data-crowded='1'] .mk-label, .hz[data-crowded='1'] .hz-label { opacity: 0; }
+.mk[data-crowded='1'] .mk-label, .hz[data-crowded='1'] .hz-label, .ev[data-crowded='1'] .ev-tag, .ev[data-crowded='1'] .ev-pole { opacity: 0; }
 
 /* ---------- content sections ---------- */
 .content { background: var(--night); }
@@ -548,6 +571,12 @@ section { position: relative; }
 .tl-item.is-key .year { color: var(--signal-ink); }
 .tl-item h3 { font-size: var(--step-1); font-weight: 600; }
 .tl-item p { font-size: 0.9375rem; color: var(--snow-2); }
+/* the entry on the mountain (lib/navigate.js showOnMap) */
+.tl-map { display: inline-flex; align-items: center; gap: 7px; justify-self: start; min-height: 32px; margin-top: 2px; font-size: 0.8125rem; color: var(--snow-3); transition: color 160ms ease, transform 160ms var(--ease-out); }
+.tl-map svg { width: 15px; height: 15px; }
+.tl-map span { text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px; transition: text-decoration-color 160ms ease; }
+.tl-map:active { transform: scale(0.97); }
+@media (hover: hover) and (pointer: fine) { .tl-map:hover { color: var(--snow); } .tl-map:hover span { text-decoration-color: currentColor; } }
 
 /* footer */
 .footer { padding: var(--space-2xl) 0 var(--space-xl); border-top: 1px solid var(--line); color: var(--snow-3); font-size: 0.8125rem; }
@@ -664,7 +693,7 @@ section { position: relative; }
   .nav-brand, .nav-menu { min-height: 44px; min-width: 44px; align-items: center; }
   .hero-index-btn { padding: 13px 0; margin: -13px 0; }
   .route-row .eye { width: 44px; height: 44px; }
-  .toggle, .btn-small { min-height: 44px; }
+  .toggle, .btn-small, .tl-map, .detail-years button, .detail-back { min-height: 44px; }
   .close { width: 44px; height: 44px; }
   .hero-side { display: none; }
   .hero { padding-bottom: 5rem; }
@@ -1030,7 +1059,7 @@ html { overflow-anchor: none; }
 .ascent[data-leaving='1'] .ascent-card { visibility: hidden; transition: opacity 180ms ease, visibility 0s linear 180ms; }
 
 /* a 3D marker that would sit under the nav hides (scene/Declutter.jsx) */
-.mk[data-under='1'], .hz[data-under='1'] { opacity: 0; pointer-events: none; }
+.mk[data-under='1'], .hz[data-under='1'], .ev[data-under='1'] { opacity: 0; pointer-events: none; }
 
 /* the route card's facts fold behind a button on phones */
 .facts-toggle {

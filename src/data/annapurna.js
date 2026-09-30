@@ -263,17 +263,17 @@ const hazards = [
 ]
 
 const timeline = [
-  { year: 1950, highlight: true, title: 'The first eight-thousander', text: 'Maurice Herzog and Louis Lachenal reach the summit on 3 June by the north face, the first 8,000 m peak ever climbed, three years before Everest. Both lose their toes; Herzog his fingers. His book, Annapurna, becomes the best-selling mountaineering book of all time.' },
-  { year: 1970, highlight: true, title: 'The South Face', text: 'Chris Bonington’s expedition climbs the 3,000 m south face, the start of big-wall climbing in the Himalaya. Don Whillans and Dougal Haston summit on 27 May; Ian Clough is killed by a serac the next day.' },
-  { year: 1977, title: 'The Dutch Rib', text: 'Van Rijswick and Sonam Sherpa reach the summit on 13 October by a rib east of the Sickle gully that avoids the worst of the serac. It becomes the modern normal route.' },
-  { year: 1978, title: 'A Woman’s Place', text: 'Arlene Blum’s American Women’s Himalayan Expedition puts Irene Miller and Vera Komarkova on the summit on 15 October, the first Americans. Two days later Vera Watson and Alison Chadwick-Onyszkiewicz fall to their deaths.' },
-  { year: 1984, title: 'The traverse', text: 'Erhard Loretan and Norbert Joos climb the entire east ridge over all three summits in alpine style and descend the north face.' },
-  { year: 1985, title: 'Northwest Face', text: 'Reinhold Messner and Hans Kammerlander climb a new line on the north-west face in a few days without fixed ropes.' },
-  { year: 1987, title: 'Winter', text: 'Jerzy Kukuczka and Artur Hajzer make the first winter ascent on 3 February, in the worst weather of the Polish winter campaigns.' },
-  { year: 1992, title: 'Béghin and Lafaille', text: 'Pierre Béghin dies when an abseil anchor fails at 7,400 m on the south face. Jean-Christophe Lafaille, hit by rockfall that breaks his arm, descends alone for five days.' },
-  { year: 1997, title: 'Boukreev', text: 'Anatoli Boukreev, hero of the 1996 Everest disaster, is killed with Dimitri Sobolev by an avalanche on the south face on Christmas Day.' },
-  { year: 2002, title: 'Lafaille returns', text: 'Ten years after his escape, Lafaille reaches the summit with Alberto Iñurrategi by the east ridge.' },
-  { year: 2013, title: 'Steck', text: 'Ueli Steck climbs the south face alone in 28 hours by the Béghin–Lafaille line and wins a Piolet d’Or. With no photographs or GPS track, the ascent is disputed to this day.' },
+  { year: 1950, at: 'summit', highlight: true, title: 'The first eight-thousander', text: 'Maurice Herzog and Louis Lachenal reach the summit on 3 June by the north face, the first 8,000 m peak ever climbed, three years before Everest. Both lose their toes; Herzog his fingers. His book, Annapurna, becomes the best-selling mountaineering book of all time.' },
+  { year: 1970, at: 'route:southface', highlight: true, title: 'The South Face', text: 'Chris Bonington’s expedition climbs the 3,000 m south face, the start of big-wall climbing in the Himalaya. Don Whillans and Dougal Haston summit on 27 May; Ian Clough is killed by a serac the next day.' },
+  { year: 1977, at: 'route:dutch', title: 'The Dutch Rib', text: 'Van Rijswick and Sonam Sherpa reach the summit on 13 October by a rib east of the Sickle gully that avoids the worst of the serac. It becomes the modern normal route.' },
+  { year: 1978, at: 'summit', title: 'A Woman’s Place', text: 'Arlene Blum’s American Women’s Himalayan Expedition puts Irene Miller and Vera Komarkova on the summit on 15 October, the first Americans. Two days later Vera Watson and Alison Chadwick-Onyszkiewicz fall to their deaths.' },
+  { year: 1984, at: 'route:eastridge', title: 'The traverse', text: 'Erhard Loretan and Norbert Joos climb the entire east ridge over all three summits in alpine style and descend the north face.' },
+  { year: 1985, at: 'route:nwface', title: 'Northwest Face', text: 'Reinhold Messner and Hans Kammerlander climb a new line on the north-west face in a few days without fixed ropes.' },
+  { year: 1987, at: 'summit', title: 'Winter', text: 'Jerzy Kukuczka and Artur Hajzer make the first winter ascent on 3 February, in the worst weather of the Polish winter campaigns.' },
+  { year: 1992, at: 'hazard:south-face', title: 'Béghin and Lafaille', text: 'Pierre Béghin dies when an abseil anchor fails at 7,400 m on the south face. Jean-Christophe Lafaille, hit by rockfall that breaks his arm, descends alone for five days.' },
+  { year: 1997, at: 'hazard:south-face', title: 'Boukreev', text: 'Anatoli Boukreev, hero of the 1996 Everest disaster, is killed with Dimitri Sobolev by an avalanche on the south face on Christmas Day.' },
+  { year: 2002, at: 'route:eastridge', title: 'Lafaille returns', text: 'Ten years after his escape, Lafaille reaches the summit with Alberto Iñurrategi by the east ridge.' },
+  { year: 2013, at: 'hazard:south-face', title: 'Steck', text: 'Ueli Steck climbs the south face alone in 28 hours by the Béghin–Lafaille line and wins a Piolet d’Or. With no photographs or GPS track, the ascent is disputed to this day.' },
   { year: 2021, title: 'Commercial season', text: 'Fixed ropes and bottled oxygen bring a record season: more than sixty summits in a single spring, more than the previous decade combined.' },
   { year: 2023, title: 'Out of the crevasse', text: 'Anurag Maloo is pulled alive from a crevasse below Camp 3 three days after falling into it, one of the most remarkable rescues in the Himalaya. Two other climbers die on the mountain that week.' },
 ]

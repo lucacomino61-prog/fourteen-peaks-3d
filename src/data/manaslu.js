@@ -259,14 +259,14 @@ const hazards = [
 const timeline = [
   { year: 1950, title: 'Tilman', text: 'H. W. Tilman’s party reaches 5,500 m on the north-east side and photographs a possible line.' },
   { year: 1954, title: 'Turned away', text: 'Villagers of Samagaon block a Japanese expedition, blaming its predecessor for the avalanche that destroyed the Pungyen monastery and killed eighteen people.' },
-  { year: 1956, highlight: true, title: 'First ascent', text: 'Toshio Imanishi and Gyalzen Norbu reach the summit on 9 May for Yūkō Maki’s Japanese expedition, the first 8,000 m peak climbed by a Japanese team.' },
-  { year: 1971, title: 'Northwest spur', text: 'A Japanese team opens the second route on the mountain.' },
-  { year: 1972, highlight: true, title: 'Fifteen dead, and Messner', text: 'On 10 April an avalanche kills fifteen members of a Korean expedition. Two weeks later Reinhold Messner climbs the south-west face solo from the top camp; Franz Jäger and Andi Schlick die in the storm that follows.' },
-  { year: 1974, title: 'The women’s ascent', text: 'A Japanese women’s expedition puts Naoko Nakaseko, Masako Uchida and Mieko Mori on the summit on 4 May, the first women on any 8,000 m peak.' },
-  { year: 1984, title: 'Winter', text: 'Maciej Berbeka and Ryszard Gajewski make the first winter ascent on 12 January by the 1972 Messner route from the south.' },
-  { year: 1986, title: 'Kukuczka', text: 'Jerzy Kukuczka and Artur Hajzer climb a new route on the north-east face on 10 November in alpine style, Kukuczka’s twelfth of the fourteen; Carlos Carsolio stops at the last bivouac with frostbite.' },
-  { year: 2012, title: 'Camp 3', text: 'A serac avalanche buries Camp 3 before dawn on 23 September; eleven climbers die, the mountain’s second mass tragedy.' },
-  { year: 2021, highlight: true, title: 'The false summit', text: 'Drone footage proves that the great majority of recorded ascents stopped on the fore-summit; from 2022 Nepal requires photographs from the true top.' },
+  { year: 1956, at: 'summit', highlight: true, title: 'First ascent', text: 'Toshio Imanishi and Gyalzen Norbu reach the summit on 9 May for Yūkō Maki’s Japanese expedition, the first 8,000 m peak climbed by a Japanese team.' },
+  { year: 1971, at: 'route:nwspur', title: 'Northwest spur', text: 'A Japanese team opens the second route on the mountain.' },
+  { year: 1972, at: 'route:swface', highlight: true, title: 'Fifteen dead, and Messner', text: 'On 10 April an avalanche kills fifteen members of a Korean expedition. Two weeks later Reinhold Messner climbs the south-west face solo from the top camp; Franz Jäger and Andi Schlick die in the storm that follows.' },
+  { year: 1974, at: 'summit', title: 'The women’s ascent', text: 'A Japanese women’s expedition puts Naoko Nakaseko, Masako Uchida and Mieko Mori on the summit on 4 May, the first women on any 8,000 m peak.' },
+  { year: 1984, at: 'route:south', title: 'Winter', text: 'Maciej Berbeka and Ryszard Gajewski make the first winter ascent on 12 January by the 1972 Messner route from the south.' },
+  { year: 1986, at: 'route:east', title: 'Kukuczka', text: 'Jerzy Kukuczka and Artur Hajzer climb a new route on the north-east face on 10 November in alpine style, Kukuczka’s twelfth of the fourteen; Carlos Carsolio stops at the last bivouac with frostbite.' },
+  { year: 2012, at: 'hazard:camp3-slope', title: 'Camp 3', text: 'A serac avalanche buries Camp 3 before dawn on 23 September; eleven climbers die, the mountain’s second mass tragedy.' },
+  { year: 2021, at: 'hazard:false-summit', highlight: true, title: 'The false summit', text: 'Drone footage proves that the great majority of recorded ascents stopped on the fore-summit; from 2022 Nepal requires photographs from the true top.' },
   { year: 2022, title: 'Record season', text: 'More than 400 summits in one autumn. Hilaree Nelson dies in a fall from the summit ridge; an avalanche below Camp 4 kills a Nepali climber.' },
 ]
 

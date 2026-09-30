@@ -7,9 +7,10 @@ import { loupe } from '../lib/loupe'
 // Order: the loupe and its read-out (nothing is written across the map in the lens), the
 // interface floating over the 3D (route tabs, the stop card, the altimeter, the explorer's panel
 // and sheet, the hero's controls), the summit, the active route's camps, hazards, then the dimmed
-// camps of other routes. A marker that would sit under the nav bar hides altogether: the nav's
+// camps of other routes; the History layer's flags come after the active route's camps (a selected
+// one with them). A marker that would sit under the nav bar hides altogether: the nav's
 // pills are see-through, and a name read through them looked broken.
-const RANK = ['.mk-summit', '.mk:not(.mk-dim)', '.hz', '.mk-dim']
+const RANK = ['.mk-summit', '.ev.is-selected', '.mk:not(.mk-dim)', '.ev', '.hz', '.mk-dim']
 const UI = ['.ascent-tabs', '.ascent-card.is-active', '.ascent[data-active="1"] .altimeter', '.panel', '.detail.is-open', '.explorer-continue', '.hero-min', '.hero-side', '.hero > .switch', '.routes-menu.is-open', '.consent']
 const GAP = 4 // px of clearance a hidden label needs before its text comes back (no flicker)
 const LENS_MARGIN = 24 // px around the loupe kept clear of names
@@ -41,7 +42,7 @@ export default function Declutter() {
       }
     }
     const navBottom = document.querySelector('.nav')?.getBoundingClientRect().bottom || 0
-    for (const el of root.querySelectorAll('.mk, .hz')) {
+    for (const el of root.querySelectorAll('.mk, .hz, .ev')) {
       const under = el.getBoundingClientRect().top < navBottom ? '1' : '0'
       if (el.dataset.under !== under) el.dataset.under = under
     }
@@ -51,7 +52,7 @@ export default function Declutter() {
         if (seen.has(el)) continue
         seen.add(el)
         if (el.dataset.hidden === '1' || el.dataset.under === '1') continue
-        const text = el.querySelector('.mk-label, .hz-label')
+        const text = el.querySelector('.mk-label, .hz-label, .ev-tag')
         if (!text) continue
         const r = text.getBoundingClientRect()
         const pad = el.dataset.crowded === '1' ? GAP : 0

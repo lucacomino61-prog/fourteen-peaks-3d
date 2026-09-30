@@ -102,7 +102,8 @@ export const useStore = create((set, get) => ({
   showCamps: true,
   showHazards: true,
   showDeathZone: false,
-  selected: null, // { type: 'camp' | 'hazard' | 'route', id, routeId }
+  showHistory: false, // the explorer's History layer: a flag where each year of the history happened (scene/Events.jsx)
+  selected: null, // { type: 'camp' | 'hazard' | 'route', id, routeId }, or { type: 'history', id: its place, year }
   hovered: null,
   quality: 'high',
   dpr: 1, // the drawing buffer's pixel ratio, steered by scene/Resolution.jsx

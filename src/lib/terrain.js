@@ -113,7 +113,13 @@ function buildTerrain(id, base, meta, detail, detail2, height, W, H, lo) {
     }
     return null
   }
-  return { id, base, meta, detail, detail2, geo, height, heightTexture, elevationAt, surface, heightAtScene, lineOfSight, snapToPeak, hitTest, lo }
+  const terrain = { id, base, meta, detail, detail2, geo, heightTexture, elevationAt, surface, heightAtScene, lineOfSight, snapToPeak, hitTest, lo }
+  // The heights themselves (4 million numbers for a full map) are kept off the enumerable keys:
+  // React's development build lists every enumerable value of a changed prop in the browser's
+  // Performance panel, and with them a switch of mountain built 150 million rows and froze the
+  // page for a minute, or ran it out of memory (npm run dev only; builds don't do this).
+  Object.defineProperty(terrain, 'height', { value: height, enumerable: false })
+  return terrain
 }
 
 /**

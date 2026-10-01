@@ -360,6 +360,21 @@ function freeTexture(t) {
   t.dispose()
   if (t.image && typeof t.image.close === 'function') t.image.close() // an ImageBitmap's memory
 }
+function freeGrid(g) {
+  g.dispose()
+  for (const a of [g.index, ...Object.values(g.attributes)]) if (a) a.array = null
+}
+
+// What an effect's cleanup frees goes a task later, and only if no effect has taken it back by
+// then: in development React runs every cleanup and then the effect again with the same objects
+// (StrictMode, Fast Refresh), and a grid emptied then is drawn from null arrays, every frame.
+const pendingFree = new WeakMap()
+function keep(things) {
+  for (const t of things) { clearTimeout(pendingFree.get(t)); pendingFree.delete(t) }
+}
+function freeSoon(things, free) {
+  for (const t of things) pendingFree.set(t, setTimeout(() => { pendingFree.delete(t); free(t) }))
+}
 
 /** The first-paint albedo through useLoader (suspense), decoded the same way. */
 class FirstPaintLoader {
@@ -673,14 +688,17 @@ export default function Terrain({ terrain, quality = 'high' }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [terrain.id, tier, uniforms, hasDetail, hasDetail2, uploader])
 
-  useEffect(() => () => { materials.base.dispose(); materials.patch.dispose() }, [materials])
+  useEffect(() => {
+    const both = [materials.base, materials.patch]
+    keep(both)
+    return () => freeSoon(both, (m) => m.dispose())
+  }, [materials])
   // the grids leave with the mountain: their GPU buffers, and their CPU copies too (up to 37 MB),
   // since React can hold on to an unmounted tree until the next switch
-  useEffect(() => () => {
-    for (const g of [baseGeometry, patchGeometry]) {
-      g.dispose()
-      for (const a of [g.index, ...Object.values(g.attributes)]) if (a) a.array = null
-    }
+  useEffect(() => {
+    const grids = [baseGeometry, patchGeometry]
+    keep(grids)
+    return () => freeSoon(grids, freeGrid)
   }, [baseGeometry, patchGeometry])
 
   const ndc = useMemo(() => new THREE.Vector2(), [])

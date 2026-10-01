@@ -653,6 +653,11 @@ export default function Terrain({ terrain, quality = 'high' }) {
 
   // stream the full-resolution textures in after first paint: light → albedo → detail → summit
   // detail. Each is decoded while the one before it goes up to the GPU by the band.
+  // A texture on screen stays there until the one that replaces it has arrived, or the terrain
+  // goes: a change of tier (the battery saver, a slow GPU's rescue) loads only the files that
+  // differ, and draws the old ones meanwhile. (They were freed at once, and drawn from emptied
+  // pixels: the mountain went dark for a second and WebGL warned "no pixels".)
+  const shown = useRef(new Map()) // uniform → { tex, file, on }
   useEffect(() => {
     let alive = true
     const owned = [], uploads = []
@@ -662,11 +667,20 @@ export default function Terrain({ terrain, quality = 'high' }) {
       hasDetail && { file: tier.detail, key: 'uDetail', on: 'uDetailOn', mark: 'detail' },
       hasDetail2 && { file: tier.detail2, key: 'uDetail2', on: 'uDetail2On', mark: 'detail2' },
     ].filter(Boolean)
-    const fetchLayer = (i) => (i < layers.length ? loadTexture(terrain.base + layers[i].file) : Promise.resolve(null))
+    // a layer this tier doesn't have (its material no longer reads it) goes back to the first paint
+    for (const [key, s] of shown.current) {
+      if (layers.some((l) => l.key === key)) continue
+      uniforms[key].value = first
+      if (s.on) uniforms[s.on].value = 0
+      freeTexture(s.tex)
+      shown.current.delete(key)
+    }
+    const todo = layers.filter((l) => shown.current.get(l.key)?.file !== l.file)
+    const fetchLayer = (i) => (i < todo.length ? loadTexture(terrain.base + todo[i].file) : Promise.resolve(null))
     const drop = (p) => p.then((t) => t && freeTexture(t))
     ;(async () => {
       let next = fetchLayer(0)
-      for (let i = 0; i < layers.length; i++) {
+      for (let i = 0; i < todo.length; i++) {
         const t = await next // missing layer: null, keep going
         next = fetchLayer(i + 1)
         if (!alive) { if (t) freeTexture(t); drop(next); return }
@@ -678,15 +692,24 @@ export default function Terrain({ terrain, quality = 'high' }) {
           if (!(await up.done) || !alive) { drop(next); return }
           t.image.data = null // on the GPU now (a restored context remounts the terrain: Scene.jsx)
         }
-        const { key, on, mark } = layers[i]
+        const { key, on, mark, file } = todo[i]
+        const old = shown.current.get(key)
         uniforms[key].value = t
         if (on) uniforms[on].value = 1
+        shown.current.set(key, { tex: t, file, on })
+        owned.splice(owned.indexOf(t), 1) // on screen: freed when replaced, or with the terrain
+        if (old) freeTexture(old.tex)
         performance.mark(`tex:${mark}:${terrain.id}`)
       }
     })()
     return () => { alive = false; uploads.forEach((u) => u.cancel()); owned.forEach(freeTexture) }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [terrain.id, tier, uniforms, hasDetail, hasDetail2, uploader])
+  useEffect(() => {
+    const textures = shown.current
+    keep([textures])
+    return () => freeSoon([textures], (m) => { for (const s of m.values()) freeTexture(s.tex); m.clear() })
+  }, [])
 
   useEffect(() => {
     const both = [materials.base, materials.patch]

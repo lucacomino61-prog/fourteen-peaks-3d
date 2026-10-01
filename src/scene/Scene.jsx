@@ -45,7 +45,15 @@ export default function Scene({ terrain }) {
   const { routes, peak } = mountain
   const paths = useMemo(() => buildPaths(terrain, routes), [terrain, routes])
   const summit = useMemo(() => terrain.snapToPeak(peak.lat, peak.lon), [terrain, peak])
-  useEffect(() => { set({ paths }) }, [paths, set])
+  // The routes' lines go to the store for the mountain on screen. A switch clears them until the new
+  // mountain's terrain is here; back to this one before that (→ then Back at once), the terrain and
+  // its lines never changed, so they are given again: without them the address, the head and the
+  // climbs stayed waiting (the title said K2 over Everest, and a route had no stops).
+  const mountainId = useStore((s) => s.mountainId)
+  const shownPaths = useStore((s) => s.paths)
+  useEffect(() => {
+    if (terrain.id === mountainId && shownPaths !== paths) set({ paths })
+  }, [paths, shownPaths, terrain.id, mountainId, set])
   // tier is decided synchronously on first render so the terrain compiles once; only a GPU that
   // can't keep up even at half resolution gets it changed, to the lightest (<Resolution>)
   const [tier, setTier] = useState(() => { const q = quality(); useStore.setState({ quality: q }); return q })

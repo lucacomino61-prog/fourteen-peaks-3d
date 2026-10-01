@@ -86,8 +86,13 @@ export function lockScroll(on) {
  * first: Lenis skips a jump to where it believes the page already is, and it learns of a scroll it
  * did not make only at the next frame. Focus scrolled a history entry's button into view, Enter
  * asked for the explorer, where Lenis still thought the page was, and the page stayed put.
+ * Lenis also holds a jump to the page height it last measured, and it measures again only 250 ms
+ * after the page changes size: a link to a summit, opened as the climb was laid out, was pulled
+ * back to the bottom of the shorter page, Camp 2 (one load in six). So it measures first, and
+ * from where the page is now.
  */
 export function jumpTo(y) {
+  if (lenis) lenis.resize()
   window.scrollTo(0, y) // (Safari before 16 rejects behavior: 'instant')
   if (lenis) lenis.scrollTo(y, { immediate: true, force: true })
 }
